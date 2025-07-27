@@ -1,0 +1,14 @@
+{
+  "name": "api-gateway",
+  "description": "API Gateway for CloudBase Functions",
+  "routes": [
+    {
+      "path": "/api/*",
+      "target": {
+        "type": "function",
+        "function": "api"
+      },
+      "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    }
+  ]
+} 

@@ -1,0 +1,138 @@
+<!--pages/register/register.wxml-->
+<view class="container">
+  <view class="register-header">
+    <text class="title">创建账号</text>
+    <text class="subtitle">加入AI助手，开启智能对话</text>
+  </view>
+  
+  <view class="register-form">
+    <!-- 错误提示 -->
+    <view class="error-message" wx:if="{{errorMessage}}">
+      <text>{{errorMessage}}</text>
+    </view>
+    
+    <!-- 邮箱输入框 -->
+    <view class="form-item">
+      <view class="input-wrapper {{formErrors.email ? 'error' : ''}}">
+        <image class="input-icon" src="/images/icon-email.png" mode="aspectFit"></image>
+        <input 
+          class="input" 
+          type="text" 
+          placeholder="邮箱" 
+          value="{{email}}" 
+          bindinput="onInputChange" 
+          data-field="email"
+        />
+      </view>
+      <text class="error-text" wx:if="{{formErrors.email}}">{{formErrors.email}}</text>
+    </view>
+    
+    <!-- 昵称输入框 -->
+    <view class="form-item">
+      <view class="input-wrapper {{formErrors.nickname ? 'error' : ''}}">
+        <image class="input-icon" src="/images/icon-user.png" mode="aspectFit"></image>
+        <input 
+          class="input" 
+          type="text" 
+          placeholder="昵称" 
+          value="{{nickname}}" 
+          bindinput="onInputChange" 
+          data-field="nickname"
+        />
+      </view>
+      <text class="error-text" wx:if="{{formErrors.nickname}}">{{formErrors.nickname}}</text>
+    </view>
+    
+    <!-- 密码输入框 -->
+    <view class="form-item">
+      <view class="input-wrapper {{formErrors.password ? 'error' : ''}}">
+        <image class="input-icon" src="/images/icon-password.png" mode="aspectFit"></image>
+        <input 
+          class="input" 
+          password="{{!showPassword}}" 
+          placeholder="密码" 
+          value="{{password}}" 
+          bindinput="onInputChange" 
+          data-field="password"
+        />
+        <view class="password-toggle" bindtap="togglePasswordVisibility" data-field="showPassword">
+          <image 
+            class="toggle-icon" 
+            src="{{showPassword ? '/images/icon-eye-open.png' : '/images/icon-eye-closed.png'}}" 
+            mode="aspectFit"
+          ></image>
+        </view>
+      </view>
+      <text class="error-text" wx:if="{{formErrors.password}}">{{formErrors.password}}</text>
+    </view>
+    
+    <!-- 确认密码输入框 -->
+    <view class="form-item">
+      <view class="input-wrapper {{formErrors.confirmPassword ? 'error' : ''}}">
+        <image class="input-icon" src="/images/icon-password.png" mode="aspectFit"></image>
+        <input 
+          class="input" 
+          password="{{!showConfirmPassword}}" 
+          placeholder="确认密码" 
+          value="{{confirmPassword}}" 
+          bindinput="onInputChange" 
+          data-field="confirmPassword"
+        />
+        <view class="password-toggle" bindtap="togglePasswordVisibility" data-field="showConfirmPassword">
+          <image 
+            class="toggle-icon" 
+            src="{{showConfirmPassword ? '/images/icon-eye-open.png' : '/images/icon-eye-closed.png'}}" 
+            mode="aspectFit"
+          ></image>
+        </view>
+      </view>
+      <text class="error-text" wx:if="{{formErrors.confirmPassword}}">{{formErrors.confirmPassword}}</text>
+    </view>
+    
+    <!-- 同意条款选项 -->
+    <view class="agree-terms" bindtap="toggleAgreeTerms">
+      <view class="checkbox {{agreeTerms ? 'checked' : ''}}">
+        <icon wx:if="{{agreeTerms}}" type="success" size="16" color="#1aad19"></icon>
+      </view>
+      <view class="terms-text">
+        <text>我已阅读并同意</text>
+        <text class="link" catchtap="navigateToTerms">《用户协议》</text>
+        <text>和</text>
+        <text class="link" catchtap="navigateToPrivacy">《隐私政策》</text>
+      </view>
+    </view>
+    
+    <!-- 注册按钮 -->
+    <button 
+      class="register-btn {{isLoading ? 'loading' : ''}}" 
+      bindtap="handleRegister" 
+      disabled="{{isLoading}}"
+    >
+      <view wx:if="{{isLoading}}" class="loading-icon"></view>
+      <text>注册</text>
+    </button>
+    
+    <!-- 分割线 -->
+    <view class="divider">
+      <view class="line"></view>
+      <text>或</text>
+      <view class="line"></view>
+    </view>
+    
+    <!-- 微信注册按钮 -->
+    <button 
+      class="wechat-btn" 
+      bindtap="handleWechatRegister" 
+      disabled="{{isLoading}}"
+    >
+      <image class="wechat-icon" src="/images/icon-wechat.png" mode="aspectFit"></image>
+      <text>微信一键注册</text>
+    </button>
+  </view>
+  
+  <!-- 底部登录链接 -->
+  <view class="login-link">
+    <text>已有账号？</text>
+    <text class="link" bindtap="navigateToLogin">立即登录</text>
+  </view>
+</view>

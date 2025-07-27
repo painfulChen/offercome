@@ -1,0 +1,293 @@
+<!--pages/login/login.wxml-->
+<view class="container">
+  <!-- 顶部返回按钮 -->
+  <view class="back-btn" bindtap="navigateBack">
+    <image src="/images/icon-back.png" mode="aspectFit"></image>
+  </view>
+  
+  <!-- 登录标题 -->
+  <view class="login-header">
+    <image class="logo" src="/images/logo.png" mode="aspectFit"></image>
+    <text class="title">欢迎使用AI助手</text>
+    <text class="subtitle">登录后体验更多功能</text>
+  </view>
+  
+  <!-- 登录方式切换 -->
+  <view class="login-type-tabs">
+    <view 
+      class="tab-item {{loginType === 'phone' ? 'active' : ''}}" 
+      data-type="phone" 
+      bindtap="switchLoginType"
+    >
+      手机号登录
+    </view>
+    <view 
+      class="tab-item {{loginType === 'wechat' ? 'active' : ''}}" 
+      data-type="wechat" 
+      bindtap="switchLoginType"
+    >
+      微信登录
+    </view>
+  </view>
+  
+  <!-- 手机号登录表单 -->
+  <view class="login-form" wx:if="{{loginType === 'phone'}}">
+    <!-- 手机号输入 -->
+    <view class="input-group">
+      <image class="input-icon" src="/images/icon-phone.png" mode="aspectFit"></image>
+      <input 
+        class="input" 
+        type="number" 
+        placeholder="请输入手机号" 
+        maxlength="11" 
+        value="{{phoneNumber}}" 
+        bindinput="inputPhoneNumber"
+        disabled="{{isLoggingIn}}"
+      />
+    </view>
+    
+    <!-- 验证码输入 -->
+    <view class="input-group verification-group {{showVerificationInput ? 'show' : ''}}">
+      <image class="input-icon" src="/images/icon-lock.png" mode="aspectFit"></image>
+      <input 
+        class="input" 
+        type="number" 
+        placeholder="请输入验证码" 
+        maxlength="6" 
+        value="{{verificationCode}}" 
+        bindinput="inputVerificationCode"
+        disabled="{{isLoggingIn}}"
+      />
+      <view 
+        class="verification-btn {{countdown > 0 ? 'disabled' : ''}}" 
+        bindtap="{{countdown > 0 ? '' : 'sendVerificationCode'}}"
+      >
+        {{countdown > 0 ? countdown + 's后重发' : '获取验证码'}}
+      </view>
+    </view>
+    
+    <!-- 登录按钮 -->
+    <button 
+      class="login-btn" 
+      bindtap="phoneLogin" 
+      disabled="{{isLoggingIn || !phoneNumber || !verificationCode}}"
+      loading="{{isLoggingIn}}"
+    >
+      登录/注册
+    </button>
+  </view>
+  
+  <!-- 微信登录 -->
+  <view class="login-form" wx:if="{{loginType === 'wechat'}}">
+    <view class="wechat-login-tip">
+      <image src="/images/icon-wechat-large.png" mode="aspectFit"></image>
+      <text>使用微信账号快速登录</text>
+    </view>
+    
+    <button 
+      class="wechat-login-btn" 
+      bindtap="wechatLogin" 
+      disabled="{{isLoggingIn}}"
+      loading="{{isLoggingIn}}"
+    >
+      <image src="/images/icon-wechat.png" mode="aspectFit"></image>
+      微信一键登录
+    </button>
+  </view>
+  
+  <!-- 用户协议 -->
+  <view class="terms-section">
+    <view class="checkbox {{agreeToTerms ? 'checked' : ''}}" bindtap="toggleAgreeToTerms">
+      <image wx:if="{{agreeToTerms}}" src="/images/icon-checked.png" mode="aspectFit"></image>
+    </view>
+    <view class="terms-text">
+      我已阅读并同意
+      <text class="link" bindtap="showTerms">《用户协议》</text>
+      和
+      <text class="link" bindtap="showPrivacy">《隐私政策》</text>
+    </view>
+  </view>
+  
+  <!-- 用户协议弹窗 -->
+  <view class="modal-mask" wx:if="{{showTermsModal}}" bindtap="closeTerms"></view>
+  <view class="modal" wx:if="{{showTermsModal}}">
+    <view class="modal-header">
+      <text class="modal-title">用户协议</text>
+      <view class="close-btn" bindtap="closeTerms">
+        <image src="/images/icon-close.png" mode="aspectFit"></image>
+      </view>
+    </view>
+    <scroll-view scroll-y class="modal-content">
+      <view class="terms-content">
+        <view class="terms-title">AI助手用户协议</view>
+        <view class="terms-section">
+          <view class="terms-subtitle">1. 协议的接受与修改</view>
+          <view class="terms-paragraph">
+            欢迎使用AI助手服务。本协议是您与AI助手之间关于使用AI助手服务的法律协议。在您使用AI助手服务之前，请您务必审慎阅读、充分理解本协议各条款内容。
+          </view>
+          <view class="terms-paragraph">
+            我们可能会不时更新本用户协议。当我们这样做时，我们会在应用内通知您，并给您机会查看修订后的条款。继续使用我们的服务将构成您对修订后的协议的接受。
+          </view>
+        </view>
+        
+        <view class="terms-section">
+          <view class="terms-subtitle">2. 服务内容</view>
+          <view class="terms-paragraph">
+            AI助手是一款基于人工智能技术的对话助手应用，为用户提供智能对话、信息查询、内容创作等服务。
+          </view>
+          <view class="terms-paragraph">
+            我们保留随时修改、中断或终止服务的权利，且无需对用户或第三方负责。
+          </view>
+        </view>
+        
+        <view class="terms-section">
+          <view class="terms-subtitle">3. 用户账号</view>
+          <view class="terms-paragraph">
+            您需要注册账号才能使用我们的完整服务。您承诺提供真实、准确、完整的注册信息，并保持信息的及时更新。
+          </view>
+          <view class="terms-paragraph">
+            您应当妥善保管账号及密码信息，对账号下的所有活动负责。如发现任何未经授权使用您账号的情况，请立即通知我们。
+          </view>
+        </view>
+        
+        <view class="terms-section">
+          <view class="terms-subtitle">4. 用户行为规范</view>
+          <view class="terms-paragraph">
+            您同意不使用AI助手从事以下行为：
+          </view>
+          <view class="terms-list">
+            <view class="terms-list-item">- 违反法律法规或侵犯他人合法权益的行为</view>
+            <view class="terms-list-item">- 上传、发布含有色情、暴力、恐怖、赌博等违法违规内容</view>
+            <view class="terms-list-item">- 干扰或破坏AI助手服务或服务器的行为</view>
+            <view class="terms-list-item">- 未经授权收集其他用户信息的行为</view>
+          </view>
+        </view>
+        
+        <view class="terms-section">
+          <view class="terms-subtitle">5. 知识产权</view>
+          <view class="terms-paragraph">
+            AI助手及其相关的所有知识产权归我们所有。未经我们明确书面许可，您不得复制、修改、创作衍生作品、反向工程、反编译或以其他方式尝试发现源代码。
+          </view>
+        </view>
+        
+        <view class="terms-section">
+          <view class="terms-subtitle">6. 免责声明</view>
+          <view class="terms-paragraph">
+            AI助手提供的服务按"现状"和"可用"的基础提供，不提供任何形式的保证。我们不保证服务一定能满足您的需求，也不保证服务不会中断，对服务的及时性、安全性、准确性也不作保证。
+          </view>
+        </view>
+        
+        <view class="terms-section">
+          <view class="terms-subtitle">7. 协议终止</view>
+          <view class="terms-paragraph">
+            您可以随时停止使用我们的服务。我们也可能在您违反本协议的情况下终止您的账号或停止向您提供服务。
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+    <view class="modal-footer">
+      <button class="modal-btn" bindtap="closeTerms">我已阅读并同意</button>
+    </view>
+  </view>
+  
+  <!-- 隐私政策弹窗 -->
+  <view class="modal-mask" wx:if="{{showPrivacyModal}}" bindtap="closePrivacy"></view>
+  <view class="modal" wx:if="{{showPrivacyModal}}">
+    <view class="modal-header">
+      <text class="modal-title">隐私政策</text>
+      <view class="close-btn" bindtap="closePrivacy">
+        <image src="/images/icon-close.png" mode="aspectFit"></image>
+      </view>
+    </view>
+    <scroll-view scroll-y class="modal-content">
+      <view class="terms-content">
+        <view class="terms-title">AI助手隐私政策</view>
+        <view class="terms-section">
+          <view class="terms-subtitle">1. 引言</view>
+          <view class="terms-paragraph">
+            我们非常重视您的隐私和个人信息保护。本隐私政策旨在向您说明我们如何收集、使用、存储和共享您的个人信息，以及您享有的相关权利。
+          </view>
+        </view>
+        
+        <view class="terms-section">
+          <view class="terms-subtitle">2. 我们收集的信息</view>
+          <view class="terms-paragraph">
+            我们可能收集以下类型的信息：
+          </view>
+          <view class="terms-list">
+            <view class="terms-list-item">- 账号信息：手机号码、微信账号等</view>
+            <view class="terms-list-item">- 个人资料：昵称、头像等</view>
+            <view class="terms-list-item">- 使用数据：对话内容、使用记录等</view>
+            <view class="terms-list-item">- 设备信息：设备型号、操作系统、唯一设备标识符等</view>
+            <view class="terms-list-item">- 位置信息：IP地址等</view>
+          </view>
+        </view>
+        
+        <view class="terms-section">
+          <view class="terms-subtitle">3. 信息的使用</view>
+          <view class="terms-paragraph">
+            我们使用收集的信息用于：
+          </view>
+          <view class="terms-list">
+            <view class="terms-list-item">- 提供、维护和改进我们的服务</view>
+            <view class="terms-list-item">- 处理您的请求和回应您的问询</view>
+            <view class="terms-list-item">- 发送服务通知和更新</view>
+            <view class="terms-list-item">- 防止欺诈和增强安全性</view>
+            <view class="terms-list-item">- 进行数据分析和研究</view>
+          </view>
+        </view>
+        
+        <view class="terms-section">
+          <view class="terms-subtitle">4. 信息的共享</view>
+          <view class="terms-paragraph">
+            除以下情况外，我们不会与第三方共享您的个人信息：
+          </view>
+          <view class="terms-list">
+            <view class="terms-list-item">- 经您明确同意</view>
+            <view class="terms-list-item">- 与我们的服务提供商共享以提供服务</view>
+            <view class="terms-list-item">- 遵守法律法规要求或政府强制性命令</view>
+            <view class="terms-list-item">- 保护我们或公众的权利、财产或安全</view>
+          </view>
+        </view>
+        
+        <view class="terms-section">
+          <view class="terms-subtitle">5. 信息安全</view>
+          <view class="terms-paragraph">
+            我们采取合理的技术和组织措施来保护您的个人信息不被未经授权的访问、使用或泄露。但请注意，互联网传输不是完全安全的，我们无法保证信息传输的绝对安全性。
+          </view>
+        </view>
+        
+        <view class="terms-section">
+          <view class="terms-subtitle">6. 您的权利</view>
+          <view class="terms-paragraph">
+            根据适用的数据保护法律，您可能拥有以下权利：
+          </view>
+          <view class="terms-list">
+            <view class="terms-list-item">- 访问您的个人信息</view>
+            <view class="terms-list-item">- 更正不准确的个人信息</view>
+            <view class="terms-list-item">- 删除您的个人信息</view>
+            <view class="terms-list-item">- 限制或反对处理您的个人信息</view>
+            <view class="terms-list-item">- 数据可携带性</view>
+          </view>
+        </view>
+        
+        <view class="terms-section">
+          <view class="terms-subtitle">7. 隐私政策的更新</view>
+          <view class="terms-paragraph">
+            我们可能会不时更新本隐私政策。当我们这样做时，我们会在应用内通知您，并给您机会查看修订后的政策。继续使用我们的服务将构成您对修订后的隐私政策的接受。
+          </view>
+        </view>
+        
+        <view class="terms-section">
+          <view class="terms-subtitle">8. 联系我们</view>
+          <view class="terms-paragraph">
+            如果您对本隐私政策有任何疑问或建议，请通过应用内的"意见反馈"功能或发送邮件至support@aiassistant.com与我们联系。
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+    <view class="modal-footer">
+      <button class="modal-btn" bindtap="closePrivacy">我已阅读并同意</button>
+    </view>
+  </view>
+</view>

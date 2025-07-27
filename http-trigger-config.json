@@ -1,0 +1,9 @@
+{
+  "functionName": "api",
+  "triggerName": "api-http-trigger",
+  "type": "http",
+  "config": {
+    "path": "/api/*",
+    "method": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+  }
+} 

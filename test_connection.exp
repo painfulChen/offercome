@@ -1,0 +1,22 @@
+#!/usr/bin/expect -f
+set timeout 30
+set server_ip "124.222.117.47"
+set username "ubuntu"
+set password "Somkouny2016@g"
+
+spawn ssh $username@$server_ip
+expect {
+    "yes/no" { send "yes\r"; exp_continue }
+    "password:" { send "$password\r" }
+}
+expect "$ "
+send "echo '连接成功！'\r"
+expect "连接成功！"
+send "lsb_release -a\r"
+expect "$ "
+send "free -h\r"
+expect "$ "
+send "df -h\r"
+expect "$ "
+send "exit\r"
+expect eof

@@ -1,0 +1,71 @@
+<!--pages/index/index.wxml-->
+<view class="container">
+  <!-- 头部欢迎区域 -->
+  <view class="header">
+    <view class="welcome">
+      <text class="title">欢迎使用AI助手</text>
+      <text class="subtitle">智能对话 • 代码生成 • 图像创作</text>
+    </view>
+    
+    <!-- 用户信息或登录按钮 -->
+    <view class="user-section" wx:if="{{isLoggedIn}}">
+      <image class="avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+      <text class="username">{{userInfo.username || '用户'}}</text>
+    </view>
+    <view class="login-section" wx:else>
+      <button class="login-btn" bindtap="goToLogin">登录</button>
+      <button class="register-btn" bindtap="goToRegister">注册</button>
+    </view>
+  </view>
+
+  <!-- 快速操作区域 -->
+  <view class="quick-actions">
+    <text class="section-title">快速操作</text>
+    <view class="action-grid">
+      <view class="action-item" wx:for="{{quickActions}}" wx:key="id" bindtap="handleQuickAction" data-action="{{item.action}}">
+        <view class="action-icon">{{item.title[0]}}</view>
+        <text class="action-title">{{item.title}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 功能模块区域 -->
+  <view class="features">
+    <text class="section-title">AI功能</text>
+    <view class="feature-grid">
+      <view class="feature-item" wx:for="{{features}}" wx:key="id" bindtap="goToFeature" data-url="{{item.url}}">
+        <image class="feature-icon" src="{{item.icon}}" mode="aspectFit"></image>
+        <view class="feature-content">
+          <text class="feature-title">{{item.title}}</text>
+          <text class="feature-desc">{{item.desc}}</text>
+        </view>
+        <view class="feature-arrow">></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 使用统计 -->
+  <view class="stats" wx:if="{{isLoggedIn}}">
+    <text class="section-title">使用统计</text>
+    <view class="stats-grid">
+      <view class="stat-item">
+        <text class="stat-number">150</text>
+        <text class="stat-label">对话次数</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-number">25</text>
+        <text class="stat-label">生成图片</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-number">10</text>
+        <text class="stat-label">代码片段</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部信息 -->
+  <view class="footer">
+    <text class="footer-text">AI助手 v1.0.0</text>
+    <text class="footer-desc">基于腾讯云CloudBase开发</text>
+  </view>
+</view> 

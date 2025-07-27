@@ -1,0 +1,1 @@
+{"name":"api-http","type":"http","config":{"path":"/api/*","method":["GET","POST","PUT","DELETE","OPTIONS"]}}

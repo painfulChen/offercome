@@ -1,0 +1,85 @@
+# CloudBase AI 开发框架 - Cursor 规则
+
+## 项目概述
+这是一个基于腾讯云CloudBase的AI开发框架，包含后台API服务和小程序开发。
+
+## 技术栈
+- 后端: Node.js + Express + MongoDB + Redis + Socket.io
+- AI服务: OpenAI + LangChain
+- 前端: 微信小程序
+- 部署: 腾讯云CloudBase
+
+## 开发规范
+
+### 代码风格
+- 使用ESLint进行代码检查
+- 使用Prettier进行代码格式化
+- 遵循JavaScript标准规范
+- 使用中文注释
+
+### 文件结构
+```
+project/
+├── server/          # 后台API服务
+├── miniprogram/     # 小程序代码
+├── tests/           # 测试文件
+└── docs/            # 文档
+```
+
+### 命名规范
+- 文件名: 小写字母，用连字符分隔
+- 变量名: camelCase
+- 常量名: UPPER_SNAKE_CASE
+- 类名: PascalCase
+
+### 提交规范
+- feat: 新功能
+- fix: 修复bug
+- docs: 文档更新
+- style: 代码格式调整
+- refactor: 代码重构
+- test: 测试相关
+- chore: 构建过程或辅助工具的变动
+
+## AI助手配置
+
+### CodeBuddy集成
+- 使用CodeBuddy进行代码生成和优化
+- 重点关注AI服务相关的代码
+- 协助小程序开发
+
+### 开发流程
+1. 本地开发使用 `npm run dev`
+2. 测试使用 `npm test`
+3. 部署使用 `./deploy.sh`
+4. 使用微信开发者工具测试小程序
+
+### 重点关注
+- AI服务的集成和优化
+- 小程序与后台API的交互
+- CloudBase的部署配置
+- 安全性考虑（JWT、数据验证等）
+
+## 常用命令
+```bash
+# 本地开发
+npm run dev
+
+# 测试
+npm test
+
+# 部署
+./deploy.sh
+
+# 安装依赖
+npm install
+
+# 构建
+npm run build
+```
+
+## 注意事项
+- 确保环境变量正确配置
+- 注意API密钥的安全性
+- 小程序需要配置服务器域名
+- 部署前要测试所有功能 

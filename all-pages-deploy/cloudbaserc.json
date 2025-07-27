@@ -1,0 +1,1 @@
+{"envId":"offercome2025-9g14jitp22f4ddfc","framework":{"name":"offercome-pages","plugins":{"hosting":{"use":"@cloudbase/framework-plugin-website","inputs":{"buildCommand":"echo \"No build needed\"","outputPath":".","cloudPath":"/"}}}}}

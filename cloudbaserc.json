@@ -1,0 +1,16 @@
+{
+  "envId": "offercome2025-9g14jitp22f4ddfc",
+  "functionRoot": "./server",
+  "functions": [
+    {
+      "name": "api",
+      "runtime": "Nodejs10.15",
+      "memorySize": 256,
+      "timeout": 30,
+      "entry": "cloudbase-function.js"
+    }
+  ],
+  "hosting": {
+    "public": "./public"
+  }
+} 

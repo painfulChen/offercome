@@ -1,0 +1,17 @@
+{
+  "envId": "offercome2025-9g14jitp22f4ddfc",
+  "functionRoot": "./server",
+  "functions": [
+    {
+      "name": "api-web",
+      "runtime": "Nodejs16.13",
+      "memorySize": 256,
+      "timeout": 10,
+      "entry": "api/index.js",
+      "type": "web"
+    }
+  ],
+  "hosting": {
+    "public": "./public"
+  }
+} 

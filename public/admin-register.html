@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户注册 - CloudBase AI 后台管理系统</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .register-container {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .register-header {
+            margin-bottom: 30px;
+        }
+        .register-header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .register-header p {
+            color: #666;
+            font-size: 14px;
+        }
+        .register-form {
+            text-align: left;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.8);
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+        .register-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        .register-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102,126,234,0.3);
+        }
+        .register-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .success-message {
+            color: #28a745;
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .link {
+            margin-top: 20px;
+            display: block;
+            color: #667eea;
+            text-decoration: underline;
+            font-size: 14px;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .logo {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-header">
+            <div class="logo">📝</div>
+            <h1>用户注册</h1>
+            <p>CloudBase AI 后台管理系统</p>
+        </div>
+        <form class="register-form" id="registerForm">
+            <div class="form-group">
+                <label for="username">用户名</label>
+                <input type="text" id="username" name="username" placeholder="请输入用户名" required minlength="2" maxlength="30" autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label for="email">邮箱</label>
+                <input type="email" id="email" name="email" placeholder="请输入邮箱" required autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" name="password" placeholder="请输入密码" required minlength="6" autocomplete="new-password">
+            </div>
+            <button type="submit" class="register-btn" id="registerBtn">注册</button>
+            <div id="message"></div>
+        </form>
+        <a href="admin-login.html" class="link">已有账号？去登录</a>
+    </div>
+    <script>
+        const API_BASE_URL = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api';
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const registerBtn = document.getElementById('registerBtn');
+            const messageDiv = document.getElementById('message');
+            // 校验
+            if (!username || !email || !password) {
+                messageDiv.innerHTML = '<div class="error-message">请填写所有必填项</div>';
+                return;
+            }
+            if (username.length < 2 || username.length > 30) {
+                messageDiv.innerHTML = '<div class="error-message">用户名长度需2-30字符</div>';
+                return;
+            }
+            if (password.length < 6) {
+                messageDiv.innerHTML = '<div class="error-message">密码至少6位</div>';
+                return;
+            }
+            // 显示加载
+            registerBtn.disabled = true;
+            registerBtn.innerHTML = '<span class="loading"></span> 注册中...';
+            messageDiv.innerHTML = '';
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, password })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    messageDiv.innerHTML = '<div class="success-message">✅ 注册成功，正在跳转登录...</div>';
+                    setTimeout(() => {
+                        window.location.href = 'admin-login.html';
+                    }, 1200);
+                } else {
+                    messageDiv.innerHTML = `<div class="error-message">❌ ${result.message || '注册失败'}</div>`;
+                }
+            } catch (error) {
+                messageDiv.innerHTML = '<div class="error-message">❌ 网络错误，请稍后重试</div>';
+            } finally {
+                registerBtn.disabled = false;
+                registerBtn.innerHTML = '注册';
+            }
+        });
+    </script>
+</body>
+</html> 

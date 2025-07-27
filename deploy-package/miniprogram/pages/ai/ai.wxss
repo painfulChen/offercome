@@ -1,0 +1,116 @@
+/* pages/ai/ai.wxss */
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: 30rpx;
+  box-sizing: border-box;
+  min-height: 100vh;
+  background-color: #f6f6f6;
+}
+
+.header {
+  margin-bottom: 40rpx;
+  padding: 20rpx 0;
+}
+
+.title {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.subtitle {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.login-tip {
+  background-color: #e8f5e9;
+  padding: 20rpx;
+  border-radius: 10rpx;
+  margin-bottom: 30rpx;
+  font-size: 28rpx;
+  color: #333;
+  text-align: center;
+}
+
+.login-link {
+  color: #1aad19;
+  margin: 0 10rpx;
+  text-decoration: underline;
+}
+
+.tools-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 30rpx;
+  margin-bottom: 40rpx;
+}
+
+.tool-item {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+  position: relative;
+  transition: all 0.3s;
+}
+
+.tool-item:active {
+  background-color: #f9f9f9;
+  transform: scale(0.98);
+}
+
+.tool-item.disabled {
+  opacity: 0.6;
+}
+
+.tool-icon {
+  width: 100rpx;
+  height: 100rpx;
+  margin-right: 30rpx;
+}
+
+.tool-info {
+  flex: 1;
+}
+
+.tool-name {
+  font-size: 34rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 10rpx;
+  display: block;
+}
+
+.tool-description {
+  font-size: 26rpx;
+  color: #666;
+  display: block;
+  line-height: 1.4;
+}
+
+.tool-arrow {
+  width: 40rpx;
+  height: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tool-arrow image {
+  width: 30rpx;
+  height: 30rpx;
+}
+
+.footer-tip {
+  text-align: center;
+  font-size: 26rpx;
+  color: #999;
+  margin-top: auto;
+  padding: 30rpx 0;
+}

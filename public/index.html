@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OfferCome - 专业求职辅导平台</title>
+    <link rel="stylesheet" href="styles-new.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- 导航栏 -->
+        <nav class="navbar">
+            <div class="nav-brand">
+                <i class="fas fa-rocket"></i>
+                <span>OfferCome</span>
+                <span class="brand-subtitle">求职辅导专家</span>
+            </div>
+            <div class="nav-menu">
+                <a href="#services" class="nav-link">服务</a>
+                <a href="#about" class="nav-link">关于</a>
+                <a href="#contact" class="nav-link">联系</a>
+                <button id="loginBtn" class="nav-btn">登录</button>
+                <button id="registerBtn" class="nav-btn primary">注册</button>
+            </div>
+            <div class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+
+        <!-- 主要内容区域 -->
+        <main class="main-content">
+            <!-- 欢迎页面 -->
+            <div id="welcomePage" class="page active">
+                <!-- Hero Section -->
+                <section class="hero-section">
+                    <div class="hero-content">
+                        <div class="hero-text">
+                            <h1 class="hero-title">
+                                <span class="gradient-text">校招求职</span>
+                                <br>专业辅导平台
+                            </h1>
+                            <p class="hero-subtitle">
+                                专注互联网校招，提供一站式求职解决方案
+                                <br>从简历优化到面试技巧，助你斩获心仪Offer
+                            </p>
+                            <div class="hero-stats">
+                                <div class="stat-item">
+                                    <span class="stat-number">500+</span>
+                                    <span class="stat-label">成功案例</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-number">95%</span>
+                                    <span class="stat-label">成功率</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-number">50+</span>
+                                    <span class="stat-label">合作企业</span>
+                                </div>
+                            </div>
+                            <div class="hero-buttons">
+                                <button id="startConsultationBtn" class="btn btn-primary">
+                                    <i class="fas fa-comments"></i>
+                                    开始咨询
+                                </button>
+                                <button id="learnMoreBtn" class="btn btn-secondary">
+                                    <i class="fas fa-play"></i>
+                                    了解更多
+                                </button>
+                            </div>
+                        </div>
+                        <div class="hero-visual">
+                            <div class="floating-card card-1">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span>校招辅导</span>
+                            </div>
+                            <div class="floating-card card-2">
+                                <i class="fas fa-briefcase"></i>
+                                <span>简历优化</span>
+                            </div>
+                            <div class="floating-card card-3">
+                                <i class="fas fa-users"></i>
+                                <span>面试技巧</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 服务特色 -->
+                <section id="services" class="services-section">
+                    <div class="section-header">
+                        <h2>专业服务</h2>
+                        <p>全方位求职辅导，助你成功入职心仪企业</p>
+                    </div>
+                    <div class="services-grid">
+                        <div class="service-card" data-config="service-1">
+                            <div class="service-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <h3>简历优化</h3>
+                            <p>专业简历定制，突出核心竞争力，提升面试通过率</p>
+                            <ul class="service-features">
+                                <li>个性化简历设计</li>
+                                <li>关键词优化</li>
+                                <li>行业标准匹配</li>
+                            </ul>
+                            <button class="service-btn">立即咨询</button>
+                        </div>
+                        <div class="service-card" data-config="service-2">
+                            <div class="service-icon">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <h3>面试辅导</h3>
+                            <p>模拟面试训练，提升沟通技巧，增强面试信心</p>
+                            <ul class="service-features">
+                                <li>一对一模拟面试</li>
+                                <li>常见问题解答</li>
+                                <li>压力应对技巧</li>
+                            </ul>
+                            <button class="service-btn">立即咨询</button>
+                        </div>
+                        <div class="service-card" data-config="service-3">
+                            <div class="service-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <h3>职业规划</h3>
+                            <p>个性化职业发展路径，明确目标方向，制定行动计划</p>
+                            <ul class="service-features">
+                                <li>职业兴趣测评</li>
+                                <li>发展路径规划</li>
+                                <li>技能提升建议</li>
+                            </ul>
+                            <button class="service-btn">立即咨询</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 成功案例 -->
+                <section class="success-section">
+                    <div class="section-header">
+                        <h2>成功案例</h2>
+                        <p>真实学员的成功故事，见证我们的专业实力</p>
+                    </div>
+                    <div class="success-grid">
+                        <div class="success-card" data-config="case-1">
+                            <div class="success-avatar">
+                                <img src="https://via.placeholder.com/80x80/667eea/ffffff?text=张" alt="学员头像">
+                            </div>
+                            <div class="success-content">
+                                <h4>张同学</h4>
+                                <p class="success-company">阿里巴巴 - 前端工程师</p>
+                                <p class="success-description">
+                                    通过我们的简历优化和面试辅导，成功入职阿里巴巴，薪资提升40%
+                                </p>
+                                <div class="success-tags">
+                                    <span class="tag">校招</span>
+                                    <span class="tag">互联网</span>
+                                    <span class="tag">前端</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="success-card" data-config="case-2">
+                            <div class="success-avatar">
+                                <img src="https://via.placeholder.com/80x80/28a745/ffffff?text=李" alt="学员头像">
+                            </div>
+                            <div class="success-content">
+                                <h4>李同学</h4>
+                                <p class="success-company">腾讯 - 产品经理</p>
+                                <p class="success-description">
+                                    职业规划指导帮助明确发展方向，成功转型产品经理岗位
+                                </p>
+                                <div class="success-tags">
+                                    <span class="tag">校招</span>
+                                    <span class="tag">互联网</span>
+                                    <span class="tag">产品</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="success-card" data-config="case-3">
+                            <div class="success-avatar">
+                                <img src="https://via.placeholder.com/80x80/dc3545/ffffff?text=王" alt="学员头像">
+                            </div>
+                            <div class="success-content">
+                                <h4>王同学</h4>
+                                <p class="success-company">字节跳动 - 算法工程师</p>
+                                <p class="success-description">
+                                    面试技巧培训显著提升表现，成功通过多轮技术面试
+                                </p>
+                                <div class="success-tags">
+                                    <span class="tag">校招</span>
+                                    <span class="tag">互联网</span>
+                                    <span class="tag">算法</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 关于我们 -->
+                <section id="about" class="about-section">
+                    <div class="about-content">
+                        <div class="about-text">
+                            <h2>关于OfferCome</h2>
+                            <p class="about-description">
+                                我们是一家专注于互联网校招的专业求职辅导平台，拥有丰富的行业经验和成功案例。
+                                我们的导师团队来自各大知名互联网公司，深谙招聘流程和面试技巧。
+                            </p>
+                            <div class="about-features">
+                                <div class="feature-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>专业导师团队</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>个性化服务</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>高成功率</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>持续跟进</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="about-visual">
+                            <div class="team-stats">
+                                <div class="stat-card">
+                                    <span class="stat-number">10+</span>
+                                    <span class="stat-label">年行业经验</span>
+                                </div>
+                                <div class="stat-card">
+                                    <span class="stat-number">50+</span>
+                                    <span class="stat-label">专业导师</span>
+                                </div>
+                                <div class="stat-card">
+                                    <span class="stat-number">1000+</span>
+                                    <span class="stat-label">服务学员</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 联系咨询 -->
+                <section id="contact" class="contact-section">
+                    <div class="section-header">
+                        <h2>立即咨询</h2>
+                        <p>开启你的求职成功之路</p>
+                    </div>
+                    <div class="contact-content">
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <i class="fas fa-phone"></i>
+                                <div>
+                                    <h4>电话咨询</h4>
+                                    <p>400-123-4567</p>
+                                </div>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-envelope"></i>
+                                <div>
+                                    <h4>邮件咨询</h4>
+                                    <p>contact@offercome.com</p>
+                                </div>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-wechat"></i>
+                                <div>
+                                    <h4>微信咨询</h4>
+                                    <p>offercome2025</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="contact-form">
+                            <form id="contactForm">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="contactName">姓名</label>
+                                        <input type="text" id="contactName" name="name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="contactPhone">电话</label>
+                                        <input type="tel" id="contactPhone" name="phone" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="contactService">咨询项目</label>
+                                    <select id="contactService" name="service" required>
+                                        <option value="">请选择咨询项目</option>
+                                        <option value="resume">简历优化</option>
+                                        <option value="interview">面试辅导</option>
+                                        <option value="career">职业规划</option>
+                                        <option value="comprehensive">综合服务</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="contactMessage">详细需求</label>
+                                    <textarea id="contactMessage" name="message" rows="4" placeholder="请详细描述您的需求和背景..."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane"></i>
+                                    提交咨询
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 登录页面 -->
+            <div id="loginPage" class="page">
+                <div class="auth-container">
+                    <div class="auth-header">
+                        <h2>用户登录</h2>
+                        <p>登录您的OfferCome账户</p>
+                    </div>
+                    <form id="loginForm" class="auth-form">
+                        <div class="form-group">
+                            <label for="loginUsername">用户名/邮箱</label>
+                            <input type="text" id="loginUsername" name="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">密码</label>
+                            <input type="password" id="loginPassword" name="password" required>
+                        </div>
+                        <div class="form-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="remember">
+                                <span>记住我</span>
+                            </label>
+                            <a href="#" class="forgot-password">忘记密码？</a>
+                        </div>
+                        <button type="submit" class="btn btn-primary">登录</button>
+                    </form>
+                    <div class="auth-footer">
+                        <p>还没有账号？<a href="#" id="showRegister">立即注册</a></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 注册页面 -->
+            <div id="registerPage" class="page">
+                <div class="auth-container">
+                    <div class="auth-header">
+                        <h2>用户注册</h2>
+                        <p>创建您的OfferCome账户</p>
+                    </div>
+                    <form id="registerForm" class="auth-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="registerUsername">用户名</label>
+                                <input type="text" id="registerUsername" name="username" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="registerEmail">邮箱</label>
+                                <input type="email" id="registerEmail" name="email" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerPhone">手机号</label>
+                            <input type="tel" id="registerPhone" name="phone" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="registerPassword">密码</label>
+                                <input type="password" id="registerPassword" name="password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="registerConfirmPassword">确认密码</label>
+                                <input type="password" id="registerConfirmPassword" name="confirmPassword" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerRole">用户类型</label>
+                            <select id="registerRole" name="role" required>
+                                <option value="">请选择用户类型</option>
+                                <option value="student">在校学生</option>
+                                <option value="graduate">应届毕业生</option>
+                                <option value="jobseeker">求职者</option>
+                                <option value="consultant">咨询师</option>
+                            </select>
+                        </div>
+                        <div class="form-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="agree" required>
+                                <span>我已阅读并同意<a href="#">服务条款</a>和<a href="#">隐私政策</a></span>
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">注册</button>
+                    </form>
+                    <div class="auth-footer">
+                        <p>已有账号？<a href="#" id="showLogin">立即登录</a></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI咨询页面 -->
+            <div id="chatPage" class="page">
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <div class="chat-info">
+                            <h2><i class="fas fa-robot"></i> AI求职助手</h2>
+                            <p>专业求职咨询，24/7在线服务</p>
+                        </div>
+                        <button id="backToWelcome" class="btn btn-secondary">返回首页</button>
+                    </div>
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message bot-message">
+                            <div class="message-content">
+                                <div class="message-avatar">
+                                    <i class="fas fa-robot"></i>
+                                </div>
+                                <div class="message-text">
+                                    <p>您好！我是OfferCome的AI求职助手，很高兴为您服务。</p>
+                                    <p>我可以为您提供：</p>
+                                    <ul>
+                                        <li>简历优化建议</li>
+                                        <li>面试技巧指导</li>
+                                        <li>职业规划咨询</li>
+                                        <li>行业信息分享</li>
+                                    </ul>
+                                    <p>请问您想了解哪个方面呢？</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <form id="chatForm">
+                            <div class="input-wrapper">
+                                <input type="text" id="messageInput" placeholder="输入您的问题..." required>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 通知提示 -->
+        <div id="notification" class="notification"></div>
+
+        <!-- 配置数据 -->
+        <script id="config-data" type="application/json">
+        {
+            "hero": {
+                "title": "校招求职专业辅导平台",
+                "subtitle": "专注互联网校招，提供一站式求职解决方案",
+                "stats": {
+                    "cases": "500+",
+                    "success_rate": "95%",
+                    "companies": "50+"
+                }
+            },
+            "services": [
+                {
+                    "id": "service-1",
+                    "title": "简历优化",
+                    "description": "专业简历定制，突出核心竞争力，提升面试通过率",
+                    "features": ["个性化简历设计", "关键词优化", "行业标准匹配"],
+                    "icon": "fas fa-file-alt"
+                },
+                {
+                    "id": "service-2",
+                    "title": "面试辅导",
+                    "description": "模拟面试训练，提升沟通技巧，增强面试信心",
+                    "features": ["一对一模拟面试", "常见问题解答", "压力应对技巧"],
+                    "icon": "fas fa-comments"
+                },
+                {
+                    "id": "service-3",
+                    "title": "职业规划",
+                    "description": "个性化职业发展路径，明确目标方向，制定行动计划",
+                    "features": ["职业兴趣测评", "发展路径规划", "技能提升建议"],
+                    "icon": "fas fa-chart-line"
+                }
+            ],
+            "success_cases": [
+                {
+                    "id": "case-1",
+                    "name": "张同学",
+                    "company": "阿里巴巴 - 前端工程师",
+                    "description": "通过我们的简历优化和面试辅导，成功入职阿里巴巴，薪资提升40%",
+                    "tags": ["校招", "互联网", "前端"],
+                    "avatar": "https://via.placeholder.com/80x80/667eea/ffffff?text=张"
+                },
+                {
+                    "id": "case-2",
+                    "name": "李同学",
+                    "company": "腾讯 - 产品经理",
+                    "description": "职业规划指导帮助明确发展方向，成功转型产品经理岗位",
+                    "tags": ["校招", "互联网", "产品"],
+                    "avatar": "https://via.placeholder.com/80x80/28a745/ffffff?text=李"
+                },
+                {
+                    "id": "case-3",
+                    "name": "王同学",
+                    "company": "字节跳动 - 算法工程师",
+                    "description": "面试技巧培训显著提升表现，成功通过多轮技术面试",
+                    "tags": ["校招", "互联网", "算法"],
+                    "avatar": "https://via.placeholder.com/80x80/dc3545/ffffff?text=王"
+                }
+            ],
+            "contact": {
+                "phone": "400-123-4567",
+                "email": "contact@offercome.com",
+                "wechat": "offercome2025"
+            }
+        }
+        </script>
+    </div>
+
+    <script>
+        // 全局变量
+        let currentUser = null;
+        let configData = null;
+        
+        // API配置
+        let API_BASE_URL = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api';
+        
+        // DOM元素
+        const pages = {
+            welcome: document.getElementById('welcomePage'),
+            login: document.getElementById('loginPage'),
+            register: document.getElementById('registerPage'),
+            chat: document.getElementById('chatPage')
+        };
+
+        const notification = document.getElementById('notification');
+
+        // 加载配置数据
+        function loadConfigData() {
+            try {
+                const configElement = document.getElementById('config-data');
+                configData = JSON.parse(configElement.textContent);
+                console.log('配置数据加载成功:', configData);
+            } catch (error) {
+                console.error('配置数据加载失败:', error);
+                configData = {};
+            }
+        }
+
+        // 页面切换函数
+        function showPage(pageName) {
+            console.log('切换到页面:', pageName);
+            // 隐藏所有页面
+            Object.values(pages).forEach(page => {
+                if (page) page.classList.remove('active');
+            });
+            
+            // 显示指定页面
+            if (pages[pageName]) {
+                pages[pageName].classList.add('active');
+            }
+        }
+
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // API调用函数
+        async function apiCall(endpoint, options = {}) {
+            try {
+                console.log(`尝试API调用: ${API_BASE_URL}${endpoint}`);
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log(`API调用成功: ${endpoint}`, data);
+                return data;
+            } catch (error) {
+                console.error(`API调用失败 (${endpoint}):`, error);
+                throw error;
+            }
+        }
+
+        // 用户注册
+        async function registerUser(userData) {
+            try {
+                const response = await apiCall('/auth/register', {
+                    method: 'POST',
+                    body: JSON.stringify(userData)
+                });
+                
+                if (response.success) {
+                    showNotification('注册成功！', 'success');
+                    return response;
+                } else {
+                    showNotification(response.error || '注册失败', 'error');
+                    throw new Error(response.error);
+                }
+            } catch (error) {
+                showNotification('注册失败，请稍后重试', 'error');
+                throw error;
+            }
+        }
+
+        // 用户登录
+        async function loginUser(userData) {
+            try {
+                const response = await apiCall('/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify(userData)
+                });
+                
+                if (response.success) {
+                    currentUser = response.user;
+                    localStorage.setItem('user', JSON.stringify(response.user));
+                    localStorage.setItem('token', response.token);
+                    showNotification('登录成功！', 'success');
+                    return response;
+                } else {
+                    showNotification(response.error || '登录失败', 'error');
+                    throw new Error(response.error);
+                }
+            } catch (error) {
+                showNotification('登录失败，请稍后重试', 'error');
+                throw error;
+            }
+        }
+
+        // AI聊天
+        async function sendChatMessage(message) {
+            try {
+                const response = await apiCall('/ai/chat', {
+                    method: 'POST',
+                    body: JSON.stringify({ message })
+                });
+                
+                if (response.success) {
+                    return response.data.response;
+                } else {
+                    showNotification(response.error || '发送失败', 'error');
+                    throw new Error(response.error);
+                }
+            } catch (error) {
+                console.error('AI聊天错误:', error);
+                return getMockResponse(message);
+            }
+        }
+
+        // 模拟AI回复
+        function getMockResponse(message) {
+            const responses = {
+                '简历': '简历优化是求职成功的关键第一步。我建议您：\n1. 突出核心竞争力\n2. 使用关键词匹配\n3. 量化工作成果\n4. 保持简洁明了\n\n需要我为您详细分析简历吗？',
+                '面试': '面试技巧包括：\n1. 充分准备常见问题\n2. 练习自我介绍\n3. 准备项目案例\n4. 注意肢体语言\n5. 保持自信积极\n\n您想了解哪个方面的面试技巧？',
+                '职业规划': '职业规划需要考虑：\n1. 个人兴趣和能力\n2. 行业发展趋势\n3. 技能提升路径\n4. 短期和长期目标\n\n您目前处于哪个职业阶段？',
+                '校招': '校招是应届生的重要机会：\n1. 关注招聘时间\n2. 准备网申材料\n3. 参加宣讲会\n4. 做好笔试准备\n5. 练习面试技巧\n\n您想了解哪个公司的校招信息？',
+                '互联网': '互联网行业特点：\n1. 技术更新快\n2. 竞争激烈\n3. 薪资较高\n4. 工作强度大\n5. 发展机会多\n\n您对哪个互联网岗位感兴趣？'
+            };
+            
+            for (const [key, response] of Object.entries(responses)) {
+                if (message.includes(key)) {
+                    return response;
+                }
+            }
+            
+            return '感谢您的咨询！我是OfferCome的AI求职助手，可以为您提供简历优化、面试技巧、职业规划等方面的专业建议。请问您想了解哪个方面呢？';
+        }
+
+        // 添加聊天消息
+        function addChatMessage(content, isUser = false) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            
+            if (!isUser) {
+                const avatar = document.createElement('div');
+                avatar.className = 'message-avatar';
+                const icon = document.createElement('i');
+                icon.className = 'fas fa-robot';
+                avatar.appendChild(icon);
+                messageContent.appendChild(avatar);
+            }
+            
+            const text = document.createElement('div');
+            text.className = 'message-text';
+            text.innerHTML = content.replace(/\n/g, '<br>');
+            messageContent.appendChild(text);
+            
+            messageDiv.appendChild(messageContent);
+            chatMessages.appendChild(messageDiv);
+            
+            // 滚动到底部
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // 事件监听器
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('页面加载完成，开始设置事件监听器');
+            
+            // 加载配置数据
+            loadConfigData();
+            
+            // 导航按钮事件
+            const loginBtn = document.getElementById('loginBtn');
+            const registerBtn = document.getElementById('registerBtn');
+            
+            if (loginBtn) {
+                loginBtn.addEventListener('click', () => {
+                    console.log('点击登录按钮');
+                    showPage('login');
+                });
+            }
+            
+            if (registerBtn) {
+                registerBtn.addEventListener('click', () => {
+                    console.log('点击注册按钮');
+                    showPage('register');
+                });
+            }
+            
+            // 开始咨询按钮
+            const startConsultationBtn = document.getElementById('startConsultationBtn');
+            if (startConsultationBtn) {
+                startConsultationBtn.addEventListener('click', () => {
+                    console.log('点击开始咨询按钮');
+                    showPage('chat');
+                });
+            }
+            
+            // 了解更多按钮
+            const learnMoreBtn = document.getElementById('learnMoreBtn');
+            if (learnMoreBtn) {
+                learnMoreBtn.addEventListener('click', () => {
+                    console.log('点击了解更多按钮');
+                    document.getElementById('services').scrollIntoView({ behavior: 'smooth' });
+                });
+            }
+            
+            // 返回首页按钮
+            const backToWelcome = document.getElementById('backToWelcome');
+            if (backToWelcome) {
+                backToWelcome.addEventListener('click', () => {
+                    console.log('点击返回首页按钮');
+                    showPage('welcome');
+                });
+            }
+            
+            // 注册表单提交
+            const registerForm = document.getElementById('registerForm');
+            if (registerForm) {
+                registerForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    console.log('提交注册表单');
+                    
+                    const formData = new FormData(e.target);
+                    const userData = {
+                        username: formData.get('username'),
+                        email: formData.get('email'),
+                        phone: formData.get('phone'),
+                        password: formData.get('password'),
+                        role: formData.get('role')
+                    };
+                    
+                    // 验证密码确认
+                    if (userData.password !== formData.get('confirmPassword')) {
+                        showNotification('两次输入的密码不一致', 'error');
+                        return;
+                    }
+                    
+                    try {
+                        await registerUser(userData);
+                        showPage('login');
+                    } catch (error) {
+                        console.error('注册失败:', error);
+                    }
+                });
+            }
+            
+            // 登录表单提交
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    console.log('提交登录表单');
+                    
+                    const formData = new FormData(e.target);
+                    const userData = {
+                        username: formData.get('username'),
+                        password: formData.get('password')
+                    };
+                    
+                    try {
+                        await loginUser(userData);
+                        showPage('welcome');
+                    } catch (error) {
+                        console.error('登录失败:', error);
+                    }
+                });
+            }
+            
+            // 聊天表单提交
+            const chatForm = document.getElementById('chatForm');
+            if (chatForm) {
+                chatForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    console.log('提交聊天表单');
+                    
+                    const messageInput = document.getElementById('messageInput');
+                    const message = messageInput.value.trim();
+                    
+                    if (!message) return;
+                    
+                    // 添加用户消息
+                    addChatMessage(message, true);
+                    messageInput.value = '';
+                    
+                    // 显示加载状态
+                    const loadingMessage = '正在思考中...';
+                    addChatMessage(loadingMessage, false);
+                    
+                    try {
+                        // 发送到AI
+                        const response = await sendChatMessage(message);
+                        
+                        // 移除加载消息
+                        const messages = document.querySelectorAll('.message');
+                        const lastMessage = messages[messages.length - 1];
+                        if (lastMessage && lastMessage.querySelector('.message-text').textContent === loadingMessage) {
+                            lastMessage.remove();
+                        }
+                        
+                        // 添加AI回复
+                        addChatMessage(response, false);
+                    } catch (error) {
+                        console.error('AI聊天错误:', error);
+                        // 移除加载消息
+                        const messages = document.querySelectorAll('.message');
+                        const lastMessage = messages[messages.length - 1];
+                        if (lastMessage && lastMessage.querySelector('.message-text').textContent === loadingMessage) {
+                            lastMessage.remove();
+                        }
+                        
+                        addChatMessage('抱歉，我现在无法回答您的问题，请稍后再试。', false);
+                    }
+                });
+            }
+            
+            // 联系表单提交
+            const contactForm = document.getElementById('contactForm');
+            if (contactForm) {
+                contactForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    console.log('提交联系表单');
+                    
+                    const formData = new FormData(e.target);
+                    const contactData = {
+                        name: formData.get('name'),
+                        phone: formData.get('phone'),
+                        service: formData.get('service'),
+                        message: formData.get('message')
+                    };
+                    
+                    showNotification('咨询信息已提交，我们会尽快与您联系！', 'success');
+                    e.target.reset();
+                });
+            }
+            
+            // 页面切换链接
+            const showRegister = document.getElementById('showRegister');
+            if (showRegister) {
+                showRegister.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    console.log('点击显示注册页面');
+                    showPage('register');
+                });
+            }
+            
+            const showLogin = document.getElementById('showLogin');
+            if (showLogin) {
+                showLogin.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    console.log('点击显示登录页面');
+                    showPage('login');
+                });
+            }
+            
+            // 导航菜单切换
+            const navToggle = document.getElementById('navToggle');
+            const navMenu = document.querySelector('.nav-menu');
+            
+            if (navToggle) {
+                navToggle.addEventListener('click', () => {
+                    navMenu.classList.toggle('active');
+                    navToggle.classList.toggle('active');
+                });
+            }
+            
+            // 检查本地存储的用户信息
+            const savedUser = localStorage.getItem('user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showNotification(`欢迎回来，${currentUser.username}！`, 'success');
+            }
+            
+            // 测试API连接
+            testApiConnection();
+        });
+
+        // 测试API连接
+        async function testApiConnection() {
+            try {
+                const response = await apiCall('/health');
+                if (response.success) {
+                    console.log('API连接正常');
+                }
+            } catch (error) {
+                console.error('API连接失败:', error);
+            }
+        }
+
+        // 键盘快捷键
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + Enter 发送消息
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                const messageInput = document.getElementById('messageInput');
+                if (messageInput === document.activeElement) {
+                    document.getElementById('chatForm').dispatchEvent(new Event('submit'));
+                }
+            }
+            
+            // Escape 返回首页
+            if (e.key === 'Escape') {
+                showPage('welcome');
+            }
+        });
+
+        // 自动调整输入框高度
+        const messageInput = document.getElementById('messageInput');
+        if (messageInput) {
+            messageInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = this.scrollHeight + 'px';
+            });
+        }
+
+        // 页面可见性变化处理
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                // 页面重新可见时，检查API状态
+                testApiConnection();
+            }
+        });
+    </script>
+</body>
+</html> 

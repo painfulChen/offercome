@@ -1,0 +1,164 @@
+<!--pages/profile/profile.wxml-->
+<view class="container">
+  <!-- 用户信息区域 -->
+  <view class="user-info-section">
+    <!-- 未登录状态 -->
+    <view class="not-logged-in" wx:if="{{!isLoggedIn && !isLoading}}">
+      <image class="default-avatar" src="/images/default-avatar.png" mode="aspectFill"></image>
+      <view class="login-prompt">
+        <text class="prompt-text">登录体验更多功能</text>
+        <button class="login-btn" bindtap="navigateToLogin">立即登录</button>
+      </view>
+    </view>
+    
+    <!-- 加载中状态 -->
+    <view class="loading-state" wx:if="{{isLoading}}">
+      <view class="loading-avatar">
+        <view class="loading-spinner"></view>
+      </view>
+      <view class="loading-info">
+        <view class="loading-line"></view>
+        <view class="loading-line short"></view>
+      </view>
+    </view>
+    
+    <!-- 已登录状态 -->
+    <view class="logged-in" wx:if="{{isLoggedIn && !isLoading}}">
+      <view class="avatar-container" bindtap="editProfile">
+        <image class="user-avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+        <view class="edit-badge">
+          <image src="/images/icon-edit.png" mode="aspectFit"></image>
+        </view>
+      </view>
+      <view class="user-details">
+        <view class="user-name-row">
+          <text class="user-name">{{userInfo.nickName || '用户'}}</text>
+          <view class="user-id">ID: {{userInfo.userId || ''}}</view>
+        </view>
+        <view class="membership-badge {{memberInfo ? 'active' : ''}}" bindtap="showMembershipModal">
+          <image class="member-icon" src="/images/icon-vip.png" mode="aspectFit"></image>
+          <text>{{memberInfo ? memberInfo.level + '会员' : '开通会员'}}</text>
+          <image class="arrow-icon" src="/images/icon-arrow-right.png" mode="aspectFit"></image>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 会员卡片 -->
+  <view class="member-card" wx:if="{{isLoggedIn && !isLoading && memberInfo}}" bindtap="navigateToMembership">
+    <view class="card-content">
+      <view class="card-left">
+        <view class="card-title">
+          <image src="/images/icon-crown.png" mode="aspectFit"></image>
+          <text>{{memberInfo.level}}会员</text>
+        </view>
+        <view class="card-expiry">{{memberInfo.expiryDate}} 到期</view>
+      </view>
+      <view class="card-right">
+        <text>会员详情</text>
+        <image src="/images/icon-arrow-right.png" mode="aspectFit"></image>
+      </view>
+    </view>
+    <view class="card-benefits">
+      <view class="benefit-item">
+        <image src="/images/icon-check.png" mode="aspectFit"></image>
+        <text>无限对话次数</text>
+      </view>
+      <view class="benefit-item">
+        <image src="/images/icon-check.png" mode="aspectFit"></image>
+        <text>优先响应</text>
+      </view>
+      <view class="benefit-item">
+        <image src="/images/icon-check.png" mode="aspectFit"></image>
+        <text>高级AI模型</text>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 推广卡片 -->
+  <view class="promo-card" wx:if="{{isLoggedIn && !isLoading && !memberInfo}}" bindtap="navigateToMembership">
+    <image class="promo-bg" src="/images/promo-bg.png" mode="aspectFill"></image>
+    <view class="promo-content">
+      <view class="promo-title">开通会员，畅享高级功能</view>
+      <view class="promo-desc">无限对话、优先响应、高级AI模型</view>
+      <button class="promo-btn">立即开通</button>
+    </view>
+  </view>
+  
+  <!-- 设置列表 -->
+  <view class="settings-section">
+    <view class="settings-list">
+      <view 
+        class="settings-item" 
+        wx:for="{{settingsList}}" 
+        wx:key="id"
+        data-url="{{item.url}}"
+        bindtap="navigateToSetting"
+      >
+        <view class="item-left">
+          <image class="item-icon" src="{{item.icon}}" mode="aspectFit"></image>
+          <text class="item-title">{{item.title}}</text>
+        </view>
+        <image class="arrow-icon" src="/images/icon-arrow-right.png" mode="aspectFit"></image>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 退出登录按钮 -->
+  <view class="logout-section" wx:if="{{isLoggedIn && !isLoading}}">
+    <button class="logout-btn" bindtap="logout">退出登录</button>
+  </view>
+  
+  <!-- 会员弹窗 -->
+  <view class="modal-mask" wx:if="{{showMemberModal}}" bindtap="closeMembershipModal"></view>
+  <view class="member-modal" wx:if="{{showMemberModal}}">
+    <view class="modal-header">
+      <text class="modal-title">会员特权</text>
+      <view class="close-btn" bindtap="closeMembershipModal">
+        <image src="/images/icon-close.png" mode="aspectFit"></image>
+      </view>
+    </view>
+    <view class="modal-content">
+      <view class="privilege-list">
+        <view class="privilege-item">
+          <image src="/images/icon-unlimited.png" mode="aspectFit"></image>
+          <view class="privilege-info">
+            <text class="privilege-title">无限对话次数</text>
+            <text class="privilege-desc">突破免费用户每日对话次数限制</text>
+          </view>
+        </view>
+        <view class="privilege-item">
+          <image src="/images/icon-priority.png" mode="aspectFit"></image>
+          <view class="privilege-info">
+            <text class="privilege-title">优先响应</text>
+            <text class="privilege-desc">高峰期享受优先响应，无需排队等待</text>
+          </view>
+        </view>
+        <view class="privilege-item">
+          <image src="/images/icon-advanced.png" mode="aspectFit"></image>
+          <view class="privilege-info">
+            <text class="privilege-title">高级AI模型</text>
+            <text class="privilege-desc">使用最新的AI模型，回答更准确</text>
+          </view>
+        </view>
+        <view class="privilege-item">
+          <image src="/images/icon-voice.png" mode="aspectFit"></image>
+          <view class="privilege-info">
+            <text class="privilege-title">语音对话</text>
+            <text class="privilege-desc">支持语音输入和语音播报功能</text>
+          </view>
+        </view>
+        <view class="privilege-item">
+          <image src="/images/icon-image.png" mode="aspectFit"></image>
+          <view class="privilege-info">
+            <text class="privilege-title">图像识别</text>
+            <text class="privilege-desc">支持图片上传和图像内容识别</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="modal-footer">
+      <button class="modal-btn" bindtap="navigateToMembership">立即开通</button>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,39 @@
+<!--pages/ai/ai.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">AI 工具</text>
+    <text class="subtitle">探索强大的人工智能功能</text>
+  </view>
+
+  <!-- 登录提示 -->
+  <view class="login-tip" wx:if="{{!isLoggedIn}}">
+    <text>请先</text>
+    <text class="login-link" bindtap="goToLogin">登录</text>
+    <text>以使用全部AI功能</text>
+  </view>
+
+  <!-- AI工具列表 -->
+  <view class="tools-grid">
+    <view 
+      class="tool-item {{!isLoggedIn ? 'disabled' : ''}}" 
+      wx:for="{{aiTools}}" 
+      wx:key="id"
+      bindtap="navigateToTool"
+      data-id="{{item.id}}"
+    >
+      <image class="tool-icon" src="{{item.icon}}" mode="aspectFit"></image>
+      <view class="tool-info">
+        <text class="tool-name">{{item.name}}</text>
+        <text class="tool-description">{{item.description}}</text>
+      </view>
+      <view class="tool-arrow">
+        <image src="/images/arrow-right.png" mode="aspectFit"></image>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部提示 -->
+  <view class="footer-tip">
+    <text>更多AI功能持续开发中...</text>
+  </view>
+</view>

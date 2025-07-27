@@ -1,0 +1,7 @@
+{
+  "Type": "timer",
+  "Name": "api-timer-trigger",
+  "Config": {
+    "CronExpression": "0 */5 * * * * *"
+  }
+}

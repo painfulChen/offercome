@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前端功能测试 - OfferCome</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 2rem;
+        }
+        
+        .test-section {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+        }
+        
+        .test-section h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+        
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background: #667eea;
+            color: white;
+            cursor: pointer;
+            margin: 0.5rem;
+            font-size: 1rem;
+        }
+        
+        button:hover {
+            background: #5a6fd8;
+        }
+        
+        .result {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        
+        .success {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+        
+        .error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+        
+        .warning {
+            border-left-color: #ffc107;
+            background: #fff3cd;
+        }
+        
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            margin: 0.5rem 0;
+            font-size: 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .api-status {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .status-item {
+            flex: 1;
+            padding: 0.5rem;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .status-online {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-offline {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-unknown {
+            background: #fff3cd;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 前端功能测试</h1>
+        
+        <!-- API状态显示 -->
+        <div class="test-section">
+            <h3>🌐 API服务状态</h3>
+            <div class="api-status">
+                <div id="cloudStatus" class="status-item status-unknown">云端API: 检测中...</div>
+            </div>
+        </div>
+        
+        <!-- API连接测试 -->
+        <div class="test-section">
+            <h3>🌐 API连接测试</h3>
+            <button onclick="testApiConnection()">测试API连接</button>
+            <div id="apiResult" class="result"></div>
+        </div>
+        
+        <!-- 用户注册测试 -->
+        <div class="test-section">
+            <h3>👤 用户注册测试</h3>
+            <div class="form-group">
+                <label>用户名:</label>
+                <input type="text" id="regUsername" placeholder="输入用户名" value="testuser">
+            </div>
+            <div class="form-group">
+                <label>邮箱:</label>
+                <input type="email" id="regEmail" placeholder="输入邮箱" value="test@example.com">
+            </div>
+            <div class="form-group">
+                <label>密码:</label>
+                <input type="password" id="regPassword" placeholder="输入密码" value="123456">
+            </div>
+            <button onclick="testRegister()">测试注册</button>
+            <div id="registerResult" class="result"></div>
+        </div>
+        
+        <!-- 用户登录测试 -->
+        <div class="test-section">
+            <h3>🔐 用户登录测试</h3>
+            <div class="form-group">
+                <label>用户名:</label>
+                <input type="text" id="loginUsername" placeholder="输入用户名" value="testuser">
+            </div>
+            <div class="form-group">
+                <label>密码:</label>
+                <input type="password" id="loginPassword" placeholder="输入密码" value="123456">
+            </div>
+            <button onclick="testLogin()">测试登录</button>
+            <div id="loginResult" class="result"></div>
+        </div>
+        
+        <!-- AI聊天测试 -->
+        <div class="test-section">
+            <h3>🤖 AI聊天测试</h3>
+            <div class="form-group">
+                <label>消息:</label>
+                <input type="text" id="chatMessage" placeholder="输入消息" value="你好">
+            </div>
+            <button onclick="testChat()">发送消息</button>
+            <div id="chatResult" class="result"></div>
+        </div>
+        
+        <!-- 页面跳转测试 -->
+        <div class="test-section">
+            <h3>📄 页面跳转测试</h3>
+            <button onclick="goToMainPage()">跳转到主页面</button>
+            <button onclick="goToAdminPage()">跳转到管理页面</button>
+            <button onclick="goToReadme()">查看说明文档</button>
+        </div>
+    </div>
+
+    <script>
+        // 云端API配置 - 使用新的HTTP访问服务地址
+        const CLOUD_API_URL = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com';
+        
+        // 显示结果
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `result ${type}`;
+        }
+        
+        // 更新API状态
+        function updateApiStatus(status, message = '') {
+            const element = document.getElementById('cloudStatus');
+            element.className = `status-item status-${status}`;
+            element.textContent = `云端API: ${message}`;
+        }
+        
+        // 测试API连接
+        async function testApiConnection() {
+            showResult('apiResult', '正在测试云端API连接...', 'warning');
+            
+            try {
+                console.log(`测试云端API: ${CLOUD_API_URL}/api/health`);
+                const response = await fetch(`${CLOUD_API_URL}/api/health`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateApiStatus('online', '在线');
+                    showResult('apiResult', 
+                        `✅ 云端API连接成功！\n` +
+                        `地址: ${CLOUD_API_URL}\n` +
+                        `响应: ${JSON.stringify(data, null, 2)}`, 
+                        'success'
+                    );
+                } else {
+                    throw new Error(data.error || 'API返回错误');
+                }
+            } catch (error) {
+                console.error('云端API测试失败:', error);
+                updateApiStatus('offline', '离线');
+                showResult('apiResult', 
+                    `❌ 云端API连接失败：${error.message}\n\n` +
+                    `请检查：\n` +
+                    `1. 云端API是否已部署\n` +
+                    `2. HTTP访问服务是否已配置\n` +
+                    `3. 网络连接是否正常`, 
+                    'error'
+                );
+            }
+        }
+        
+        // API调用函数
+        async function callApi(endpoint, options = {}) {
+            try {
+                console.log(`调用云端API: ${CLOUD_API_URL}${endpoint}`);
+                const response = await fetch(`${CLOUD_API_URL}${endpoint}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('API调用成功:', data);
+                return { success: true, data };
+            } catch (error) {
+                console.error('API调用失败:', error);
+                throw error;
+            }
+        }
+        
+        // 用户注册测试
+        async function testRegister() {
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            
+            if (!username || !email || !password) {
+                showResult('registerResult', '❌ 请填写所有字段', 'error');
+                return;
+            }
+            
+            try {
+                const result = await callApi('/api/auth/register', {
+                    method: 'POST',
+                    body: JSON.stringify({ username, email, password })
+                });
+                
+                if (result.data.success) {
+                    showResult('registerResult', 
+                        `✅ 注册成功！\n` +
+                        `用户ID: ${result.data.user.id}\n` +
+                        `用户名: ${result.data.user.username}\n` +
+                        `邮箱: ${result.data.user.email}\n` +
+                        `角色: ${result.data.user.role}\n` +
+                        `完整响应: ${JSON.stringify(result.data, null, 2)}`, 
+                        'success'
+                    );
+                } else {
+                    showResult('registerResult', 
+                        `❌ 注册失败：${result.data.message || result.data.error}`, 
+                        'error'
+                    );
+                }
+            } catch (error) {
+                showResult('registerResult', 
+                    `❌ 注册失败：${error.message}`, 
+                    'error'
+                );
+            }
+        }
+        
+        // 用户登录测试
+        async function testLogin() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!username || !password) {
+                showResult('loginResult', '❌ 请填写用户名和密码', 'error');
+                return;
+            }
+            
+            try {
+                const result = await callApi('/api/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ username, password })
+                });
+                
+                if (result.data.success) {
+                    showResult('loginResult', 
+                        `✅ 登录成功！\n` +
+                        `用户ID: ${result.data.user.id}\n` +
+                        `用户名: ${result.data.user.username}\n` +
+                        `邮箱: ${result.data.user.email}\n` +
+                        `角色: ${result.data.user.role}\n` +
+                        `Token: ${result.data.token}\n` +
+                        `完整响应: ${JSON.stringify(result.data, null, 2)}`, 
+                        'success'
+                    );
+                } else {
+                    showResult('loginResult', 
+                        `❌ 登录失败：${result.data.message || result.data.error}`, 
+                        'error'
+                    );
+                }
+            } catch (error) {
+                showResult('loginResult', 
+                    `❌ 登录失败：${error.message}`, 
+                    'error'
+                );
+            }
+        }
+        
+        // AI聊天测试
+        async function testChat() {
+            const message = document.getElementById('chatMessage').value;
+            
+            if (!message) {
+                showResult('chatResult', '❌ 请输入消息', 'error');
+                return;
+            }
+            
+            try {
+                const result = await callApi('/api/ai/chat', {
+                    method: 'POST',
+                    body: JSON.stringify({ message })
+                });
+                
+                const response = result.data.message || result.data.data?.response;
+                showResult('chatResult', 
+                    `✅ AI回复成功！\n` +
+                    `消息: ${message}\n` +
+                    `回复: ${response}\n` +
+                    `完整响应: ${JSON.stringify(result.data, null, 2)}`, 
+                    'success'
+                );
+            } catch (error) {
+                showResult('chatResult', 
+                    `❌ 聊天失败：${error.message}`, 
+                    'error'
+                );
+            }
+        }
+        
+        // 页面跳转
+        function goToMainPage() {
+            window.open('index.html', '_blank');
+        }
+        
+        function goToAdminPage() {
+            window.open('admin-dashboard-simple.html', '_blank');
+        }
+        
+        function goToReadme() {
+            window.open('README.html', '_blank');
+        }
+        
+        // 页面加载时自动测试API
+        window.addEventListener('load', async () => {
+            console.log('页面加载完成，开始测试云端API...');
+            await testApiConnection();
+        });
+    </script>
+</body>
+</html> 

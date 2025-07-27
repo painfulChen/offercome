@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudBase AI 后台管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* 侧边栏样式 */
+        .sidebar {
+            width: 250px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 20px;
+        }
+
+        .sidebar-header h2 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-header p {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #555;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-radius: 0 25px 25px 0;
+            margin-right: 10px;
+        }
+
+        .nav-link:hover {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .nav-icon {
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        /* 主内容区域 */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+        }
+
+        /* 仪表板卡片 */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 24px;
+            color: white;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .card-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .card-description {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* 表格样式 */
+        .table-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .table-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* 状态标签 */
+        .status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 隐藏内容 */
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>🤖 AI管理系统</h2>
+                <p>CloudBase AI 后台管理</p>
+            </div>
+            
+            <div style="padding: 0 20px 20px; border-bottom: 1px solid #eee; margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <div style="font-size: 14px; color: #666;">当前用户</div>
+                        <div id="userInfo" style="font-weight: 600; color: #333;">-</div>
+                    </div>
+                    <button onclick="logout()" style="background: none; border: none; color: #dc3545; cursor: pointer; font-size: 12px;">
+                        🚪 退出
+                    </button>
+                </div>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#dashboard" class="nav-link active" data-section="dashboard">
+                        <span class="nav-icon">📊</span>
+                        仪表板
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#users" class="nav-link" data-section="users">
+                        <span class="nav-icon">👥</span>
+                        用户管理
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#ai-stats" class="nav-link" data-section="ai-stats">
+                        <span class="nav-icon">🤖</span>
+                        AI调用统计
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#cost-analysis" class="nav-link" data-section="cost-analysis">
+                        <span class="nav-icon">💰</span>
+                        成本分析
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#system" class="nav-link" data-section="system">
+                        <span class="nav-icon">⚙️</span>
+                        系统监控
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#logs" class="nav-link" data-section="logs">
+                        <span class="nav-icon">📝</span>
+                        日志管理
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <!-- 仪表板 -->
+            <div id="dashboard" class="content-section active">
+                <div class="header">
+                    <h1>📊 系统仪表板</h1>
+                    <p>实时监控系统状态和关键指标</p>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon" style="background: linear-gradient(90deg, #667eea, #764ba2);">
+                                👥
+                            </div>
+                            <div>
+                                <div class="card-title">总用户数</div>
+                                <div class="card-value" id="totalUsers">-</div>
+                                <div class="card-description">注册用户总数</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon" style="background: linear-gradient(90deg, #28a745, #20c997);">
+                                🤖
+                            </div>
+                            <div>
+                                <div class="card-title">AI调用次数</div>
+                                <div class="card-value" id="totalAICalls">-</div>
+                                <div class="card-description">今日AI调用总数</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon" style="background: linear-gradient(90deg, #ffc107, #fd7e14);">
+                                💰
+                            </div>
+                            <div>
+                                <div class="card-title">总成本</div>
+                                <div class="card-value" id="totalCost">-</div>
+                                <div class="card-description">累计API调用成本</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon" style="background: linear-gradient(90deg, #dc3545, #e83e8c);">
+                                ⚡
+                            </div>
+                            <div>
+                                <div class="card-title">系统状态</div>
+                                <div class="card-value" id="systemStatus">-</div>
+                                <div class="card-description">当前系统运行状态</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">📈 最近活动</h3>
+                        <div class="table-actions">
+                            <button class="btn btn-secondary" onclick="refreshDashboard()">
+                                🔄 刷新
+                            </button>
+                        </div>
+                    </div>
+                    <div id="recentActivity">
+                        <div class="loading"></div> 加载中...
+                    </div>
+                </div>
+            </div>
+
+            <!-- 用户管理 -->
+            <div id="users" class="content-section">
+                <div class="header">
+                    <h1>👥 用户管理</h1>
+                    <p>管理系统用户和权限</p>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">用户列表</h3>
+                        <div class="table-actions">
+                            <button class="btn btn-primary" onclick="showAddUserModal()">
+                                ➕ 添加用户
+                            </button>
+                            <button class="btn btn-secondary" onclick="refreshUsers()">
+                                🔄 刷新
+                            </button>
+                        </div>
+                    </div>
+                    <div id="usersTable">
+                        <div class="loading"></div> 加载中...
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI调用统计 -->
+            <div id="ai-stats" class="content-section">
+                <div class="header">
+                    <h1>🤖 AI调用统计</h1>
+                    <p>监控AI服务的使用情况和性能</p>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon" style="background: linear-gradient(90deg, #667eea, #764ba2);">
+                                📊
+                            </div>
+                            <div>
+                                <div class="card-title">今日调用</div>
+                                <div class="card-value" id="todayCalls">-</div>
+                                <div class="card-description">今日AI调用次数</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon" style="background: linear-gradient(90deg, #28a745, #20c997);">
+                                ⏱️
+                            </div>
+                            <div>
+                                <div class="card-title">平均响应时间</div>
+                                <div class="card-value" id="avgResponseTime">-</div>
+                                <div class="card-description">毫秒</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon" style="background: linear-gradient(90deg, #ffc107, #fd7e14);">
+                                ✅
+                            </div>
+                            <div>
+                                <div class="card-title">成功率</div>
+                                <div class="card-value" id="successRate">-</div>
+                                <div class="card-description">成功调用比例</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">调用记录</h3>
+                        <div class="table-actions">
+                            <button class="btn btn-secondary" onclick="refreshAIStats()">
+                                🔄 刷新
+                            </button>
+                        </div>
+                    </div>
+                    <div id="aiCallLogs">
+                        <div class="loading"></div> 加载中...
+                    </div>
+                </div>
+            </div>
+
+            <!-- 成本分析 -->
+            <div id="cost-analysis" class="content-section">
+                <div class="header">
+                    <h1>💰 成本分析</h1>
+                    <p>详细分析API调用成本和费用趋势</p>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon" style="background: linear-gradient(90deg, #dc3545, #e83e8c);">
+                                💸
+                            </div>
+                            <div>
+                                <div class="card-title">今日成本</div>
+                                <div class="card-value" id="todayCost">-</div>
+                                <div class="card-description">今日API调用费用</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon" style="background: linear-gradient(90deg, #28a745, #20c997);">
+                                📈
+                            </div>
+                            <div>
+                                <div class="card-title">本月成本</div>
+                                <div class="card-value" id="monthCost">-</div>
+                                <div class="card-description">本月累计费用</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon" style="background: linear-gradient(90deg, #ffc107, #fd7e14);">
+                                🎯
+                            </div>
+                            <div>
+                                <div class="card-title">平均单次成本</div>
+                                <div class="card-value" id="avgCallCost">-</div>
+                                <div class="card-description">每次调用平均费用</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">成本明细</h3>
+                        <div class="table-actions">
+                            <button class="btn btn-secondary" onclick="refreshCostAnalysis()">
+                                🔄 刷新
+                            </button>
+                        </div>
+                    </div>
+                    <div id="costDetails">
+                        <div class="loading"></div> 加载中...
+                    </div>
+                </div>
+            </div>
+
+            <!-- 系统监控 -->
+            <div id="system" class="content-section">
+                <div class="header">
+                    <h1>⚙️ 系统监控</h1>
+                    <p>监控系统性能和运行状态</p>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon" style="background: linear-gradient(90deg, #667eea, #764ba2);">
+                                🖥️
+                            </div>
+                            <div>
+                                <div class="card-title">CPU使用率</div>
+                                <div class="card-value" id="cpuUsage">-</div>
+                                <div class="card-description">当前CPU负载</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon" style="background: linear-gradient(90deg, #28a745, #20c997);">
+                                💾
+                            </div>
+                            <div>
+                                <div class="card-title">内存使用</div>
+                                <div class="card-value" id="memoryUsage">-</div>
+                                <div class="card-description">当前内存占用</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon" style="background: linear-gradient(90deg, #ffc107, #fd7e14);">
+                                🌐
+                            </div>
+                            <div>
+                                <div class="card-title">网络状态</div>
+                                <div class="card-value" id="networkStatus">-</div>
+                                <div class="card-description">网络连接状态</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">系统日志</h3>
+                        <div class="table-actions">
+                            <button class="btn btn-secondary" onclick="refreshSystemLogs()">
+                                🔄 刷新
+                            </button>
+                        </div>
+                    </div>
+                    <div id="systemLogs">
+                        <div class="loading"></div> 加载中...
+                    </div>
+                </div>
+            </div>
+
+            <!-- 日志管理 -->
+            <div id="logs" class="content-section">
+                <div class="header">
+                    <h1>📝 日志管理</h1>
+                    <p>查看和管理系统日志</p>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">系统日志</h3>
+                        <div class="table-actions">
+                            <button class="btn btn-primary" onclick="exportLogs()">
+                                📥 导出日志
+                            </button>
+                            <button class="btn btn-secondary" onclick="refreshLogs()">
+                                🔄 刷新
+                            </button>
+                        </div>
+                    </div>
+                    <div id="logsTable">
+                        <div class="loading"></div> 加载中...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 配置
+        const API_BASE_URL = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api';
+        
+        // 认证检查
+        function checkAuth() {
+            const token = localStorage.getItem('adminToken');
+            const user = localStorage.getItem('adminUser');
+            
+            if (!token || !user) {
+                window.location.href = 'admin-login.html';
+                return false;
+            }
+            
+            // 验证token
+            fetch(`${API_BASE_URL}/auth/verify`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (!result.success) {
+                    localStorage.removeItem('adminToken');
+                    localStorage.removeItem('adminUser');
+                    window.location.href = 'admin-login.html';
+                } else {
+                    // 显示用户信息
+                    const userData = JSON.parse(user);
+                    document.getElementById('userInfo').textContent = `${userData.username} (${userData.role})`;
+                }
+            })
+            .catch(() => {
+                localStorage.removeItem('adminToken');
+                localStorage.removeItem('adminUser');
+                window.location.href = 'admin-login.html';
+            });
+            
+            return true;
+        }
+        
+        // 退出登录
+        function logout() {
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminUser');
+            window.location.href = 'admin-login.html';
+        }
+
+        // 导航功能
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // 移除所有活动状态
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+                
+                // 添加活动状态
+                link.classList.add('active');
+                const section = link.getAttribute('data-section');
+                document.getElementById(section).classList.add('active');
+                
+                // 加载对应数据
+                loadSectionData(section);
+            });
+        });
+
+        // 加载页面数据
+        function loadSectionData(section) {
+            switch(section) {
+                case 'dashboard':
+                    loadDashboardData();
+                    break;
+                case 'users':
+                    loadUsersData();
+                    break;
+                case 'ai-stats':
+                    loadAIStatsData();
+                    break;
+                case 'cost-analysis':
+                    loadCostAnalysisData();
+                    break;
+                case 'system':
+                    loadSystemData();
+                    break;
+                case 'logs':
+                    loadLogsData();
+                    break;
+            }
+        }
+
+        // 加载仪表板数据
+        async function loadDashboardData() {
+            try {
+                // 加载统计数据
+                const statsResponse = await fetch(`${API_BASE_URL}/cost/stats`);
+                const stats = await statsResponse.json();
+                
+                if (stats.success) {
+                    document.getElementById('totalAICalls').textContent = stats.totalCalls || 0;
+                    document.getElementById('totalCost').textContent = `¥${(stats.totalCost || 0).toFixed(4)}`;
+                }
+
+                // 加载系统状态
+                const healthResponse = await fetch(`${API_BASE_URL}/health`);
+                const health = await healthResponse.json();
+                
+                if (health.success) {
+                    document.getElementById('systemStatus').textContent = '正常';
+                    document.getElementById('systemStatus').style.color = '#28a745';
+                } else {
+                    document.getElementById('systemStatus').textContent = '异常';
+                    document.getElementById('systemStatus').style.color = '#dc3545';
+                }
+
+                // 模拟用户数据
+                document.getElementById('totalUsers').textContent = '156';
+
+                // 加载最近活动
+                loadRecentActivity();
+            } catch (error) {
+                console.error('加载仪表板数据失败:', error);
+            }
+        }
+
+        // 加载最近活动
+        async function loadRecentActivity() {
+            try {
+                const container = document.getElementById('recentActivity');
+                container.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>时间</th>
+                                <th>用户</th>
+                                <th>操作</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>2025-07-26 12:30:15</td>
+                                <td>user123</td>
+                                <td>AI聊天调用</td>
+                                <td><span class="status status-success">成功</span></td>
+                            </tr>
+                            <tr>
+                                <td>2025-07-26 12:28:42</td>
+                                <td>user456</td>
+                                <td>成本查询</td>
+                                <td><span class="status status-success">成功</span></td>
+                            </tr>
+                            <tr>
+                                <td>2025-07-26 12:25:18</td>
+                                <td>admin</td>
+                                <td>系统配置更新</td>
+                                <td><span class="status status-success">成功</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) {
+                console.error('加载最近活动失败:', error);
+            }
+        }
+
+        // 加载用户数据
+        async function loadUsersData() {
+            try {
+                const container = document.getElementById('usersTable');
+                container.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>用户ID</th>
+                                <th>用户名</th>
+                                <th>邮箱</th>
+                                <th>注册时间</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>admin</td>
+                                <td>admin@example.com</td>
+                                <td>2025-07-01</td>
+                                <td><span class="status status-success">活跃</span></td>
+                                <td>
+                                    <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;">编辑</button>
+                                    <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;">删除</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>user123</td>
+                                <td>user123@example.com</td>
+                                <td>2025-07-15</td>
+                                <td><span class="status status-success">活跃</span></td>
+                                <td>
+                                    <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;">编辑</button>
+                                    <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;">删除</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) {
+                console.error('加载用户数据失败:', error);
+            }
+        }
+
+        // 加载AI统计数据
+        async function loadAIStatsData() {
+            try {
+                const statsResponse = await fetch(`${API_BASE_URL}/cost/stats`);
+                const stats = await statsResponse.json();
+                
+                if (stats.success) {
+                    document.getElementById('todayCalls').textContent = stats.totalCalls || 0;
+                    document.getElementById('avgResponseTime').textContent = '1155ms';
+                    document.getElementById('successRate').textContent = '98.5%';
+                }
+
+                const container = document.getElementById('aiCallLogs');
+                container.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>时间</th>
+                                <th>用户</th>
+                                <th>模型</th>
+                                <th>成本</th>
+                                <th>响应时间</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>2025-07-26 12:30:15</td>
+                                <td>user123</td>
+                                <td>kimi-moonshot-v1-8k</td>
+                                <td>¥0.0001</td>
+                                <td>1155ms</td>
+                                <td><span class="status status-success">成功</span></td>
+                            </tr>
+                            <tr>
+                                <td>2025-07-26 12:28:42</td>
+                                <td>user456</td>
+                                <td>kimi-moonshot-v1-8k</td>
+                                <td>¥0.0001</td>
+                                <td>856ms</td>
+                                <td><span class="status status-success">成功</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) {
+                console.error('加载AI统计数据失败:', error);
+            }
+        }
+
+        // 加载成本分析数据
+        async function loadCostAnalysisData() {
+            try {
+                const statsResponse = await fetch(`${API_BASE_URL}/cost/stats`);
+                const stats = await statsResponse.json();
+                
+                if (stats.success) {
+                    document.getElementById('todayCost').textContent = `¥${(stats.totalCost || 0).toFixed(4)}`;
+                    document.getElementById('monthCost').textContent = `¥${((stats.totalCost || 0) * 30).toFixed(4)}`;
+                    document.getElementById('avgCallCost').textContent = `¥${((stats.totalCost || 0) / (stats.totalCalls || 1)).toFixed(4)}`;
+                }
+
+                const container = document.getElementById('costDetails');
+                container.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>日期</th>
+                                <th>调用次数</th>
+                                <th>总成本</th>
+                                <th>平均成本</th>
+                                <th>趋势</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>2025-07-26</td>
+                                <td>156</td>
+                                <td>¥0.0156</td>
+                                <td>¥0.0001</td>
+                                <td>📈 +12%</td>
+                            </tr>
+                            <tr>
+                                <td>2025-07-25</td>
+                                <td>142</td>
+                                <td>¥0.0142</td>
+                                <td>¥0.0001</td>
+                                <td>📈 +8%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) {
+                console.error('加载成本分析数据失败:', error);
+            }
+        }
+
+        // 加载系统数据
+        async function loadSystemData() {
+            try {
+                document.getElementById('cpuUsage').textContent = '23%';
+                document.getElementById('memoryUsage').textContent = '45%';
+                document.getElementById('networkStatus').textContent = '正常';
+
+                const container = document.getElementById('systemLogs');
+                container.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>时间</th>
+                                <th>级别</th>
+                                <th>消息</th>
+                                <th>来源</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>2025-07-26 12:30:15</td>
+                                <td><span class="status status-success">INFO</span></td>
+                                <td>AI API调用成功</td>
+                                <td>KimiService</td>
+                            </tr>
+                            <tr>
+                                <td>2025-07-26 12:28:42</td>
+                                <td><span class="status status-success">INFO</span></td>
+                                <td>成本记录更新</td>
+                                <td>CostTracker</td>
+                            </tr>
+                            <tr>
+                                <td>2025-07-26 12:25:18</td>
+                                <td><span class="status status-warning">WARN</span></td>
+                                <td>API响应时间较长</td>
+                                <td>SystemMonitor</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) {
+                console.error('加载系统数据失败:', error);
+            }
+        }
+
+        // 加载日志数据
+        async function loadLogsData() {
+            try {
+                const container = document.getElementById('logsTable');
+                container.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>时间</th>
+                                <th>级别</th>
+                                <th>模块</th>
+                                <th>消息</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>2025-07-26 12:30:15</td>
+                                <td><span class="status status-success">INFO</span></td>
+                                <td>API</td>
+                                <td>用户user123调用AI聊天接口</td>
+                                <td>
+                                    <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;">查看</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2025-07-26 12:28:42</td>
+                                <td><span class="status status-success">INFO</span></td>
+                                <td>Cost</td>
+                                <td>成本记录: ¥0.0001</td>
+                                <td>
+                                    <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;">查看</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2025-07-26 12:25:18</td>
+                                <td><span class="status status-warning">WARN</span></td>
+                                <td>System</td>
+                                <td>API响应时间超过阈值</td>
+                                <td>
+                                    <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;">查看</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) {
+                console.error('加载日志数据失败:', error);
+            }
+        }
+
+        // 刷新功能
+        function refreshDashboard() {
+            loadDashboardData();
+        }
+
+        function refreshUsers() {
+            loadUsersData();
+        }
+
+        function refreshAIStats() {
+            loadAIStatsData();
+        }
+
+        function refreshCostAnalysis() {
+            loadCostAnalysisData();
+        }
+
+        function refreshSystemLogs() {
+            loadSystemData();
+        }
+
+        function refreshLogs() {
+            loadLogsData();
+        }
+
+        // 其他功能
+        function showAddUserModal() {
+            alert('添加用户功能待实现');
+        }
+
+        function exportLogs() {
+            alert('导出日志功能待实现');
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth(); // 检查认证
+            loadDashboardData();
+        });
+    </script>
+</body>
+</html> 

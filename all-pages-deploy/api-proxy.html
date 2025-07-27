@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API代理 - OfferCome</title>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+        .api-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .api-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+        .api-url {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            word-break: break-all;
+            margin-bottom: 10px;
+        }
+        .test-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+        }
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .result {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.85em;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .status.success {
+            background: #10b981;
+            color: white;
+        }
+        .status.error {
+            background: #ef4444;
+            color: white;
+        }
+        .status.loading {
+            background: #f59e0b;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 API代理测试</h1>
+        
+        <div class="api-section">
+            <div class="api-title">健康检查 API</div>
+            <div class="api-url">GET http://localhost:3000/api/health</div>
+            <button class="test-btn" onclick="testAPI('health')">测试健康检查</button>
+            <span id="health-status" class="status">未测试</span>
+            <div id="health-result" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="api-section">
+            <div class="api-title">案例列表 API</div>
+            <div class="api-url">GET http://localhost:3000/api/cases</div>
+            <button class="test-btn" onclick="testAPI('cases')">测试案例列表</button>
+            <span id="cases-status" class="status">未测试</span>
+            <div id="cases-result" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="api-section">
+            <div class="api-title">分类列表 API</div>
+            <div class="api-url">GET http://localhost:3000/api/categories</div>
+            <button class="test-btn" onclick="testAPI('categories')">测试分类列表</button>
+            <span id="categories-status" class="status">未测试</span>
+            <div id="categories-result" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="api-section">
+            <div class="api-title">热门案例 API</div>
+            <div class="api-url">GET http://localhost:3000/api/cases/hot/list</div>
+            <button class="test-btn" onclick="testAPI('hot-cases')">测试热门案例</button>
+            <span id="hot-cases-status" class="status">未测试</span>
+            <div id="hot-cases-result" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="api-section">
+            <div class="api-title">精选案例 API</div>
+            <div class="api-url">GET http://localhost:3000/api/cases/featured/list</div>
+            <button class="test-btn" onclick="testAPI('featured-cases')">测试精选案例</button>
+            <span id="featured-cases-status" class="status">未测试</span>
+            <div id="featured-cases-result" class="result" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        async function testAPI(type) {
+            const statusElement = document.getElementById(`${type}-status`);
+            const resultElement = document.getElementById(`${type}-result`);
+            
+            // 更新状态为加载中
+            statusElement.textContent = '测试中...';
+            statusElement.className = 'status loading';
+            resultElement.style.display = 'none';
+            
+            try {
+                let url;
+                switch(type) {
+                    case 'health':
+                        url = 'http://localhost:3000/api/health';
+                        break;
+                    case 'cases':
+                        url = 'http://localhost:3000/api/cases';
+                        break;
+                    case 'categories':
+                        url = 'http://localhost:3000/api/categories';
+                        break;
+                    case 'hot-cases':
+                        url = 'http://localhost:3000/api/cases/hot/list';
+                        break;
+                    case 'featured-cases':
+                        url = 'http://localhost:3000/api/cases/featured/list';
+                        break;
+                    default:
+                        throw new Error('未知的API类型');
+                }
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                // 显示结果
+                resultElement.textContent = JSON.stringify(data, null, 2);
+                resultElement.style.display = 'block';
+                
+                // 更新状态
+                if (response.ok) {
+                    statusElement.textContent = '成功';
+                    statusElement.className = 'status success';
+                } else {
+                    statusElement.textContent = '失败';
+                    statusElement.className = 'status error';
+                }
+                
+            } catch (error) {
+                // 显示错误
+                resultElement.textContent = `错误: ${error.message}`;
+                resultElement.style.display = 'block';
+                statusElement.textContent = '错误';
+                statusElement.className = 'status error';
+            }
+        }
+
+        // 页面加载时自动测试健康检查
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                testAPI('health');
+            }, 1000);
+        });
+    </script>
+</body>
+</html> 

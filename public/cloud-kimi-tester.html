@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kimi API 云端测试器</title>
+    <meta name="description" content="真实Kimi API调用测试器，使用云端云函数代理">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .chat-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .chat-container {
+            height: 400px;
+            overflow-y: auto;
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 10px;
+            max-width: 80%;
+        }
+        
+        .message-content {
+            margin-bottom: 8px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+        
+        .message-metadata {
+            font-size: 12px;
+            color: #666;
+            background: rgba(0,0,0,0.05);
+            padding: 5px 8px;
+            border-radius: 5px;
+            margin-top: 8px;
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .user-message .message-metadata {
+            background: rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .ai-message .message-metadata {
+            background: rgba(0,0,0,0.05);
+            color: #666;
+        }
+        
+        .user-message {
+            background: #007bff;
+            color: white;
+            margin-left: auto;
+        }
+        
+        .ai-message {
+            background: #e9ecef;
+            color: #333;
+        }
+        
+        .system-message {
+            background: #28a745;
+            color: white;
+            text-align: center;
+            max-width: 100%;
+        }
+        
+        .error-message {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .input-section {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .message-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        .message-input:focus {
+            border-color: #007bff;
+        }
+        
+        .send-button {
+            padding: 12px 25px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        
+        .send-button:hover {
+            background: #0056b3;
+        }
+        
+        .send-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .stats-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .stat-label {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .stat-value {
+            color: #007bff;
+            font-weight: bold;
+        }
+        
+        .call-method {
+            background: #28a745;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .test-buttons {
+            margin-top: 20px;
+        }
+        
+        .test-button {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 5px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .test-button:hover {
+            background: #545b62;
+        }
+        
+        .test-result {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Kimi API 云端测试器</h1>
+            <p>真实Kimi API调用 + 云端代理 + 实时响应</p>
+        </div>
+        
+        <div class="content">
+            <div class="chat-section">
+                <div class="call-method" id="callMethod">检测云端代理可用性...</div>
+                
+                <div class="chat-container" id="chatContainer">
+                    <div class="message system-message">
+                        欢迎使用Kimi API云端测试器！系统通过云端云函数代理调用CloudBase函数，获取真实的Kimi AI回复。现在可以开始对话了！
+                        <br><br>
+                        <strong>🌐 云端访问地址:</strong> 当前页面
+                    </div>
+                </div>
+                
+                <div class="input-section">
+                    <input type="text" id="messageInput" class="message-input" placeholder="输入您的问题..." onkeypress="handleKeyPress(event)">
+                    <button id="sendBtn" class="send-button" onclick="sendMessage()">发送</button>
+                </div>
+            </div>
+            
+            <div class="stats-section">
+                <h3>📊 统计信息</h3>
+                <div class="stat-item">
+                    <span class="stat-label">总调用次数:</span>
+                    <span class="stat-value" id="totalCalls">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">总成本:</span>
+                    <span class="stat-value" id="totalCost">¥0.0000</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">成功次数:</span>
+                    <span class="stat-value" id="successCount">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">平均响应时间:</span>
+                    <span class="stat-value" id="avgResponseTime">0ms</span>
+                </div>
+                
+                <div class="test-buttons">
+                    <button class="test-button" onclick="testHealth()">测试健康状态</button>
+                    <button class="test-button" onclick="testCostStats()">测试成本统计</button>
+                    <button class="test-button" onclick="testAIStatus()">测试AI状态</button>
+                    <div class="test-result" id="testResult">点击按钮开始测试...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 使用云端云函数代理 -->
+    <script>
+        // 全局变量
+        let chatHistory = [];
+        let totalCalls = 0;
+        let totalCost = 0;
+        let successCount = 0;
+        let responseTimes = [];
+        
+        // 云端云函数配置
+        const CLOUD_FUNCTION_URL = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api';
+        
+        // 等待页面加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStats();
+            // 初始化检测
+            console.log('检测云端代理可用性...');
+            checkCloudProxyAvailability();
+        });
+
+        // 检查云端代理可用性
+        async function checkCloudProxyAvailability() {
+            try {
+                const response = await fetch(`${CLOUD_FUNCTION_URL}/health`);
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ 云端代理可用:', data);
+                    updateCallMethod('云端代理');
+                    addMessage('system', '欢迎使用Kimi API云端测试器！云端代理正常运行，可以开始真实AI对话。');
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                console.error('云端代理检测失败:', error);
+                updateCallMethod('不可用');
+                addMessage('error', `云端代理不可用: ${error.message}。请检查网络连接。`);
+            }
+        }
+
+        // 通过云端代理调用API
+        async function callCloudAPI(path, options = {}) {
+            const startTime = Date.now();
+            
+            try {
+                console.log('通过云端代理调用API:', path, options);
+                
+                const response = await fetch(`${CLOUD_FUNCTION_URL}/proxy`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        path: path,
+                        method: options.method || 'GET',
+                        body: options.body || null
+                    })
+                });
+                
+                const responseTime = Date.now() - startTime;
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                console.log('云端代理返回结果:', result);
+                
+                // 解析返回的数据结构
+                let parsedResult;
+                if (result.body && typeof result.body === 'string') {
+                    try {
+                        parsedResult = JSON.parse(result.body);
+                    } catch (parseError) {
+                        console.error('解析body失败:', parseError);
+                        return {
+                            success: false,
+                            error: '响应数据解析失败',
+                            responseTime: responseTime,
+                            method: 'Cloud-Proxy'
+                        };
+                    }
+                } else {
+                    parsedResult = result;
+                }
+                
+                return {
+                    ...parsedResult,
+                    responseTime: responseTime,
+                    method: 'Cloud-Proxy'
+                };
+                
+            } catch (error) {
+                console.error('云端代理调用失败:', error);
+                const responseTime = Date.now() - startTime;
+                return {
+                    success: false,
+                    error: error.message,
+                    responseTime: responseTime,
+                    method: 'Cloud-Proxy'
+                };
+            }
+        }
+
+        // 添加消息到聊天界面
+        function addMessage(type, content, metadata = {}) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}-message`;
+            
+            // 创建主要内容
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            
+            // 处理长文本，将换行符转换为HTML段落
+            if (type === 'ai' && content.includes('\n')) {
+                const paragraphs = content.split('\n').filter(p => p.trim());
+                paragraphs.forEach((paragraph, index) => {
+                    if (index > 0) {
+                        contentDiv.appendChild(document.createElement('br'));
+                    }
+                    const p = document.createElement('p');
+                    p.textContent = paragraph;
+                    p.style.margin = '0 0 8px 0';
+                    contentDiv.appendChild(p);
+                });
+            } else {
+                contentDiv.textContent = content;
+            }
+            
+            messageDiv.appendChild(contentDiv);
+            
+            // 如果有元数据，创建元数据区域
+            if (metadata.cost || metadata.model || metadata.responseTime) {
+                const metadataDiv = document.createElement('div');
+                metadataDiv.className = 'message-metadata';
+                
+                const metadataItems = [];
+                if (metadata.cost) {
+                    metadataItems.push(`💰 成本: ¥${metadata.cost.toFixed(4)}`);
+                }
+                if (metadata.model) {
+                    metadataItems.push(`🤖 模型: ${metadata.model}`);
+                }
+                if (metadata.responseTime) {
+                    metadataItems.push(`⏱️ 响应时间: ${metadata.responseTime}ms`);
+                }
+                
+                metadataDiv.textContent = metadataItems.join(' | ');
+                messageDiv.appendChild(metadataDiv);
+            }
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // 更新调用方式显示
+        function updateCallMethod(method) {
+            const callMethodElement = document.getElementById('callMethod');
+            callMethodElement.textContent = method;
+            callMethodElement.style.color = method === '云端代理' ? '#28a745' : '#ffc107';
+        }
+
+        // sendMessage函数内加保护
+        function setSendBtnDisabled(disabled) {
+            var btn = document.getElementById('sendBtn');
+            if (btn) btn.disabled = disabled;
+        }
+
+        async function sendMessage() {
+            setSendBtnDisabled(true);
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            
+            if (!message) return;
+            
+            // 添加用户消息
+            addMessage('user', message);
+            messageInput.value = '';
+            
+            try {
+                totalCalls++;
+                updateStats();
+                
+                // 调用AI聊天API
+                const result = await callCloudAPI('/api/ai/chat', {
+                    method: 'POST',
+                    body: JSON.stringify({ message: message })
+                });
+                
+                if (result.success) {
+                    successCount++;
+                    totalCost += result.cost || 0;
+                    responseTimes.push(result.responseTime);
+                    
+                    addMessage('ai', result.message, {
+                        cost: result.cost,
+                        model: result.model,
+                        responseTime: result.responseTime
+                    });
+                } else {
+                    addMessage('system', `错误: ${result.message || '未知错误'}`);
+                }
+                
+            } catch (error) {
+                console.error('发送消息失败:', error);
+                addMessage('system', `发送失败: ${error.message}`);
+            } finally {
+                // 恢复发送按钮
+                setSendBtnDisabled(false);
+                updateStats();
+            }
+        }
+        
+        // 处理回车键
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+        
+        // 测试系统健康状态
+        async function testHealth() {
+            const resultDiv = document.getElementById('testResult');
+            resultDiv.textContent = '正在测试健康状态...';
+            
+            try {
+                const result = await callCloudAPI('/api/health');
+                resultDiv.textContent = JSON.stringify(result, null, 2);
+            } catch (error) {
+                resultDiv.textContent = `测试失败: ${error.message}`;
+            }
+        }
+        
+        // 测试成本统计
+        async function testCostStats() {
+            const resultDiv = document.getElementById('testResult');
+            resultDiv.textContent = '正在测试成本统计...';
+            
+            try {
+                const result = await callCloudAPI('/api/cost/stats');
+                resultDiv.textContent = JSON.stringify(result, null, 2);
+            } catch (error) {
+                resultDiv.textContent = `测试失败: ${error.message}`;
+            }
+        }
+        
+        // 测试AI状态
+        async function testAIStatus() {
+            const resultDiv = document.getElementById('testResult');
+            resultDiv.textContent = '正在测试AI状态...';
+            
+            try {
+                const result = await callCloudAPI('/api/ai/status');
+                resultDiv.textContent = JSON.stringify(result, null, 2);
+            } catch (error) {
+                resultDiv.textContent = `测试失败: ${error.message}`;
+            }
+        }
+        
+        // 更新统计信息
+        function updateStats() {
+            document.getElementById('totalCalls').textContent = totalCalls;
+            document.getElementById('totalCost').textContent = `¥${totalCost.toFixed(4)}`;
+            document.getElementById('successCount').textContent = successCount;
+            
+            if (responseTimes.length > 0) {
+                const avgTime = Math.round(responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length);
+                document.getElementById('avgResponseTime').textContent = `${avgTime}ms`;
+            }
+        }
+    </script>
+</body>
+</html> 
