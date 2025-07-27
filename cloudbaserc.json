@@ -4,11 +4,10 @@
   "functions": [
     {
       "name": "api",
-      "runtime": "Nodejs10.15",
+      "runtime": "Nodejs16.13",
       "memorySize": 256,
       "timeout": 30,
-      "entry": "cloudbase-function.js",
-      "handler": "cloudbase-function.main"
+      "entry": "index.js"
     }
   ],
   "hosting": {

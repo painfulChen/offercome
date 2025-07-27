@@ -14,9 +14,9 @@
       "server": {
         "use": "@cloudbase/framework-plugin-node",
         "inputs": {
-          "entry": "server/index-test.js",
+          "entry": "server/index.js",
           "path": "/api",
-          "name": "offercome-api",
+          "name": "api",
           "region": "ap-shanghai",
           "runtime": "Nodejs16.13",
           "memory": 512,
