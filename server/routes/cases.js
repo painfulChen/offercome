@@ -1,66 +1,68 @@
 const express = require('express');
 const router = express.Router();
-const SuccessCase = require('../models/SuccessCase');
-const CaseCategory = require('../models/CaseCategory');
-const { auth } = require('../middleware/auth');
-const { logger } = require('../utils/logger');
+const StudentCase = require('../models/StudentCase');
 
-// 获取案例列表
+// 获取精选案例
+router.get('/featured', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 6;
+    const cases = await StudentCase.getFeaturedCases(limit);
+    
+    res.json({
+      success: true,
+      data: cases,
+      message: '获取精选案例成功'
+    });
+  } catch (error) {
+    console.error('获取精选案例失败:', error);
+    res.status(500).json({
+      success: false,
+      message: '获取精选案例失败',
+      error: error.message
+    });
+  }
+});
+
+// 获取所有案例
 router.get('/', async (req, res) => {
   try {
-    const {
-      page = 1,
-      limit = 12,
-      industry,
-      position,
-      category,
-      featured,
-      search,
-      sort = 'createdAt',
-      order = 'desc'
+    const { 
+      page = 1, 
+      limit = 10, 
+      category, 
+      industry, 
+      package,
+      difficulty 
     } = req.query;
-
-    // 构建查询条件
-    const query = { status: 'published' };
     
-    if (industry) query.industry = industry;
-    if (position) query.position = position;
-    if (category) query.categoryId = parseInt(category);
-    if (featured === 'true') query.featured = true;
+    const query = { 'status': '已发布' };
     
-    if (search) {
-      const regex = new RegExp(search, 'i');
-      query.$or = [
-        { title: regex },
-        { subtitle: regex },
-        { description: regex },
-        { industry: regex },
-        { position: regex },
-        { company: regex },
-        { tags: regex }
-      ];
+    if (category) {
+      query['showcase.category'] = category;
     }
-
-    // 计算分页
+    
+    if (industry) {
+      query['jobHuntingProcess.finalOffer.industry'] = industry;
+    }
+    
+    if (package) {
+      query['coachingService.package'] = package;
+    }
+    
+    if (difficulty) {
+      query['showcase.difficulty'] = difficulty;
+    }
+    
     const skip = (parseInt(page) - 1) * parseInt(limit);
-    const sortObj = { [sort]: order === 'desc' ? -1 : 1 };
-
-    // 执行查询
-    const [cases, total] = await Promise.all([
-      SuccessCase.find(query)
-        .sort(sortObj)
-        .skip(skip)
-        .limit(parseInt(limit))
-        .populate('category', 'name color icon')
-        .populate('creator', 'username avatar'),
-      SuccessCase.countDocuments(query)
-    ]);
-
-    // 计算分页信息
-    const totalPages = Math.ceil(total / parseInt(limit));
-    const hasNext = page < totalPages;
-    const hasPrev = page > 1;
-
+    
+    const cases = await StudentCase.find(query)
+      .sort({ 'createdAt': -1 })
+      .skip(skip)
+      .limit(parseInt(limit))
+      .exec();
+    
+    const total = await StudentCase.countDocuments(query);
+    
     res.json({
       success: true,
       data: {
@@ -69,14 +71,13 @@ router.get('/', async (req, res) => {
           page: parseInt(page),
           limit: parseInt(limit),
           total,
-          totalPages,
-          hasNext,
-          hasPrev
+          pages: Math.ceil(total / parseInt(limit))
         }
-      }
+      },
+      message: '获取案例列表成功'
     });
   } catch (error) {
-    logger.error('获取案例列表失败:', error);
+    console.error('获取案例列表失败:', error);
     res.status(500).json({
       success: false,
       message: '获取案例列表失败',
@@ -85,31 +86,29 @@ router.get('/', async (req, res) => {
   }
 });
 
-// 获取案例详情
+// 获取单个案例详情
 router.get('/:id', async (req, res) => {
   try {
-    const { id } = req.params;
+    const caseId = req.params.id;
+    const caseData = await StudentCase.findById(caseId);
     
-    const caseData = await SuccessCase.findById(id)
-      .populate('category', 'name color icon')
-      .populate('creator', 'username avatar');
-
     if (!caseData) {
       return res.status(404).json({
         success: false,
         message: '案例不存在'
       });
     }
-
-    // 增加浏览次数
-    await caseData.incrementViewCount();
-
+    
+    // 增加浏览量
+    await caseData.incrementViews();
+    
     res.json({
       success: true,
-      data: caseData
+      data: caseData,
+      message: '获取案例详情成功'
     });
   } catch (error) {
-    logger.error('获取案例详情失败:', error);
+    console.error('获取案例详情失败:', error);
     res.status(500).json({
       success: false,
       message: '获取案例详情失败',
@@ -118,93 +117,163 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// 获取热门案例
-router.get('/hot/list', async (req, res) => {
+// 获取案例统计数据
+router.get('/stats/overview', async (req, res) => {
   try {
-    const { limit = 6 } = req.query;
+    const stats = await StudentCase.getStatistics();
+    const result = stats[0] || {
+      totalCases: 0,
+      avgSalaryIncrease: 0,
+      avgDuration: 0,
+      avgApplications: 0,
+      avgInterviews: 0,
+      avgOffers: 0,
+      avgRating: 0
+    };
     
-    const hotCases = await SuccessCase.getHotCases(parseInt(limit));
-
     res.json({
       success: true,
-      data: hotCases
+      data: result,
+      message: '获取统计数据成功'
     });
   } catch (error) {
-    logger.error('获取热门案例失败:', error);
+    console.error('获取统计数据失败:', error);
     res.status(500).json({
       success: false,
-      message: '获取热门案例失败',
+      message: '获取统计数据失败',
       error: error.message
     });
   }
 });
 
-// 获取推荐案例
-router.get('/featured/list', async (req, res) => {
+// 获取行业分布统计
+router.get('/stats/industries', async (req, res) => {
   try {
-    const { limit = 6 } = req.query;
+    const industryStats = await StudentCase.aggregate([
+      {
+        $match: {
+          'status': '已发布'
+        }
+      },
+      {
+        $group: {
+          _id: '$jobHuntingProcess.finalOffer.industry',
+          count: { $sum: 1 },
+          avgSalary: { $avg: '$jobHuntingProcess.finalOffer.salary.base' },
+          avgSalaryIncrease: { $avg: '$statistics.salaryIncrease' }
+        }
+      },
+      {
+        $sort: { count: -1 }
+      }
+    ]);
     
-    const featuredCases = await SuccessCase.getFeaturedCases(parseInt(limit));
-
     res.json({
       success: true,
-      data: featuredCases
+      data: industryStats,
+      message: '获取行业统计成功'
     });
   } catch (error) {
-    logger.error('获取推荐案例失败:', error);
+    console.error('获取行业统计失败:', error);
     res.status(500).json({
       success: false,
-      message: '获取推荐案例失败',
+      message: '获取行业统计失败',
       error: error.message
     });
   }
 });
 
-// 按行业获取案例
-router.get('/industry/:industry', async (req, res) => {
+// 获取薪资增长统计
+router.get('/stats/salary-increase', async (req, res) => {
   try {
-    const { industry } = req.params;
-    const { limit = 10 } = req.query;
+    const salaryStats = await StudentCase.aggregate([
+      {
+        $match: {
+          'status': '已发布',
+          'statistics.salaryIncrease': { $exists: true }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          avgIncrease: { $avg: '$statistics.salaryIncrease' },
+          maxIncrease: { $max: '$statistics.salaryIncrease' },
+          minIncrease: { $min: '$statistics.salaryIncrease' },
+          totalCases: { $sum: 1 }
+        }
+      }
+    ]);
     
-    const cases = await SuccessCase.getCasesByIndustry(industry, parseInt(limit));
-
     res.json({
       success: true,
-      data: cases
+      data: salaryStats[0] || {
+        avgIncrease: 0,
+        maxIncrease: 0,
+        minIncrease: 0,
+        totalCases: 0
+      },
+      message: '获取薪资增长统计成功'
     });
   } catch (error) {
-    logger.error('按行业获取案例失败:', error);
+    console.error('获取薪资增长统计失败:', error);
     res.status(500).json({
       success: false,
-      message: '按行业获取案例失败',
+      message: '获取薪资增长统计失败',
       error: error.message
     });
   }
 });
 
-// 搜索案例
-router.get('/search/query', async (req, res) => {
+// 获取成功率统计
+router.get('/stats/success-rate', async (req, res) => {
   try {
-    const { keyword, limit = 20 } = req.query;
+    const successStats = await StudentCase.aggregate([
+      {
+        $match: {
+          'status': '已发布'
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          totalCases: { $sum: 1 },
+          avgApplications: { $avg: '$jobHuntingProcess.applicationsSubmitted' },
+          avgInterviews: { $avg: '$jobHuntingProcess.interviewsAttended' },
+          avgOffers: { $avg: '$jobHuntingProcess.offersReceived' },
+          avgDuration: { $avg: '$jobHuntingProcess.duration' }
+        }
+      }
+    ]);
     
-    if (!keyword || keyword.trim().length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: '搜索关键词不能为空'
-      });
-    }
-
-    const cases = await SuccessCase.searchCases(keyword.trim(), parseInt(limit));
-
+    const stats = successStats[0] || {
+      totalCases: 0,
+      avgApplications: 0,
+      avgInterviews: 0,
+      avgOffers: 0,
+      avgDuration: 0
+    };
+    
+    // 计算成功率
+    const successRate = stats.totalCases > 0 ? 
+      (stats.avgOffers / stats.avgApplications * 100).toFixed(1) : 0;
+    
+    const interviewRate = stats.totalCases > 0 ? 
+      (stats.avgInterviews / stats.avgApplications * 100).toFixed(1) : 0;
+    
     res.json({
       success: true,
-      data: cases
+      data: {
+        ...stats,
+        successRate: parseFloat(successRate),
+        interviewRate: parseFloat(interviewRate)
+      },
+      message: '获取成功率统计成功'
     });
   } catch (error) {
-    logger.error('搜索案例失败:', error);
+    console.error('获取成功率统计失败:', error);
     res.status(500).json({
       success: false,
-      message: '搜索案例失败',
+      message: '获取成功率统计失败',
       error: error.message
     });
   }
@@ -213,27 +282,25 @@ router.get('/search/query', async (req, res) => {
 // 点赞案例
 router.post('/:id/like', async (req, res) => {
   try {
-    const { id } = req.params;
+    const caseId = req.params.id;
+    const caseData = await StudentCase.findById(caseId);
     
-    const caseData = await SuccessCase.findById(id);
     if (!caseData) {
       return res.status(404).json({
         success: false,
         message: '案例不存在'
       });
     }
-
-    await caseData.incrementLikeCount();
-
+    
+    await caseData.incrementLikes();
+    
     res.json({
       success: true,
-      message: '点赞成功',
-      data: {
-        likeCount: caseData.likeCount
-      }
+      data: { likes: caseData.likes },
+      message: '点赞成功'
     });
   } catch (error) {
-    logger.error('点赞案例失败:', error);
+    console.error('点赞失败:', error);
     res.status(500).json({
       success: false,
       message: '点赞失败',
@@ -242,191 +309,72 @@ router.post('/:id/like', async (req, res) => {
   }
 });
 
-// 获取案例统计
-router.get('/stats/overview', async (req, res) => {
+// 分享案例
+router.post('/:id/share', async (req, res) => {
   try {
-    const [
-      totalCases,
-      totalViews,
-      totalLikes,
-      industryStats,
-      categoryStats
-    ] = await Promise.all([
-      SuccessCase.countDocuments({ status: 'published' }),
-      SuccessCase.aggregate([
-        { $match: { status: 'published' } },
-        { $group: { _id: null, total: { $sum: '$viewCount' } } }
-      ]),
-      SuccessCase.aggregate([
-        { $match: { status: 'published' } },
-        { $group: { _id: null, total: { $sum: '$likeCount' } } }
-      ]),
-      SuccessCase.aggregate([
-        { $match: { status: 'published' } },
-        { $group: { _id: '$industry', count: { $sum: 1 } } },
-        { $sort: { count: -1 } },
-        { $limit: 10 }
-      ]),
-      CaseCategory.getCategoriesWithCount()
-    ]);
-
-    res.json({
-      success: true,
-      data: {
-        totalCases,
-        totalViews: totalViews[0]?.total || 0,
-        totalLikes: totalLikes[0]?.total || 0,
-        industryStats,
-        categoryStats
-      }
-    });
-  } catch (error) {
-    logger.error('获取案例统计失败:', error);
-    res.status(500).json({
-      success: false,
-      message: '获取案例统计失败',
-      error: error.message
-    });
-  }
-});
-
-// 管理员功能：创建案例
-router.post('/', auth, async (req, res) => {
-  try {
-    const caseData = {
-      ...req.body,
-      createdBy: req.user.id
-    };
-
-    const newCase = new SuccessCase(caseData);
-    await newCase.save();
-
-    res.status(201).json({
-      success: true,
-      message: '案例创建成功',
-      data: newCase
-    });
-  } catch (error) {
-    logger.error('创建案例失败:', error);
-    res.status(500).json({
-      success: false,
-      message: '创建案例失败',
-      error: error.message
-    });
-  }
-});
-
-// 管理员功能：更新案例
-router.put('/:id', auth, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const updateData = {
-      ...req.body,
-      updatedBy: req.user.id
-    };
-
-    const updatedCase = await SuccessCase.findByIdAndUpdate(
-      id,
-      updateData,
-      { new: true, runValidators: true }
-    ).populate('category', 'name color icon')
-     .populate('creator', 'username avatar');
-
-    if (!updatedCase) {
+    const caseId = req.params.id;
+    const caseData = await StudentCase.findById(caseId);
+    
+    if (!caseData) {
       return res.status(404).json({
         success: false,
         message: '案例不存在'
       });
     }
-
+    
+    await caseData.incrementShares();
+    
     res.json({
       success: true,
-      message: '案例更新成功',
-      data: updatedCase
+      data: { shares: caseData.shares },
+      message: '分享成功'
     });
   } catch (error) {
-    logger.error('更新案例失败:', error);
+    console.error('分享失败:', error);
     res.status(500).json({
       success: false,
-      message: '更新案例失败',
+      message: '分享失败',
       error: error.message
     });
   }
 });
 
-// 管理员功能：删除案例
-router.delete('/:id', auth, async (req, res) => {
+// 获取推荐案例
+router.get('/recommendations/:id', async (req, res) => {
   try {
-    const { id } = req.params;
+    const caseId = req.params.id;
+    const currentCase = await StudentCase.findById(caseId);
     
-    const deletedCase = await SuccessCase.findByIdAndDelete(id);
-    
-    if (!deletedCase) {
+    if (!currentCase) {
       return res.status(404).json({
         success: false,
         message: '案例不存在'
       });
     }
-
+    
+    // 基于行业和类别推荐相似案例
+    const recommendations = await StudentCase.find({
+      _id: { $ne: caseId },
+      'status': '已发布',
+      $or: [
+        { 'jobHuntingProcess.finalOffer.industry': currentCase.jobHuntingProcess.finalOffer.industry },
+        { 'showcase.category': currentCase.showcase.category }
+      ]
+    })
+    .sort({ 'createdAt': -1 })
+    .limit(3)
+    .exec();
+    
     res.json({
       success: true,
-      message: '案例删除成功'
+      data: recommendations,
+      message: '获取推荐案例成功'
     });
   } catch (error) {
-    logger.error('删除案例失败:', error);
+    console.error('获取推荐案例失败:', error);
     res.status(500).json({
       success: false,
-      message: '删除案例失败',
-      error: error.message
-    });
-  }
-});
-
-// 管理员功能：获取所有案例（包括草稿）
-router.get('/admin/all', auth, async (req, res) => {
-  try {
-    const {
-      page = 1,
-      limit = 20,
-      status,
-      category
-    } = req.query;
-
-    const query = {};
-    if (status) query.status = status;
-    if (category) query.categoryId = parseInt(category);
-
-    const skip = (parseInt(page) - 1) * parseInt(limit);
-
-    const [cases, total] = await Promise.all([
-      SuccessCase.find(query)
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(parseInt(limit))
-        .populate('category', 'name color icon')
-        .populate('creator', 'username avatar'),
-      SuccessCase.countDocuments(query)
-    ]);
-
-    const totalPages = Math.ceil(total / parseInt(limit));
-
-    res.json({
-      success: true,
-      data: {
-        cases,
-        pagination: {
-          page: parseInt(page),
-          limit: parseInt(limit),
-          total,
-          totalPages
-        }
-      }
-    });
-  } catch (error) {
-    logger.error('获取所有案例失败:', error);
-    res.status(500).json({
-      success: false,
-      message: '获取所有案例失败',
+      message: '获取推荐案例失败',
       error: error.message
     });
   }

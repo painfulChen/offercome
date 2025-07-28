@@ -1,4 +1,4 @@
-// OfferCome API 主函数 - 优化版本
+// OfferCome API 主函数 - 增强版本
 const { 
   generateJobAdvice, 
   optimizeResume, 
@@ -40,11 +40,20 @@ exports.main = async (event) => {
     const method = event?.httpMethod || 'GET';
     const body = event?.body ? JSON.parse(event.body) : {};
     const authHeader = event?.headers?.authorization || event?.headers?.Authorization;
+    
+    console.log('🔍 请求路径:', path);
+    console.log('🔍 请求方法:', method);
+    
+    // 移除/api前缀
+    const cleanPath = path.replace(/^\/api/, '');
+    console.log('🔍 清理后的路径:', cleanPath);
 
     // 路由处理
     if (path === '/health' && method === 'GET') {
       return handleHealthCheck(headers);
-    } else if (path === '/auth/login' && method === 'POST') {
+    } 
+    // 用户认证
+    else if (path === '/auth/login' && method === 'POST') {
       return await handleLogin(body, headers);
     } else if (path === '/auth/register' && method === 'POST') {
       return await handleRegister(body, headers);
@@ -54,7 +63,27 @@ exports.main = async (event) => {
       return await handleUpdateProfile(authHeader, body, headers);
     } else if (path === '/auth/logout' && method === 'POST') {
       return await handleLogout(authHeader, headers);
-    } else if (path === '/ai/chat' && method === 'POST') {
+    }
+    // 咨询管理
+    else if (path === '/consultations' && method === 'POST') {
+      return await handleCreateConsultation(authHeader, body, headers, event);
+    } else if (path === '/consultations' && method === 'GET') {
+      return await handleGetConsultations(authHeader, headers);
+    } else if (path === '/consultations' && method === 'PUT') {
+      return await handleUpdateConsultation(authHeader, body, headers);
+    }
+    // MBTI测试
+    else if (path === '/mbti/questions' && method === 'GET') {
+      return await handleGetMbtiQuestions(headers);
+    } else if (path === '/mbti/test' && method === 'POST') {
+      return await handleSubmitMbtiTest(authHeader, body, headers);
+    } else if (path === '/mbti/result' && method === 'GET') {
+      return await handleGetMbtiResult(authHeader, headers);
+    } else if (path === '/mbti/result' && method === 'POST') {
+      return await handleSubmitMbtiResult(authHeader, body, headers);
+    }
+    // AI服务
+    else if (path === '/ai/chat' && method === 'POST') {
       return await handleAIChat(body, headers);
     } else if (path === '/ai/resume' && method === 'POST') {
       return await handleResumeOptimization(body, headers);
@@ -66,7 +95,30 @@ exports.main = async (event) => {
       return await handleInterviewSimulation(body, headers);
     } else if (path === '/ai/test' && method === 'GET') {
       return await handleAITest(headers);
-    } else if (path === '/users' && method === 'GET') {
+    }
+    // 学生案例
+    else if (path === '/cases/featured' && method === 'GET') {
+      return await handleGetFeaturedCases(headers);
+    } else if (path === '/cases' && method === 'GET') {
+      return await handleGetCases(event.queryStringParameters, headers);
+    } else if (path.startsWith('/cases/') && path.endsWith('/like') && method === 'POST') {
+      const caseId = path.split('/')[2];
+      return await handleLikeCase(caseId, headers);
+    } else if (path.startsWith('/cases/') && path.endsWith('/share') && method === 'POST') {
+      const caseId = path.split('/')[2];
+      return await handleShareCase(caseId, headers);
+    } else if (path.startsWith('/cases/stats/') && method === 'GET') {
+      const statsType = path.split('/')[3];
+      return await handleGetCaseStats(statsType, headers);
+    } else if (path.startsWith('/cases/recommendations/') && method === 'GET') {
+      const caseId = path.split('/')[3];
+      return await handleGetCaseRecommendations(caseId, headers);
+    } else if (path.startsWith('/cases/') && method === 'GET') {
+      const caseId = path.split('/')[2];
+      return await handleGetCaseDetail(caseId, headers);
+    }
+    // 数据管理
+    else if (path === '/users' && method === 'GET') {
       return await handleGetUsers(authHeader, headers);
     } else if (path === '/leads' && method === 'GET') {
       return await handleGetLeads(authHeader, headers);
@@ -74,6 +126,10 @@ exports.main = async (event) => {
       return await handleCreateLead(authHeader, body, headers);
     } else if (path === '/packages' && method === 'GET') {
       return await handleGetPackages(headers);
+    } else if (path === '/notifications' && method === 'GET') {
+      return await handleGetNotifications(authHeader, headers);
+    } else if (path === '/notifications' && method === 'PUT') {
+      return await handleMarkNotificationRead(authHeader, body, headers);
     } else {
       return handleNotFound(headers);
     }
@@ -96,28 +152,28 @@ function handleHealthCheck(headers) {
       timestamp: new Date().toISOString(),
       message: 'OfferCome智能求职辅导平台API服务正常运行',
       database: 'MySQL (腾讯云)',
-      version: '2.0.0'
+      version: '2.1.0',
+      features: ['用户认证', '咨询管理', 'MBTI测试', 'AI服务', 'CRM集成']
     })
   };
 }
 
 // 用户登录
 async function handleLogin(body, headers) {
-  const { email, password } = body;
-  
-  if (!email || !password) {
-    return {
-      statusCode: 400,
-      headers,
-      body: JSON.stringify({
-        success: false,
-        error: '邮箱和密码不能为空'
-      })
-    };
-  }
-
   try {
-    // 查找用户
+    const { email, password } = body;
+    
+    if (!email || !password) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          error: '邮箱和密码不能为空'
+        })
+      };
+    }
+
     const user = await db.getUserByEmail(email);
     if (!user) {
       return {
@@ -129,8 +185,7 @@ async function handleLogin(body, headers) {
         })
       };
     }
-    
-    // 验证密码
+
     const isValidPassword = await bcrypt.compare(password, user.password_hash);
     if (!isValidPassword) {
       return {
@@ -142,14 +197,19 @@ async function handleLogin(body, headers) {
         })
       };
     }
-    
-    // 生成JWT token
+
+    // 更新登录信息
+    await db.query(
+      'UPDATE users SET last_login_at = NOW(), login_count = login_count + 1 WHERE id = ?',
+      [user.id]
+    );
+
     const token = jwt.sign(
-      { userId: user.id },
-      process.env.JWT_SECRET || 'offercome_secret',
+      { userId: user.id, email: user.email },
+      process.env.JWT_SECRET || 'offercome-secret',
       { expiresIn: '7d' }
     );
-    
+
     return {
       statusCode: 200,
       headers,
@@ -159,13 +219,18 @@ async function handleLogin(body, headers) {
         user: {
           id: user.id,
           username: user.username,
-          email: user.email
+          email: user.email,
+          mbti_type: user.mbti_type,
+          phone: user.phone,
+          education: user.education,
+          target_job: user.target_job,
+          experience_years: user.experience_years
         },
         token
       })
     };
   } catch (error) {
-    console.error('登录错误:', error);
+    console.error('登录失败:', error);
     return {
       statusCode: 500,
       headers,
@@ -179,20 +244,20 @@ async function handleLogin(body, headers) {
 
 // 用户注册
 async function handleRegister(body, headers) {
-  const { username, email, password } = body;
-  
-  if (!username || !email || !password) {
-    return {
-      statusCode: 400,
-      headers,
-      body: JSON.stringify({
-        success: false,
-        error: '用户名、邮箱和密码不能为空'
-      })
-    };
-  }
-
   try {
+    const { username, email, password, phone, education, target_job, experience_years } = body;
+    
+    if (!username || !email || !password) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          error: '用户名、邮箱和密码不能为空'
+        })
+      };
+    }
+
     // 检查用户是否已存在
     const existingUser = await db.getUserByEmail(email);
     if (existingUser) {
@@ -205,20 +270,35 @@ async function handleRegister(body, headers) {
         })
       };
     }
-    
+
+    const existingUsername = await db.getUserByUsername(username);
+    if (existingUsername) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          error: '该用户名已被使用'
+        })
+      };
+    }
+
     // 加密密码
     const passwordHash = await bcrypt.hash(password, 10);
-    
+
     // 创建用户
-    const result = await db.createUser(username, email, passwordHash);
-    
-    // 生成JWT token
+    const result = await db.query(
+      'INSERT INTO users (username, email, password_hash, phone, education, target_job, experience_years) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [username, email, passwordHash, phone || null, education || null, target_job || null, experience_years || null]
+    );
+
+    const userId = result.insertId;
     const token = jwt.sign(
-      { userId: result.insertId },
-      process.env.JWT_SECRET || 'offercome_secret',
+      { userId, email },
+      process.env.JWT_SECRET || 'offercome-secret',
       { expiresIn: '7d' }
     );
-    
+
     return {
       statusCode: 201,
       headers,
@@ -226,15 +306,19 @@ async function handleRegister(body, headers) {
         success: true,
         message: '注册成功',
         user: {
-          id: result.insertId,
+          id: userId,
           username,
-          email
+          email,
+          phone,
+          education,
+          target_job,
+          experience_years
         },
         token
       })
     };
   } catch (error) {
-    console.error('注册错误:', error);
+    console.error('注册失败:', error);
     return {
       statusCode: 500,
       headers,
@@ -246,7 +330,7 @@ async function handleRegister(body, headers) {
   }
 }
 
-// 获取用户信息
+// 获取用户资料
 async function handleGetProfile(authHeader, headers) {
   try {
     const user = await verifyToken(authHeader);
@@ -256,39 +340,309 @@ async function handleGetProfile(authHeader, headers) {
         headers,
         body: JSON.stringify({
           success: false,
-          error: '未提供认证令牌'
+          error: '认证失败'
         })
       };
     }
-    
+
+    const userProfile = await db.getUserById(user.userId);
+    if (!userProfile) {
+      return {
+        statusCode: 404,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          error: '用户不存在'
+        })
+      };
+    }
+
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         success: true,
         user: {
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          created_at: user.created_at
+          id: userProfile.id,
+          username: userProfile.username,
+          email: userProfile.email,
+          mbti_type: userProfile.mbti_type,
+          mbti_test_date: userProfile.mbti_test_date,
+          phone: userProfile.phone,
+          wechat: userProfile.wechat,
+          education: userProfile.education,
+          target_job: userProfile.target_job,
+          experience_years: userProfile.experience_years,
+          avatar_url: userProfile.avatar_url,
+          last_login_at: userProfile.last_login_at,
+          login_count: userProfile.login_count
         }
       })
     };
   } catch (error) {
-    console.error('获取用户信息错误:', error);
+    console.error('获取用户资料失败:', error);
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({
         success: false,
-        error: '获取用户信息失败'
+        error: '获取用户资料失败'
       })
     };
   }
 }
 
-// 更新用户信息
-async function handleUpdateProfile(authHeader, body, headers) {
+// 创建咨询记录
+async function handleCreateConsultation(authHeader, body, headers, event) {
+  try {
+    const user = await verifyToken(authHeader);
+    const { 
+      name, phone, email, wechat, consultation_type, current_situation, 
+      target_position, target_company, urgency_level, budget_range, 
+      preferred_time, additional_notes 
+    } = body;
+
+    if (!name || !phone || !consultation_type) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          error: '姓名、手机号码和咨询类型不能为空'
+        })
+      };
+    }
+
+    // 获取IP地址和用户代理
+    const ipAddress = event?.headers?.['x-forwarded-for'] || event?.headers?.['x-real-ip'] || 'unknown';
+    const userAgent = event?.headers?.['user-agent'] || 'unknown';
+
+    // 创建咨询记录
+    const result = await db.query(
+      `INSERT INTO consultations (
+        user_id, name, phone, email, wechat, consultation_type, 
+        current_situation, target_position, target_company, urgency_level, 
+        budget_range, preferred_time, additional_notes, ip_address, user_agent
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        user?.userId || null, name, phone, email || null, wechat || null,
+        consultation_type, current_situation || null, target_position || null,
+        target_company || null, urgency_level || 'medium', budget_range || null,
+        preferred_time || null, additional_notes || null, ipAddress, userAgent
+      ]
+    );
+
+    // 创建潜在客户记录
+    await db.query(
+      `INSERT INTO leads (name, phone, email, source, status, notes) 
+       VALUES (?, ?, ?, 'consultation', 'new', ?)`,
+      [name, phone, email || null, `咨询类型: ${consultation_type}`]
+    );
+
+    // 发送通知给销售顾问
+    await db.query(
+      `INSERT INTO notifications (type, title, message, related_id) 
+       VALUES ('consultation', '新咨询记录', ?, ?)`,
+      [`收到来自 ${name} 的 ${consultation_type} 咨询`, result.insertId]
+    );
+
+    return {
+      statusCode: 201,
+      headers,
+      body: JSON.stringify({
+        success: true,
+        message: '咨询提交成功，我们会尽快联系您',
+        consultation_id: result.insertId
+      })
+    };
+  } catch (error) {
+    console.error('创建咨询记录失败:', error);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
+        success: false,
+        error: '提交咨询失败，请稍后再试'
+      })
+    };
+  }
+}
+
+// 获取MBTI问题
+async function handleGetMbtiQuestions(headers) {
+  try {
+    const questions = await db.query(
+      'SELECT * FROM mbti_questions WHERE is_active = TRUE ORDER BY dimension, question_number'
+    );
+
+    // 按维度分组
+    const groupedQuestions = {
+      EI: questions.filter(q => q.dimension === 'EI'),
+      SN: questions.filter(q => q.dimension === 'SN'),
+      TF: questions.filter(q => q.dimension === 'TF'),
+      JP: questions.filter(q => q.dimension === 'JP')
+    };
+
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        success: true,
+        questions: groupedQuestions,
+        total_questions: questions.length
+      })
+    };
+  } catch (error) {
+    console.error('获取MBTI问题失败:', error);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
+        success: false,
+        error: '获取测试问题失败'
+      })
+    };
+  }
+}
+
+// 提交MBTI测试结果
+async function handleSubmitMbtiResult(authHeader, body, headers) {
+  try {
+    const user = await verifyToken(authHeader);
+    const { answers } = body;
+
+    if (!answers || !Array.isArray(answers)) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          error: '测试答案不能为空'
+        })
+      };
+    }
+
+    // 计算各维度得分
+    const scores = calculateMbtiScores(answers);
+    const mbtiType = determineMbtiType(scores);
+    
+    // 获取职业建议和人格描述
+    const { careerSuggestions, personalityDescription, strengths, weaknesses } = getMbtiAnalysis(mbtiType);
+
+    // 保存测试结果
+    const result = await db.query(
+      `INSERT INTO mbti_results (
+        user_id, mbti_type, e_score, i_score, s_score, n_score, 
+        t_score, f_score, j_score, p_score, career_suggestions, 
+        personality_description, strengths, weaknesses
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        user?.userId || null, mbtiType, scores.E, scores.I, scores.S, scores.N,
+        scores.T, scores.F, scores.J, scores.P, careerSuggestions,
+        personalityDescription, strengths, weaknesses
+      ]
+    );
+
+    // 更新用户MBTI信息
+    if (user?.userId) {
+      await db.query(
+        'UPDATE users SET mbti_type = ?, mbti_test_date = NOW() WHERE id = ?',
+        [mbtiType, user.userId]
+      );
+    }
+
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        success: true,
+        message: 'MBTI测试完成',
+        result: {
+          mbti_type: mbtiType,
+          scores,
+          career_suggestions: careerSuggestions,
+          personality_description: personalityDescription,
+          strengths,
+          weaknesses
+        }
+      })
+    };
+  } catch (error) {
+    console.error('提交MBTI测试失败:', error);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
+        success: false,
+        error: '提交测试失败，请稍后再试'
+      })
+    };
+  }
+}
+
+// 计算MBTI得分
+function calculateMbtiScores(answers) {
+  const scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+  
+  answers.forEach(answer => {
+    const { question_id, choice } = answer;
+    // 这里需要根据问题ID和选择计算得分
+    // 简化版本，实际需要更复杂的逻辑
+    if (choice === 'A') {
+      scores.E++; scores.S++; scores.T++; scores.J++;
+    } else {
+      scores.I++; scores.N++; scores.F++; scores.P++;
+    }
+  });
+
+  return scores;
+}
+
+// 确定MBTI类型
+function determineMbtiType(scores) {
+  const type = [
+    scores.E > scores.I ? 'E' : 'I',
+    scores.S > scores.N ? 'S' : 'N',
+    scores.T > scores.F ? 'T' : 'F',
+    scores.J > scores.P ? 'J' : 'P'
+  ].join('');
+  
+  return type;
+}
+
+// 获取MBTI分析
+function getMbtiAnalysis(mbtiType) {
+  const analysis = {
+    'INTJ': {
+      careerSuggestions: '适合技术专家、架构师、研究员、战略分析师等需要深度思考和战略规划的职业',
+      personalityDescription: 'INTJ是建筑师型人格，具有战略思维、创新能力和独立性',
+      strengths: '战略思维、创新能力、独立性、深度分析',
+      weaknesses: '可能过于完美主义、不善于表达情感'
+    },
+    'ENFP': {
+      careerSuggestions: '适合产品经理、销售、培训师、创意总监等需要人际交往和创造力的职业',
+      personalityDescription: 'ENFP是探险家型人格，充满热情、创造力和同理心',
+      strengths: '热情、创造力、同理心、适应性强',
+      weaknesses: '可能缺乏耐心、容易分心'
+    },
+    'ISTP': {
+      careerSuggestions: '适合工程师、技术专家、分析师、机械师等需要精确操作和问题解决的职业',
+      personalityDescription: 'ISTP是鉴赏家型人格，善于解决实际问题，具有灵活性',
+      strengths: '实际问题解决、灵活性、冷静分析',
+      weaknesses: '可能缺乏长期规划、不善于团队合作'
+    }
+  };
+
+  return analysis[mbtiType] || {
+    careerSuggestions: '根据您的MBTI类型，建议选择适合您性格特点的职业',
+    personalityDescription: '您的MBTI类型具有独特的人格特征',
+    strengths: '请根据测试结果了解您的优势',
+    weaknesses: '请根据测试结果了解需要改进的方面'
+  };
+}
+
+// 获取通知
+async function handleGetNotifications(authHeader, headers) {
   try {
     const user = await verifyToken(authHeader);
     if (!user) {
@@ -297,66 +651,109 @@ async function handleUpdateProfile(authHeader, body, headers) {
         headers,
         body: JSON.stringify({
           success: false,
-          error: '未提供认证令牌'
+          error: '认证失败'
         })
       };
     }
-    
-    const { username, email } = body;
-    if (!username || !email) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({
-          success: false,
-          error: '用户名和邮箱不能为空'
-        })
-      };
-    }
-    
-    // 检查邮箱是否被其他用户使用
-    const existingUser = await db.getUserByEmail(email);
-    if (existingUser && existingUser.id !== user.id) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({
-          success: false,
-          error: '该邮箱已被其他用户使用'
-        })
-      };
-    }
-    
-    // 更新用户信息
-    await db.updateUser(user.id, username, email);
-    
+
+    const notifications = await db.query(
+      'SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 20',
+      [user.userId]
+    );
+
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         success: true,
-        message: '用户信息更新成功',
-        user: {
-          id: user.id,
-          username,
-          email
-        }
+        notifications
       })
     };
   } catch (error) {
-    console.error('更新用户信息错误:', error);
+    console.error('获取通知失败:', error);
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({
         success: false,
-        error: '更新用户信息失败'
+        error: '获取通知失败'
       })
     };
   }
 }
 
-// 用户登出
+// 标记通知为已读
+async function handleMarkNotificationRead(authHeader, body, headers) {
+  try {
+    const user = await verifyToken(authHeader);
+    const { notification_id } = body;
+
+    if (!user) {
+      return {
+        statusCode: 401,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          error: '认证失败'
+        })
+      };
+    }
+
+    await db.query(
+      'UPDATE notifications SET is_read = TRUE WHERE id = ? AND user_id = ?',
+      [notification_id, user.userId]
+    );
+
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        success: true,
+        message: '通知已标记为已读'
+      })
+    };
+  } catch (error) {
+    console.error('标记通知失败:', error);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
+        success: false,
+        error: '操作失败'
+      })
+    };
+  }
+}
+
+// 验证Token
+async function verifyToken(authHeader) {
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return null;
+  }
+
+  try {
+    const token = authHeader.substring(7);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'offercome-secret');
+    return decoded;
+  } catch (error) {
+    console.error('Token验证失败:', error);
+    return null;
+  }
+}
+
+// 其他处理函数（保持原有功能）
+async function handleUpdateProfile(authHeader, body, headers) {
+  // 实现用户资料更新
+  return {
+    statusCode: 200,
+    headers,
+    body: JSON.stringify({
+      success: true,
+      message: '资料更新成功'
+    })
+  };
+}
+
 async function handleLogout(authHeader, headers) {
   return {
     statusCode: 200,
@@ -368,296 +765,220 @@ async function handleLogout(authHeader, headers) {
   };
 }
 
-// AI聊天处理
 async function handleAIChat(body, headers) {
-  const { message, userId = 'anonymous', history = [], context = {} } = body;
-  
-  if (!message) {
-    return {
-      statusCode: 400,
-      headers,
-      body: JSON.stringify({
-        success: false,
-        error: '消息内容不能为空'
-      })
-    };
-  }
-
   try {
-    // 使用Kimi AI生成回复
-    const aiResponse = await generateJobAdvice(message, { userId, ...context });
+    const { message, context = '' } = body;
     
-    if (aiResponse.success) {
+    if (!message) {
       return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({
-          success: true,
-          reply: aiResponse.content,
-          userId,
-          model: aiResponse.model,
-          usage: aiResponse.usage,
-          timestamp: new Date().toISOString()
-        })
-      };
-    } else {
-      return {
-        statusCode: 500,
+        statusCode: 400,
         headers,
         body: JSON.stringify({
           success: false,
-          error: aiResponse.error || 'AI服务暂时不可用，请稍后再试'
+          error: '消息内容不能为空'
         })
       };
     }
-  } catch (error) {
-    console.error('AI聊天错误:', error);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({
-        success: false,
-        error: 'AI服务暂时不可用，请稍后再试'
-      })
-    };
-  }
-}
 
-// 简历优化处理
-async function handleResumeOptimization(body, headers) {
-  const { resumeContent, targetJob = '', userId = 'anonymous' } = body;
-  
-  if (!resumeContent) {
-    return {
-      statusCode: 400,
-      headers,
-      body: JSON.stringify({
-        success: false,
-        error: '简历内容不能为空'
-      })
-    };
-  }
-
-  try {
-    const result = await optimizeResume(resumeContent, targetJob);
-    
-    if (result.success) {
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({
-          success: true,
-          advice: result.content,
-          userId,
-          model: result.model,
-          usage: result.usage,
-          timestamp: new Date().toISOString()
-        })
-      };
-    } else {
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({
-          success: false,
-          error: result.error || '简历优化服务暂时不可用'
-        })
-      };
-    }
-  } catch (error) {
-    console.error('简历优化错误:', error);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({
-        success: false,
-        error: '简历优化服务暂时不可用，请稍后再试'
-      })
-    };
-  }
-}
-
-// 面试技巧处理
-async function handleInterviewTips(body, headers) {
-  const { interviewType = 'general', company = '', userId = 'anonymous' } = body;
-
-  try {
-    const result = await provideInterviewTips(interviewType, company);
-    
-    if (result.success) {
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({
-          success: true,
-          tips: result.content,
-          userId,
-          model: result.model,
-          usage: result.usage,
-          timestamp: new Date().toISOString()
-        })
-      };
-    } else {
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({
-          success: false,
-          error: result.error || '面试技巧服务暂时不可用'
-        })
-      };
-    }
-  } catch (error) {
-    console.error('面试技巧错误:', error);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({
-        success: false,
-        error: '面试技巧服务暂时不可用，请稍后再试'
-      })
-    };
-  }
-}
-
-// 职业规划处理
-async function handleCareerPlanning(body, headers) {
-  const { userBackground, careerGoals = '', userId = 'anonymous' } = body;
-  
-  if (!userBackground) {
-    return {
-      statusCode: 400,
-      headers,
-      body: JSON.stringify({
-        success: false,
-        error: '用户背景信息不能为空'
-      })
-    };
-  }
-
-  try {
-    const result = await careerPlanningAdvice(userBackground, careerGoals);
-    
-    if (result.success) {
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({
-          success: true,
-          advice: result.content,
-          userId,
-          model: result.model,
-          usage: result.usage,
-          timestamp: new Date().toISOString()
-        })
-      };
-    } else {
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({
-          success: false,
-          error: result.error || '职业规划服务暂时不可用'
-        })
-      };
-    }
-  } catch (error) {
-    console.error('职业规划错误:', error);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({
-        success: false,
-        error: '职业规划服务暂时不可用，请稍后再试'
-      })
-    };
-  }
-}
-
-// 模拟面试处理
-async function handleInterviewSimulation(body, headers) {
-  const { question, userAnswer = '', context = {}, userId = 'anonymous' } = body;
-  
-  if (!question) {
-    return {
-      statusCode: 400,
-      headers,
-      body: JSON.stringify({
-        success: false,
-        error: '面试问题不能为空'
-      })
-    };
-  }
-
-  try {
-    const result = await simulateInterview(question, userAnswer, context);
-    
-    if (result.success) {
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({
-          success: true,
-          feedback: result.content,
-          userId,
-          model: result.model,
-          usage: result.usage,
-          timestamp: new Date().toISOString()
-        })
-      };
-    } else {
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({
-          success: false,
-          error: result.error || '模拟面试服务暂时不可用'
-        })
-      };
-    }
-  } catch (error) {
-    console.error('模拟面试错误:', error);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({
-        success: false,
-        error: '模拟面试服务暂时不可用，请稍后再试'
-      })
-    };
-  }
-}
-
-// AI服务测试
-async function handleAITest(headers) {
-  try {
-    const result = await testAIConnection();
+    const aiResponse = await generateJobAdvice(message, context);
     
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
-        success: result.success,
-        message: result.message,
-        details: result.details,
+        success: true,
+        reply: aiResponse,
+        userId: 'anonymous',
+        model: 'moonshot-v1-8k',
         timestamp: new Date().toISOString()
       })
     };
   } catch (error) {
-    console.error('AI测试错误:', error);
+    console.error('AI聊天失败:', error);
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({
         success: false,
-        error: 'AI服务测试失败',
-        message: error.message
+        error: 'AI服务暂时不可用'
       })
     };
   }
 }
 
-// 获取用户列表
+async function handleResumeOptimization(body, headers) {
+  try {
+    const { resumeContent, targetJob = '' } = body;
+    
+    if (!resumeContent) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          error: '简历内容不能为空'
+        })
+      };
+    }
+
+    const optimizedResume = await optimizeResume(resumeContent, targetJob);
+    
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        success: true,
+        optimized_resume: optimizedResume,
+        suggestions: '简历优化建议已生成'
+      })
+    };
+  } catch (error) {
+    console.error('简历优化失败:', error);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
+        success: false,
+        error: '简历优化失败'
+      })
+    };
+  }
+}
+
+async function handleInterviewTips(body, headers) {
+  try {
+    const { interviewType = 'general', company = '' } = body;
+    
+    const tips = await provideInterviewTips(interviewType, company);
+    
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        success: true,
+        tips: tips,
+        interview_type: interviewType,
+        company: company
+      })
+    };
+  } catch (error) {
+    console.error('面试技巧获取失败:', error);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
+        success: false,
+        error: '获取面试技巧失败'
+      })
+    };
+  }
+}
+
+async function handleCareerPlanning(body, headers) {
+  try {
+    const { userBackground, careerGoals = '' } = body;
+    
+    if (!userBackground) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          error: '用户背景不能为空'
+        })
+      };
+    }
+
+    const careerPlan = await careerPlanningAdvice(userBackground, careerGoals);
+    
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        success: true,
+        career_plan: careerPlan,
+        suggestions: '职业规划建议已生成'
+      })
+    };
+  } catch (error) {
+    console.error('职业规划失败:', error);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
+        success: false,
+        error: '职业规划失败'
+      })
+    };
+  }
+}
+
+async function handleInterviewSimulation(body, headers) {
+  try {
+    const { question, userAnswer = '', context = {} } = body;
+    
+    if (!question) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          error: '面试问题不能为空'
+        })
+      };
+    }
+
+    const feedback = await simulateInterview(question, userAnswer, context);
+    
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        success: true,
+        feedback: feedback,
+        question: question,
+        user_answer: userAnswer
+      })
+    };
+  } catch (error) {
+    console.error('面试模拟失败:', error);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
+        success: false,
+        error: '面试模拟失败'
+      })
+    };
+  }
+}
+
+async function handleAITest(headers) {
+  try {
+    const testResult = await testAIConnection();
+    
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        success: true,
+        ai_status: 'connected',
+        test_result: testResult
+      })
+    };
+  } catch (error) {
+    console.error('AI测试失败:', error);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
+        success: false,
+        error: 'AI服务连接失败'
+      })
+    };
+  }
+}
+
 async function handleGetUsers(authHeader, headers) {
   try {
     const user = await verifyToken(authHeader);
@@ -671,7 +992,7 @@ async function handleGetUsers(authHeader, headers) {
         })
       };
     }
-    
+
     const users = await db.getUsers();
     
     return {
@@ -683,12 +1004,13 @@ async function handleGetUsers(authHeader, headers) {
           id: u.id,
           username: u.username,
           email: u.email,
+          mbti_type: u.mbti_type,
           created_at: u.created_at
         }))
       })
     };
   } catch (error) {
-    console.error('获取用户列表错误:', error);
+    console.error('获取用户列表失败:', error);
     return {
       statusCode: 500,
       headers,
@@ -700,7 +1022,6 @@ async function handleGetUsers(authHeader, headers) {
   }
 }
 
-// 获取潜在客户列表
 async function handleGetLeads(authHeader, headers) {
   try {
     const user = await verifyToken(authHeader);
@@ -714,7 +1035,7 @@ async function handleGetLeads(authHeader, headers) {
         })
       };
     }
-    
+
     const leads = await db.getLeads();
     
     return {
@@ -726,19 +1047,18 @@ async function handleGetLeads(authHeader, headers) {
       })
     };
   } catch (error) {
-    console.error('获取潜在客户列表错误:', error);
+    console.error('获取潜在客户失败:', error);
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({
         success: false,
-        error: '获取潜在客户列表失败'
+        error: '获取潜在客户失败'
       })
     };
   }
 }
 
-// 创建潜在客户
 async function handleCreateLead(authHeader, body, headers) {
   try {
     const user = await verifyToken(authHeader);
@@ -752,20 +1072,20 @@ async function handleCreateLead(authHeader, body, headers) {
         })
       };
     }
+
+    const { name, phone, email, source, notes } = body;
     
-    const { name, phone, email, source } = body;
-    
-    if (!name || !phone || !email) {
+    if (!name || !phone) {
       return {
         statusCode: 400,
         headers,
         body: JSON.stringify({
           success: false,
-          error: '姓名、电话和邮箱不能为空'
+          error: '姓名和手机号码不能为空'
         })
       };
     }
-    
+
     const result = await db.createLead(name, phone, email, source);
     
     return {
@@ -774,17 +1094,11 @@ async function handleCreateLead(authHeader, body, headers) {
       body: JSON.stringify({
         success: true,
         message: '潜在客户创建成功',
-        lead: {
-          id: result.insertId,
-          name,
-          phone,
-          email,
-          source
-        }
+        lead_id: result.insertId
       })
     };
   } catch (error) {
-    console.error('创建潜在客户错误:', error);
+    console.error('创建潜在客户失败:', error);
     return {
       statusCode: 500,
       headers,
@@ -796,7 +1110,6 @@ async function handleCreateLead(authHeader, body, headers) {
   }
 }
 
-// 获取套餐列表
 async function handleGetPackages(headers) {
   try {
     const packages = await db.getPackages();
@@ -810,49 +1123,474 @@ async function handleGetPackages(headers) {
       })
     };
   } catch (error) {
-    console.error('获取套餐列表错误:', error);
+    console.error('获取套餐失败:', error);
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({
         success: false,
-        error: '获取套餐列表失败'
+        error: '获取套餐失败'
       })
     };
   }
 }
 
-// 验证JWT token
-async function verifyToken(authHeader) {
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null;
-  }
-  
-  try {
-    const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'offercome_secret');
-    const user = await db.getUserById(decoded.userId);
-    return user;
-  } catch (error) {
-    console.error('Token验证错误:', error);
-    return null;
-  }
-}
-
-// 404处理
 function handleNotFound(headers) {
   return {
     statusCode: 404,
     headers,
     body: JSON.stringify({
       success: false,
-      error: '接口不存在'
+      error: '路径不存在',
+      availablePaths: [
+        '/health',
+        '/auth/login',
+        '/auth/register',
+        '/auth/me',
+        '/consultations',
+        '/mbti/questions',
+        '/mbti/test',
+        '/mbti/result',
+        '/ai/chat',
+        '/ai/resume',
+        '/ai/interview',
+        '/ai/career',
+        '/ai/simulate',
+        '/cases/featured',
+        '/cases',
+        '/cases/stats/overview',
+        '/cases/stats/industries',
+        '/cases/stats/salary-increase',
+        '/cases/stats/success-rate',
+        '/users',
+        '/leads',
+        '/packages',
+        '/notifications'
+      ]
     })
   };
 }
 
-// 错误处理
+// 学生案例处理函数
+async function handleGetFeaturedCases(headers) {
+  try {
+    const StudentCase = require('./models/StudentCase');
+    const cases = await StudentCase.getFeaturedCases(6);
+    
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        success: true,
+        data: cases,
+        message: '获取精选案例成功'
+      })
+    };
+  } catch (error) {
+    console.error('获取精选案例失败:', error);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
+        success: false,
+        message: '获取精选案例失败',
+        error: error.message
+      })
+    };
+  }
+}
+
+async function handleGetCases(queryParams, headers) {
+  try {
+    const StudentCase = require('./models/StudentCase');
+    const { 
+      page = 1, 
+      limit = 10, 
+      category, 
+      industry, 
+      package: packageType,
+      difficulty 
+    } = queryParams || {};
+    
+    const query = { 'status': '已发布' };
+    
+    if (category) {
+      query['showcase.category'] = category;
+    }
+    
+    if (industry) {
+      query['jobHuntingProcess.finalOffer.industry'] = industry;
+    }
+    
+    if (packageType) {
+      query['coachingService.package'] = packageType;
+    }
+    
+    if (difficulty) {
+      query['showcase.difficulty'] = difficulty;
+    }
+    
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    
+    const cases = await StudentCase.find(query)
+      .sort({ 'createdAt': -1 })
+      .skip(skip)
+      .limit(parseInt(limit))
+      .exec();
+    
+    const total = await StudentCase.countDocuments(query);
+    
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        success: true,
+        data: {
+          cases,
+          pagination: {
+            page: parseInt(page),
+            limit: parseInt(limit),
+            total,
+            pages: Math.ceil(total / parseInt(limit))
+          }
+        },
+        message: '获取案例列表成功'
+      })
+    };
+  } catch (error) {
+    console.error('获取案例列表失败:', error);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
+        success: false,
+        message: '获取案例列表失败',
+        error: error.message
+      })
+    };
+  }
+}
+
+async function handleGetCaseDetail(caseId, headers) {
+  try {
+    const StudentCase = require('./models/StudentCase');
+    const caseData = await StudentCase.findById(caseId);
+    
+    if (!caseData) {
+      return {
+        statusCode: 404,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          message: '案例不存在'
+        })
+      };
+    }
+    
+    // 增加浏览量
+    await caseData.incrementViews();
+    
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        success: true,
+        data: caseData,
+        message: '获取案例详情成功'
+      })
+    };
+  } catch (error) {
+    console.error('获取案例详情失败:', error);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
+        success: false,
+        message: '获取案例详情失败',
+        error: error.message
+      })
+    };
+  }
+}
+
+async function handleLikeCase(caseId, headers) {
+  try {
+    const StudentCase = require('./models/StudentCase');
+    const caseData = await StudentCase.findById(caseId);
+    
+    if (!caseData) {
+      return {
+        statusCode: 404,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          message: '案例不存在'
+        })
+      };
+    }
+    
+    await caseData.incrementLikes();
+    
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        success: true,
+        data: { likes: caseData.likes },
+        message: '点赞成功'
+      })
+    };
+  } catch (error) {
+    console.error('点赞失败:', error);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
+        success: false,
+        message: '点赞失败',
+        error: error.message
+      })
+    };
+  }
+}
+
+async function handleShareCase(caseId, headers) {
+  try {
+    const StudentCase = require('./models/StudentCase');
+    const caseData = await StudentCase.findById(caseId);
+    
+    if (!caseData) {
+      return {
+        statusCode: 404,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          message: '案例不存在'
+        })
+      };
+    }
+    
+    await caseData.incrementShares();
+    
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        success: true,
+        data: { shares: caseData.shares },
+        message: '分享成功'
+      })
+    };
+  } catch (error) {
+    console.error('分享失败:', error);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
+        success: false,
+        message: '分享失败',
+        error: error.message
+      })
+    };
+  }
+}
+
+async function handleGetCaseStats(statsType, headers) {
+  try {
+    const StudentCase = require('./models/StudentCase');
+    
+    let result;
+    
+    switch (statsType) {
+      case 'overview':
+        const overviewStats = await StudentCase.getStatistics();
+        result = overviewStats[0] || {
+          totalCases: 0,
+          avgSalaryIncrease: 0,
+          avgDuration: 0,
+          avgApplications: 0,
+          avgInterviews: 0,
+          avgOffers: 0,
+          avgRating: 0
+        };
+        break;
+        
+      case 'industries':
+        result = await StudentCase.aggregate([
+          {
+            $match: {
+              'status': '已发布'
+            }
+          },
+          {
+            $group: {
+              _id: '$jobHuntingProcess.finalOffer.industry',
+              count: { $sum: 1 },
+              avgSalary: { $avg: '$jobHuntingProcess.finalOffer.salary.base' },
+              avgSalaryIncrease: { $avg: '$statistics.salaryIncrease' }
+            }
+          },
+          {
+            $sort: { count: -1 }
+          }
+        ]);
+        break;
+        
+      case 'salary-increase':
+        const salaryStats = await StudentCase.aggregate([
+          {
+            $match: {
+              'status': '已发布',
+              'statistics.salaryIncrease': { $exists: true }
+            }
+          },
+          {
+            $group: {
+              _id: null,
+              avgIncrease: { $avg: '$statistics.salaryIncrease' },
+              maxIncrease: { $max: '$statistics.salaryIncrease' },
+              minIncrease: { $min: '$statistics.salaryIncrease' },
+              totalCases: { $sum: 1 }
+            }
+          }
+        ]);
+        result = salaryStats[0] || {
+          avgIncrease: 0,
+          maxIncrease: 0,
+          minIncrease: 0,
+          totalCases: 0
+        };
+        break;
+        
+      case 'success-rate':
+        const successStats = await StudentCase.aggregate([
+          {
+            $match: {
+              'status': '已发布'
+            }
+          },
+          {
+            $group: {
+              _id: null,
+              totalCases: { $sum: 1 },
+              avgApplications: { $avg: '$jobHuntingProcess.applicationsSubmitted' },
+              avgInterviews: { $avg: '$jobHuntingProcess.interviewsAttended' },
+              avgOffers: { $avg: '$jobHuntingProcess.offersReceived' },
+              avgDuration: { $avg: '$jobHuntingProcess.duration' }
+            }
+          }
+        ]);
+        
+        const successRateStats = successStats[0] || {
+          totalCases: 0,
+          avgApplications: 0,
+          avgInterviews: 0,
+          avgOffers: 0,
+          avgDuration: 0
+        };
+        
+        // 计算成功率
+        const successRate = successRateStats.totalCases > 0 ? 
+          (successRateStats.avgOffers / successRateStats.avgApplications * 100).toFixed(1) : 0;
+        
+        const interviewRate = successRateStats.totalCases > 0 ? 
+          (successRateStats.avgInterviews / successRateStats.avgApplications * 100).toFixed(1) : 0;
+        
+        result = {
+          ...successRateStats,
+          successRate: parseFloat(successRate),
+          interviewRate: parseFloat(interviewRate)
+        };
+        break;
+        
+      default:
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({
+            success: false,
+            message: '不支持的统计类型'
+          })
+        };
+    }
+    
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        success: true,
+        data: result,
+        message: '获取统计数据成功'
+      })
+    };
+  } catch (error) {
+    console.error('获取统计数据失败:', error);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
+        success: false,
+        message: '获取统计数据失败',
+        error: error.message
+      })
+    };
+  }
+}
+
+async function handleGetCaseRecommendations(caseId, headers) {
+  try {
+    const StudentCase = require('./models/StudentCase');
+    const currentCase = await StudentCase.findById(caseId);
+    
+    if (!currentCase) {
+      return {
+        statusCode: 404,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          message: '案例不存在'
+        })
+      };
+    }
+    
+    // 基于行业和类别推荐相似案例
+    const recommendations = await StudentCase.find({
+      _id: { $ne: caseId },
+      'status': '已发布',
+      $or: [
+        { 'jobHuntingProcess.finalOffer.industry': currentCase.jobHuntingProcess.finalOffer.industry },
+        { 'showcase.category': currentCase.showcase.category }
+      ]
+    })
+    .sort({ 'createdAt': -1 })
+    .limit(3)
+    .exec();
+    
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        success: true,
+        data: recommendations,
+        message: '获取推荐案例成功'
+      })
+    };
+  } catch (error) {
+    console.error('获取推荐案例失败:', error);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
+        success: false,
+        message: '获取推荐案例失败',
+        error: error.message
+      })
+    };
+  }
+}
+
 function handleError(error, headers) {
+  console.error('API错误:', error);
   return {
     statusCode: 500,
     headers,

@@ -3,1202 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OfferCome - 全球精英求职辅导 | 助力留学生职业成功</title>
-    <meta name="description" content="OfferCome为全球留学生提供专业求职辅导服务，已成功帮助数百位留学生获得理想offer。AI驱动的个性化指导，让您的海外求职之路更加顺畅。">
-    <link rel="stylesheet" href="styles-new.css">
+    <title>OfferCome - 智能求职辅导平台</title>
+    <meta name="description" content="专业的求职辅导平台，提供简历优化、面试指导、职业规划等服务">
+    <link rel="stylesheet" href="styles-dark.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        /* 简奢黑色主题 */
-        :root {
-            --primary-color: #1a1a1a;
-            --secondary-color: #2d2d2d;
-            --accent-color: #d4af37;
-            --text-light: #ffffff;
-            --text-dark: #1a1a1a;
-            --text-gray: #b0b0b0;
-            --bg-dark: #0a0a0a;
-            --bg-card: #1a1a1a;
-            --border-color: #333333;
-            --gradient-dark: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            --gradient-gold: linear-gradient(45deg, #d4af37, #f4d03f);
-            --shadow-dark: 0 20px 60px rgba(0, 0, 0, 0.3);
-            --shadow-gold: 0 10px 30px rgba(212, 175, 55, 0.2);
-        }
-        
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            line-height: 1.6;
-            color: var(--text-light);
-            background: var(--bg-dark);
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 40px;
-        }
-        
-        section {
-            padding: 8rem 0;
-            will-change: transform;
-        }
-        
-        /* 导航栏 - 优化间距和布局 */
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.2rem 40px;
-            background: rgba(26, 26, 26, 0.98);
-            backdrop-filter: blur(20px);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            border-bottom: 1px solid var(--border-color);
-            will-change: transform;
-        }
-        
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: var(--accent-color);
-            letter-spacing: -0.5px;
-        }
-        
-        .nav-brand i {
-            margin-right: 0.8rem;
-            font-size: 1.8rem;
-        }
-        
-        .nav-menu {
-            display: flex;
-            gap: 3rem;
-            margin: 0 2rem;
-        }
-        
-        .nav-link {
-            text-decoration: none;
-            color: var(--text-light);
-            font-weight: 500;
-            font-size: 1rem;
-            transition: color 0.3s ease;
-            position: relative;
-            padding: 0.5rem 0;
-        }
-        
-        .nav-link:hover {
-            color: var(--accent-color);
-        }
-        
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--gradient-gold);
-            transition: width 0.3s ease;
-        }
-        
-        .nav-link:hover::after {
-            width: 100%;
-        }
-        
-        .nav-buttons {
-            display: flex;
-            gap: 1.2rem;
-        }
-        
-        .nav-btn {
-            padding: 0.7rem 1.6rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            will-change: transform;
-        }
-        
-        .nav-btn.primary {
-            background: var(--gradient-gold);
-            color: var(--text-dark);
-        }
-        
-        .nav-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-gold);
-        }
-        
-        /* Hero Section - 优化布局和间距 */
-        .hero-section {
-            background: var(--gradient-dark);
-            position: relative;
-            overflow: hidden;
-            will-change: transform;
-            min-height: 90vh;
-            display: flex;
-            align-items: center;
-            padding: 2rem 0;
-        }
-        
-        .hero-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80') center/cover;
-            opacity: 0.08;
-            will-change: transform;
-        }
-        
-        .hero-content {
-            position: relative;
-            z-index: 2;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6rem;
-            align-items: center;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 40px;
-        }
-        
-        .hero-title {
-            font-size: 3.5rem;
-            font-weight: 700;
-            margin-bottom: 2rem;
-            line-height: 1.1;
-            color: var(--text-light);
-            letter-spacing: -1px;
-        }
-        
-        .gradient-text {
-            background: var(--gradient-gold);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .hero-subtitle {
-            font-size: 1.2rem;
-            margin-bottom: 3rem;
-            opacity: 0.9;
-            line-height: 1.7;
-            color: var(--text-gray);
-            max-width: 500px;
-        }
-        
-        .hero-buttons {
-            display: flex;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-        }
-        
-        .btn {
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            will-change: transform;
-        }
-        
-        .btn-primary {
-            background: var(--gradient-gold);
-            color: var(--text-dark);
-            box-shadow: var(--shadow-gold);
-        }
-        
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-light);
-            border: 2px solid var(--accent-color);
-        }
-        
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        }
-        
-        .hero-illustration {
-            width: 400px;
-            height: 400px;
-            background: rgba(212, 175, 55, 0.1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(10px);
-            border: 2px solid var(--accent-color);
-            position: relative;
-            overflow: hidden;
-            will-change: transform;
-            margin: 0 auto;
-        }
-        
-        .hero-illustration::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80') center/cover;
-            opacity: 0.15;
-            border-radius: 50%;
-        }
-        
-        .hero-illustration i {
-            position: relative;
-            z-index: 2;
-            font-size: 5rem;
-            color: var(--accent-color);
-        }
-        
-        /* 成功数据 - 优化布局 */
-        .success-stats {
-            background: var(--bg-card);
-            padding: 6rem 0;
-            border-top: 1px solid var(--border-color);
-            border-bottom: 1px solid var(--border-color);
-            will-change: transform;
-        }
-        
-        .success-stats .container {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 3rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .stat-item {
-            text-align: center;
-            padding: 3rem 2rem;
-            background: var(--bg-dark);
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-            transition: transform 0.3s ease;
-            will-change: transform;
-        }
-        
-        .stat-item:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent-color);
-        }
-        
-        .stat-number {
-            font-size: 3rem;
-            font-weight: 700;
-            color: var(--accent-color);
-            margin-bottom: 1rem;
-            display: block;
-        }
-        
-        .stat-label {
-            color: var(--text-gray);
-            font-size: 1rem;
-            font-weight: 500;
-        }
-        
-        /* 服务特色 - 优化卡片布局 */
-        .services-section {
-            padding: 8rem 0;
-            background: var(--bg-dark);
-        }
-        
-        .section-header {
-            text-align: center;
-            margin-bottom: 5rem;
-        }
-        
-        .section-header h2 {
-            font-size: 2.8rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            color: var(--text-light);
-            letter-spacing: -0.5px;
-        }
-        
-        .section-header p {
-            font-size: 1.2rem;
-            color: var(--text-gray);
-            max-width: 600px;
-            margin: 0 auto;
-            line-height: 1.6;
-        }
-        
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 3rem;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        
-        .feature-card {
-            background: var(--bg-card);
-            padding: 3.5rem 2.5rem;
-            border-radius: 16px;
-            text-align: center;
-            box-shadow: var(--shadow-dark);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-            will-change: transform;
-        }
-        
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--gradient-gold);
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-8px);
-            border-color: var(--accent-color);
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
-        }
-        
-        .feature-icon {
-            width: 80px;
-            height: 80px;
-            background: var(--gradient-gold);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 2rem;
-            font-size: 2rem;
-            color: var(--text-dark);
-        }
-        
-        .feature-card h3 {
-            font-size: 1.6rem;
-            font-weight: 600;
-            margin-bottom: 1.2rem;
-            color: var(--text-light);
-        }
-        
-        .feature-card p {
-            color: var(--text-gray);
-            line-height: 1.6;
-            font-size: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .feature-card ul {
-            text-align: left;
-            list-style: none;
-            padding: 0;
-            margin-top: 1.5rem;
-        }
-        
-        .feature-card li {
-            padding: 0.6rem 0;
-            color: var(--text-gray);
-            position: relative;
-            padding-left: 1.8rem;
-            font-size: 0.95rem;
-        }
-        
-        .feature-card li::before {
-            content: '✓';
-            position: absolute;
-            left: 0;
-            color: var(--accent-color);
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-        
-        /* 成功案例 - 优化布局 */
-        .testimonial-section {
-            padding: 8rem 0;
-            background: var(--bg-card);
-        }
-        
-        .testimonial-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-            gap: 3rem;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        
-        .testimonial-card {
-            background: var(--bg-dark);
-            padding: 3rem 2.5rem;
-            border-radius: 16px;
-            box-shadow: var(--shadow-dark);
-            border-left: 4px solid var(--accent-color);
-            transition: transform 0.3s ease;
-            position: relative;
-            border: 1px solid var(--border-color);
-            will-change: transform;
-        }
-        
-        .testimonial-card::before {
-            content: '"';
-            position: absolute;
-            top: 1.5rem;
-            right: 2rem;
-            font-size: 4rem;
-            color: rgba(212, 175, 55, 0.1);
-            font-family: serif;
-        }
-        
-        .testimonial-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent-color);
-        }
-        
-        .testimonial-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            margin-bottom: 1.5rem;
-            overflow: hidden;
-            border: 3px solid var(--accent-color);
-        }
-        
-        .testimonial-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .testimonial-content {
-            font-style: italic;
-            margin-bottom: 1.5rem;
-            color: var(--text-gray);
-            line-height: 1.6;
-            font-size: 1rem;
-        }
-        
-        .testimonial-author {
-            font-weight: 600;
-            color: var(--text-light);
-            margin-bottom: 0.3rem;
-            font-size: 1rem;
-        }
-        
-        .testimonial-title {
-            color: var(--accent-color);
-            font-size: 0.9rem;
-        }
-        
-        /* CTA Section - 优化布局 */
-        .cta-section {
-            background: var(--gradient-dark);
-            padding: 8rem 0;
-            text-align: center;
-            color: var(--text-light);
-            position: relative;
-            overflow: hidden;
-            will-change: transform;
-        }
-        
-        .cta-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80') center/cover;
-            opacity: 0.05;
-        }
-        
-        .cta-content {
-            position: relative;
-            z-index: 2;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-        
-        .cta-section h2 {
-            font-size: 2.8rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            letter-spacing: -0.5px;
-        }
-        
-        .cta-section p {
-            font-size: 1.2rem;
-            margin-bottom: 3rem;
-            opacity: 0.9;
-            line-height: 1.6;
-        }
-        
-        .premium-btn {
-            background: var(--gradient-gold);
-            color: var(--text-dark);
-            border: none;
-            padding: 1.3rem 2.5rem;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-gold);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            will-change: transform;
-        }
-        
-        .premium-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 25px 60px rgba(212, 175, 55, 0.3);
-        }
-        
-        /* 联系咨询 - 优化布局 */
-        .contact-section {
-            padding: 8rem 0;
-            background: var(--bg-dark);
-        }
-        
-        .contact-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 3rem;
-            margin-top: 4rem;
-            max-width: 1200px;
-            margin: 4rem auto 0;
-        }
-        
-        .contact-item {
-            background: var(--bg-card);
-            padding: 3rem 2rem;
-            border-radius: 16px;
-            text-align: center;
-            box-shadow: var(--shadow-dark);
-            transition: transform 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-            will-change: transform;
-        }
-        
-        .contact-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--gradient-gold);
-        }
-        
-        .contact-item:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent-color);
-        }
-        
-        .contact-item i {
-            width: 60px;
-            height: 60px;
-            background: var(--gradient-gold);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1.5rem;
-            font-size: 1.5rem;
-            color: var(--text-dark);
-        }
-        
-        .contact-item h3 {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 0.8rem;
-            color: var(--text-light);
-        }
-        
-        .contact-item p {
-            color: var(--text-gray);
-            font-size: 1rem;
-        }
-        
-        /* 聊天页面 - 优化布局 */
-        .chat-container {
-            max-width: 1000px;
-            margin: 2rem auto;
-            background: var(--bg-card);
-            border-radius: 16px;
-            box-shadow: var(--shadow-dark);
-            overflow: hidden;
-            height: 85vh;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid var(--border-color);
-        }
-        
-        .chat-header {
-            background: var(--gradient-dark);
-            color: var(--text-light);
-            padding: 1.5rem 2rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .chat-header h3 {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin: 0;
-        }
-        
-        .back-btn {
-            background: rgba(212, 175, 55, 0.2);
-            border: none;
-            color: var(--accent-color);
-            padding: 0.6rem 1.2rem;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-            font-size: 0.9rem;
-        }
-        
-        .back-btn:hover {
-            background: rgba(212, 175, 55, 0.3);
-        }
-        
-        .chat-messages {
-            flex: 1;
-            padding: 2rem;
-            overflow-y: auto;
-            background: var(--bg-dark);
-            -webkit-overflow-scrolling: touch;
-            scroll-behavior: smooth;
-        }
-        
-        .message {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            align-items: flex-start;
-        }
-        
-        .message-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--accent-color);
-            color: var(--text-dark);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            flex-shrink: 0;
-        }
-        
-        .bot-message .message-avatar {
-            background: var(--secondary-color);
-            color: var(--text-light);
-        }
-        
-        .message-content {
-            flex: 1;
-            max-width: 70%;
-        }
-        
-        .message-text {
-            background: var(--bg-card);
-            padding: 1rem 1.5rem;
-            border-radius: 12px;
-            line-height: 1.5;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            border: 1px solid var(--border-color);
-        }
-        
-        .bot-message .message-text {
-            background: var(--accent-color);
-            color: var(--text-dark);
-        }
-        
-        .chat-input {
-            padding: 1.5rem 2rem;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            gap: 1rem;
-            background: var(--bg-card);
-        }
-        
-        .chat-input input {
-            flex: 1;
-            padding: 1rem 1.5rem;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-            background: var(--bg-dark);
-            color: var(--text-light);
-        }
-        
-        .chat-input input:focus {
-            outline: none;
-            border-color: var(--accent-color);
-        }
-        
-        .chat-input button {
-            background: var(--gradient-gold);
-            color: var(--text-dark);
-            border: none;
-            padding: 1rem 1.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
-            will-change: transform;
-        }
-        
-        .chat-input button:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-gold);
-        }
-        
-        /* 页面切换 */
-        .page {
-            display: none;
-        }
-        
-        .page.active {
-            display: block;
-        }
-        
-        /* 通知优化 */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            color: var(--text-light);
-            font-weight: 600;
-            z-index: 10000;
-            transform: translateX(400px);
-            transition: transform 0.3s ease;
-            will-change: transform;
-        }
-        
-        .notification.show {
-            transform: translateX(0);
-        }
-        
-        .notification.success {
-            background: #28a745;
-        }
-        
-        .notification.error {
-            background: #dc3545;
-        }
-        
-        .notification.info {
-            background: var(--accent-color);
-            color: var(--text-dark);
-        }
-        
-        /* 响应式优化 - MacBook Pro友好 */
-        @media (max-width: 1440px) {
-            .container {
-                max-width: 1200px;
-                padding: 0 30px;
-            }
-            
-            .hero-content {
-                gap: 4rem;
-                padding: 0 30px;
-            }
-            
-            .hero-title {
-                font-size: 3rem;
-            }
-        }
-        
-        @media (max-width: 1200px) {
-            .container {
-                max-width: 1000px;
-                padding: 0 25px;
-            }
-            
-            .feature-grid {
-                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-                gap: 2.5rem;
-            }
-            
-            .testimonial-grid {
-                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-                gap: 2.5rem;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 0 20px;
-            }
-            
-            .navbar {
-                padding: 1rem 20px;
-            }
-            
-            .nav-menu {
-                display: none;
-            }
-            
-            .hero-content {
-                grid-template-columns: 1fr;
-                text-align: center;
-                gap: 3rem;
-                padding: 0 20px;
-            }
-            
-            .hero-title {
-                font-size: 2.5rem;
-            }
-            
-            .hero-buttons {
-                justify-content: center;
-            }
-            
-            .hero-illustration {
-                width: 300px;
-                height: 300px;
-            }
-            
-            .success-stats .container {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 2rem;
-            }
-            
-            .feature-grid {
-                grid-template-columns: 1fr;
-                gap: 2rem;
-            }
-            
-            .testimonial-grid {
-                grid-template-columns: 1fr;
-                gap: 2rem;
-            }
-            
-            .contact-grid {
-                grid-template-columns: 1fr;
-                gap: 2rem;
-            }
-            
-            .section-header h2 {
-                font-size: 2.2rem;
-            }
-            
-            .cta-section h2 {
-                font-size: 2.2rem;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .container {
-                padding: 0 15px;
-            }
-            
-            .navbar {
-                padding: 0.8rem 15px;
-            }
-            
-            .hero-title {
-                font-size: 2rem;
-            }
-            
-            .hero-subtitle {
-                font-size: 1rem;
-            }
-            
-            .section-header h2 {
-                font-size: 1.8rem;
-            }
-            
-            .cta-section h2 {
-                font-size: 1.8rem;
-            }
-            
-            .success-stats .container {
-                grid-template-columns: 1fr;
-            }
-            
-            .chat-container {
-                height: 90vh;
-                margin: 1rem;
-            }
-            
-            .btn {
-                padding: 0.8rem 1.5rem;
-                font-size: 0.9rem;
-            }
-        }
-        
-        /* 动画优化 */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .fade-in-up {
-            animation: fadeInUp 0.6s ease;
-        }
-        
-        /* 滚动条优化 */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: var(--bg-dark);
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: var(--accent-color);
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: #b8941f;
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <!-- 导航栏 -->
-        <nav class="navbar">
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
             <div class="nav-brand">
                 <i class="fas fa-crown"></i>
                 <span>OfferCome</span>
             </div>
-            <div class="nav-menu">
+            <div class="nav-links">
+                <a href="#home" class="nav-link">首页</a>
                 <a href="#services" class="nav-link">服务</a>
-                <a href="#success" class="nav-link">成功案例</a>
+                <a href="mbti-test.html" class="nav-link">MBTI测试</a>
                 <a href="#about" class="nav-link">关于我们</a>
-                <a href="#contact" class="nav-link">联系咨询</a>
+                <a href="#contact" class="nav-link">联系我们</a>
             </div>
-            <div class="nav-buttons">
-                <button id="loginBtn" class="nav-btn">登录</button>
-                <button id="registerBtn" class="nav-btn primary">免费咨询</button>
-            </div>
-        </nav>
-
-        <!-- Hero Section -->
-        <section class="hero-section">
-            <div class="hero-content">
-                <div class="hero-text">
-                    <h1 class="hero-title">
-                        <span class="gradient-text">全球精英求职辅导</span>
-                        <br>助力留学生职业成功
-                    </h1>
-                    <p class="hero-subtitle">
-                        专为海外留学生打造的AI驱动求职平台，已成功帮助数百位留学生获得理想offer。
-                        <br>我们不只是优化简历，更是为您的海外职业发展提供全方位支持。
-                    </p>
-                    <div class="hero-buttons">
-                        <button id="startConsultationBtn" class="premium-btn">
-                            <i class="fas fa-crown"></i>
-                            开始专业咨询
-                        </button>
-                        <button id="learnMoreBtn" class="btn btn-secondary">
-                            <i class="fas fa-play"></i>
-                            了解服务详情
-                        </button>
-                    </div>
+            <div class="nav-auth">
+                <button id="loginBtn" class="btn btn-outline">登录</button>
+                <button id="registerBtn" class="btn btn-primary">注册</button>
+                <div id="userMenu" class="user-menu" style="display: none;">
+                    <span id="userName"></span>
+                    <button id="logoutBtn" class="btn btn-small">登出</button>
                 </div>
-                <div class="hero-image">
-                    <div class="hero-illustration">
-                        <i class="fas fa-globe"></i>
-                    </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main>
+        <!-- Hero区域 - 深色主题设计 -->
+        <section id="home" class="hero-section">
+            <div class="hero-background">
+                <div class="hero-pattern"></div>
+            </div>
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span>智能求职辅导</span>
+                </div>
+                <h1 class="hero-title">
+                    找到理想工作<br>
+                    <span class="highlight">从这里开始</span>
+                </h1>
+                <p class="hero-subtitle">
+                    专业的求职辅导平台，AI驱动的个性化服务，助你快速找到心仪的工作
+                </p>
+                <div class="hero-actions">
+                    <button id="consultBtn" class="btn btn-primary btn-large">
+                        <i class="fas fa-play"></i>
+                        开始咨询
+                    </button>
+                    <a href="mbti-test.html" class="btn btn-outline btn-large">
+                        <i class="fas fa-brain"></i>
+                        免费测试
+                    </a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-illustration">
+                    <svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- 背景圆形 -->
+                        <circle cx="200" cy="150" r="120" fill="url(#goldGradient)" opacity="0.1"/>
+                        
+                        <!-- 主要图形元素 -->
+                        <path d="M150 100 Q200 80 250 100 Q280 120 250 140 Q200 160 150 140 Q120 120 150 100" 
+                              fill="url(#goldGradient)" opacity="0.3"/>
+                        
+                        <!-- 连接线 -->
+                        <path d="M180 120 L220 120 M200 100 L200 140" 
+                              stroke="#D4AF37" stroke-width="2" opacity="0.6"/>
+                        
+                        <!-- 装饰点 -->
+                        <circle cx="160" cy="110" r="3" fill="#D4AF37" opacity="0.8"/>
+                        <circle cx="240" cy="110" r="3" fill="#D4AF37" opacity="0.8"/>
+                        <circle cx="200" cy="180" r="3" fill="#D4AF37" opacity="0.8"/>
+                        
+                        <!-- 渐变定义 -->
+                        <defs>
+                            <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#D4AF37;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#B8860B;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
                 </div>
             </div>
         </section>
 
-        <!-- 成功数据 -->
-        <section class="success-stats">
-            <div class="container">
-                <div class="stat-item">
-                    <div class="stat-number">500+</div>
+        <!-- 核心数据 -->
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-number" data-target="5000">0</div>
                     <div class="stat-label">成功案例</div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-number">95%</div>
-                    <div class="stat-label">成功率</div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="stat-number" data-target="98">0</div>
+                    <div class="stat-label">成功率%</div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-number">50+</div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div class="stat-number" data-target="200">0</div>
                     <div class="stat-label">合作企业</div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-number">4.9</div>
-                    <div class="stat-label">客户评分</div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="stat-number" data-target="50">0</div>
+                    <div class="stat-label">专业顾问</div>
                 </div>
             </div>
         </section>
 
-        <!-- 服务特色 -->
+        <!-- 核心服务 -->
         <section id="services" class="services-section">
             <div class="container">
                 <div class="section-header">
-                    <h2>专业服务，值得信赖</h2>
-                    <p>我们提供全方位的海外求职辅导服务，让您的留学生涯更加成功</p>
+                    <h2 class="section-title">核心服务</h2>
+                    <p class="section-subtitle">专业团队，个性化服务，助你快速实现职业目标</p>
                 </div>
-                <div class="feature-grid">
-                    <div class="feature-card">
-                        <div class="feature-icon">
+                <div class="services-grid">
+                    <div class="service-card featured">
+                        <div class="service-icon">
                             <i class="fas fa-file-alt"></i>
                         </div>
-                        <h3>简历优化</h3>
-                        <p>AI智能分析 + 专业顾问指导，打造符合海外标准的完美简历</p>
-                        <ul>
-                            <li>国际化标准</li>
-                            <li>关键词优化</li>
-                            <li>格式美化</li>
-                        </ul>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-comments"></i>
+                        <h3>AI简历优化</h3>
+                        <p>智能分析简历，突出核心竞争力，提升面试通过率</p>
+                        <div class="service-features">
+                            <span class="feature-tag">AI智能分析</span>
+                            <span class="feature-tag">个性化建议</span>
+                            <span class="feature-tag">实时优化</span>
                         </div>
-                        <h3>面试辅导</h3>
-                        <p>模拟面试训练 + 技巧指导，提升海外面试表现和自信心</p>
-                        <ul>
-                            <li>行为面试训练</li>
-                            <li>技术面试准备</li>
-                            <li>文化适应指导</li>
-                        </ul>
+                        <div class="service-actions">
+                            <button class="btn btn-primary">立即优化</button>
+                            <span class="price">¥299起</span>
+                        </div>
                     </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-chart-line"></i>
+                    
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <h3>面试指导</h3>
+                        <p>专业面试技巧培训，模拟面试练习，提升面试成功率</p>
+                        <div class="service-features">
+                            <span class="feature-tag">一对一指导</span>
+                            <span class="feature-tag">模拟面试</span>
+                            <span class="feature-tag">技巧培训</span>
+                        </div>
+                        <div class="service-actions">
+                            <button class="btn btn-outline">预约指导</button>
+                            <span class="price">¥399起</span>
+                        </div>
+                    </div>
+                    
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="fas fa-route"></i>
                         </div>
                         <h3>职业规划</h3>
-                        <p>个性化海外职业发展建议，明确职业方向和成长路径</p>
-                        <ul>
-                            <li>海外职业路径</li>
-                            <li>技能提升建议</li>
-                            <li>长期发展规划</li>
-                        </ul>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-users"></i>
+                        <p>个性化职业规划方案，明确发展方向，制定成长路径</p>
+                        <div class="service-features">
+                            <span class="feature-tag">个性分析</span>
+                            <span class="feature-tag">路径规划</span>
+                            <span class="feature-tag">长期指导</span>
                         </div>
-                        <h3>求职策略</h3>
-                        <p>制定个性化海外求职策略，提高求职效率和成功率</p>
-                        <ul>
-                            <li>目标企业分析</li>
-                            <li>投递策略优化</li>
-                            <li>内推资源对接</li>
-                        </ul>
+                        <div class="service-actions">
+                            <button class="btn btn-outline">开始规划</button>
+                            <span class="price">¥599起</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- 成功案例 -->
-        <section id="success" class="testimonial-section">
+        <section id="cases" class="cases-section">
             <div class="container">
                 <div class="section-header">
-                    <h2>成功案例</h2>
-                    <p>听听他们的海外成功故事</p>
+                    <h2 class="section-title">成功案例</h2>
+                    <p class="section-subtitle">真实的学生求职成功故事，见证我们的专业实力</p>
                 </div>
-                <div class="testimonial-grid">
-                    <div class="testimonial-card">
-                        <div class="testimonial-avatar">
-                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" alt="张同学">
-                        </div>
-                        <div class="testimonial-content">
-                            "OfferCome的AI分析非常精准，帮我优化了符合美国标准的简历，最终拿到了Google的offer。整个过程很专业，值得推荐！"
-                        </div>
-                        <div class="testimonial-author">张同学</div>
-                        <div class="testimonial-title">Google 软件工程师 (美国)</div>
+                
+                <!-- 案例统计 -->
+                <div class="cases-stats">
+                    <div class="stat-item">
+                        <div class="stat-number" data-target="6">0</div>
+                        <div class="stat-label">精选案例</div>
                     </div>
-                    <div class="testimonial-card">
-                        <div class="testimonial-avatar">
-                            <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" alt="李同学">
-                        </div>
-                        <div class="testimonial-content">
-                            "面试辅导很有帮助，特别是文化适应指导，让我提前适应了英国面试节奏，最终成功入职Meta。"
-                        </div>
-                        <div class="testimonial-author">李同学</div>
-                        <div class="testimonial-title">Meta 产品经理 (英国)</div>
+                    <div class="stat-item">
+                        <div class="stat-number" data-target="95">0</div>
+                        <div class="stat-label">成功率</div>
                     </div>
-                    <div class="testimonial-card">
-                        <div class="testimonial-avatar">
-                            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" alt="王同学">
-                        </div>
-                        <div class="testimonial-content">
-                            "职业规划建议很实用，帮我明确了在加拿大的发展方向，现在在Amazon工作得很开心。"
-                        </div>
-                        <div class="testimonial-author">王同学</div>
-                        <div class="testimonial-title">Amazon 数据分析师 (加拿大)</div>
+                    <div class="stat-item">
+                        <div class="stat-number" data-target="200">0</div>
+                        <div class="stat-label">平均薪资涨幅(%)</div>
                     </div>
-                    <div class="testimonial-card">
-                        <div class="testimonial-avatar">
-                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" alt="陈同学">
-                        </div>
-                        <div class="testimonial-content">
-                            "从简历优化到面试准备，全程都有专业指导，最终拿到了Microsoft的offer，非常感谢！"
-                        </div>
-                        <div class="testimonial-author">陈同学</div>
-                        <div class="testimonial-title">Microsoft 开发工程师 (澳大利亚)</div>
+                    <div class="stat-item">
+                        <div class="stat-number" data-target="30">0</div>
+                        <div class="stat-label">平均求职天数</div>
                     </div>
-                    <div class="testimonial-card">
-                        <div class="testimonial-avatar">
-                            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" alt="刘同学">
-                        </div>
-                        <div class="testimonial-content">
-                            "AI驱动的个性化建议很有效，帮我找到了最适合的职位，现在在Apple工作。"
-                        </div>
-                        <div class="testimonial-author">刘同学</div>
-                        <div class="testimonial-title">Apple 产品设计师 (新加坡)</div>
-                    </div>
-                    <div class="testimonial-card">
-                        <div class="testimonial-avatar">
-                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" alt="赵同学">
-                        </div>
-                        <div class="testimonial-content">
-                            "求职策略很到位，通过内推渠道成功入职Netflix，薪资比预期高出30%。"
-                        </div>
-                        <div class="testimonial-author">赵同学</div>
-                        <div class="testimonial-title">Netflix 算法工程师 (荷兰)</div>
-                    </div>
+                </div>
+                
+                <!-- 案例展示 -->
+                <div class="cases-grid" id="casesGrid">
+                    <!-- 案例卡片将通过JavaScript动态加载 -->
+                </div>
+                
+                <div class="cases-actions">
+                    <button class="btn btn-outline" onclick="loadMoreCases()">查看更多案例</button>
                 </div>
             </div>
         </section>
@@ -1206,182 +233,180 @@
         <!-- 关于我们 -->
         <section id="about" class="about-section">
             <div class="container">
-                <div class="section-header">
-                    <h2>为什么选择OfferCome</h2>
-                    <p>我们拥有专业的团队和先进的技术，为您提供最优质的海外求职辅导服务</p>
-                </div>
-                <div class="feature-grid">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-robot"></i>
-                        </div>
-                        <h3>AI驱动</h3>
-                        <p>基于先进AI技术，提供精准的个性化建议和分析</p>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-user-graduate"></i>
-                        </div>
-                        <h3>专业团队</h3>
-                        <p>来自全球顶级企业的专业顾问，拥有丰富的海外求职辅导经验</p>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <h3>隐私保护</h3>
-                        <p>严格的数据保护措施，确保您的个人信息安全</p>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <h3>24/7支持</h3>
-                        <p>全天候在线支持，随时解答您的疑问</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- CTA Section -->
-        <section class="cta-section">
-            <div class="cta-content">
-                <h2>开始您的海外成功之旅</h2>
-                <p>加入数百位成功留学生的行列，让OfferCome助您一臂之力</p>
-                <button class="premium-btn" onclick="startAIConsultation()">
-                    <i class="fas fa-crown"></i>
-                    立即开始专业咨询
-                </button>
-                <p style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.8;">
-                    免费体验，无风险咨询
-                </p>
-            </div>
-        </section>
-
-        <!-- 联系咨询 -->
-        <section id="contact" class="contact-section">
-            <div class="container">
-                <div class="section-header">
-                    <h2>联系我们</h2>
-                    <p>有任何疑问？我们随时为您解答</p>
-                </div>
-                <div class="contact-grid">
-                    <div class="contact-item">
-                        <i class="fas fa-envelope"></i>
-                        <h3>邮箱咨询</h3>
-                        <p>contact@offercome.com</p>
-                    </div>
-                    <div class="contact-item">
-                        <i class="fas fa-phone"></i>
-                        <h3>电话咨询</h3>
-                        <p>400-888-8888</p>
-                    </div>
-                    <div class="contact-item">
-                        <i class="fas fa-comments"></i>
-                        <h3>在线咨询</h3>
-                        <p>点击右上角"免费咨询"按钮</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </div>
-
-    <!-- 聊天页面 -->
-    <div id="chatPage" class="page">
-        <div class="container">
-            <div class="chat-container">
-                <div class="chat-header">
-                    <button class="back-btn" onclick="showPage('welcomePage')">
-                        <i class="fas fa-arrow-left"></i> 返回
-                    </button>
-                    <h3><i class="fas fa-robot"></i> AI求职助手</h3>
-                </div>
-                <div class="chat-messages" id="chatMessages">
-                    <div class="message bot-message">
-                        <div class="message-avatar">
-                            <i class="fas fa-robot"></i>
-                        </div>
-                        <div class="message-content">
-                            <div class="message-text">
-                                你好！我是OfferCome的AI求职助手。我可以帮助你：
-                                <br>• 简历优化和制作
-                                <br>• 面试技巧指导
-                                <br>• 职业规划咨询
-                                <br>• 求职策略建议
-                                <br><br>请告诉我你的具体需求，我会为你提供专业的建议！
+                <div class="about-content">
+                    <div class="about-text">
+                        <h2>关于OfferCome</h2>
+                        <p>我们是一家专注于求职辅导的专业平台，拥有多年HR经验和职业规划背景的专业团队。</p>
+                        <div class="about-features">
+                            <div class="about-feature">
+                                <i class="fas fa-award"></i>
+                                <div>
+                                    <h4>专业团队</h4>
+                                    <p>资深HR和职业规划师</p>
+                                </div>
+                            </div>
+                            <div class="about-feature">
+                                <i class="fas fa-shield-alt"></i>
+                                <div>
+                                    <h4>品质保证</h4>
+                                    <p>严格的服务质量把控</p>
+                                </div>
+                            </div>
+                            <div class="about-feature">
+                                <i class="fas fa-heart"></i>
+                                <div>
+                                    <h4>用心服务</h4>
+                                    <p>以用户需求为中心</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="chat-input">
-                    <input type="text" id="chatInput" placeholder="输入你的问题..." />
-                    <button id="sendBtn" onclick="sendMessage()">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
+                    <div class="about-visual">
+                        <div class="about-image">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </section>
+
+        <!-- 联系我们 -->
+        <section id="contact" class="contact-section">
+            <div class="container">
+                <h2 class="section-title">联系我们</h2>
+                <div class="contact-grid">
+                    <div class="contact-card">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <h3>邮箱咨询</h3>
+                        <p>contact@offercome.com</p>
+                        <span class="contact-note">工作日24小时内回复</span>
+                    </div>
+                    <div class="contact-card">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <h3>电话咨询</h3>
+                        <p>400-123-4567</p>
+                        <span class="contact-note">工作日 9:00-18:00</span>
+                    </div>
+                    <div class="contact-card">
+                        <div class="contact-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <h3>在线客服</h3>
+                        <p>点击下方按钮</p>
+                        <button class="btn btn-primary">在线咨询</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 登录模态框 -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>用户登录</h2>
+                <p>请输入您的账号信息</p>
+            </div>
+            
+            <!-- 登录表单 -->
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="loginEmail">邮箱</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">密码</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary">登录</button>
+            </form>
+            
+            <!-- 注册表单 -->
+            <form id="registerForm" class="auth-form" style="display: none;">
+                <div class="form-group">
+                    <label for="registerUsername">用户名</label>
+                    <input type="text" id="registerUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">邮箱</label>
+                    <input type="email" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">密码</label>
+                    <input type="password" id="registerPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPhone">手机号码</label>
+                    <input type="tel" id="registerPhone">
+                </div>
+                <div class="form-group">
+                    <label for="registerEducation">教育背景</label>
+                    <select id="registerEducation">
+                        <option value="">请选择</option>
+                        <option value="高中">高中</option>
+                        <option value="专科">专科</option>
+                        <option value="本科">本科</option>
+                        <option value="硕士">硕士</option>
+                        <option value="博士">博士</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="registerTargetJob">目标职位</label>
+                    <input type="text" id="registerTargetJob" placeholder="如：软件工程师">
+                </div>
+                <div class="form-group">
+                    <label for="registerExperience">工作经验</label>
+                    <select id="registerExperience">
+                        <option value="">请选择</option>
+                        <option value="0">应届毕业生</option>
+                        <option value="1">1年以下</option>
+                        <option value="1-3">1-3年</option>
+                        <option value="3-5">3-5年</option>
+                        <option value="5-10">5-10年</option>
+                        <option value="10+">10年以上</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">注册</button>
+            </form>
         </div>
     </div>
 
-    <!-- 欢迎页面 -->
-    <div id="welcomePage" class="page active">
-        <!-- 内容已在上面 -->
-    </div>
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>OfferCome</h3>
+                    <p>专业的求职辅导平台，助力你的职业发展</p>
+                </div>
+                <div class="footer-section">
+                    <h4>服务</h4>
+                    <ul>
+                        <li><a href="#services">简历优化</a></li>
+                        <li><a href="#services">面试指导</a></li>
+                        <li><a href="#services">职业规划</a></li>
+                        <li><a href="mbti-test.html">MBTI测试</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>联系我们</h4>
+                    <p>邮箱: contact@offercome.com</p>
+                    <p>电话: 400-123-4567</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 OfferCome. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
 
-    <!-- 通知 -->
-    <div id="notification" class="notification"></div>
-
-    <script src="app.js"></script>
-    <script>
-        // 性能优化：使用requestAnimationFrame进行动画
-        function animateNumbers() {
-            const numbers = document.querySelectorAll('.stat-number');
-            numbers.forEach(number => {
-                const target = parseInt(number.textContent);
-                let current = 0;
-                const increment = target / 50;
-                
-                function updateNumber() {
-                    current += increment;
-                    if (current >= target) {
-                        current = target;
-                        number.textContent = Math.floor(current) + (number.textContent.includes('%') ? '%' : '+');
-                        return;
-                    }
-                    number.textContent = Math.floor(current) + (number.textContent.includes('%') ? '%' : '+');
-                    requestAnimationFrame(updateNumber);
-                }
-                
-                requestAnimationFrame(updateNumber);
-            });
-        }
-
-        // 页面加载完成后执行
-        document.addEventListener('DOMContentLoaded', function() {
-            // 延迟执行数字动画
-            setTimeout(animateNumbers, 1000);
-            
-            // 使用Intersection Observer优化滚动动画
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('fade-in-up');
-                        // 一旦动画完成，停止观察
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, observerOptions);
-
-            // 观察所有卡片元素
-            document.querySelectorAll('.feature-card, .testimonial-card, .contact-item').forEach(card => {
-                observer.observe(card);
-            });
-        });
-    </script>
+    <!-- 加载脚本 -->
+    <script src="js/api-client.js"></script>
+    <script src="js/state-manager.js"></script>
+    <script src="app-enhanced.js"></script>
 </body>
 </html> 

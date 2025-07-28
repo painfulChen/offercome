@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OfferCome - 智能求职辅导平台</title>
+    <meta name="description" content="专业的求职辅导平台，提供简历优化、面试指导、职业规划、MBTI测试等服务">
+    <link rel="stylesheet" href="styles-new.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-rocket"></i>
+                <span>OfferCome</span>
+                <div class="brand-subtitle">智能求职辅导</div>
+            </div>
+            <div class="nav-links">
+                <a href="#home" class="nav-link">首页</a>
+                <a href="#services" class="nav-link">服务</a>
+                <a href="#mbti" class="nav-link">MBTI测试</a>
+                <a href="#about" class="nav-link">关于我们</a>
+                <a href="#contact" class="nav-link">联系我们</a>
+            </div>
+            <div class="nav-auth">
+                <button id="loginBtn" class="btn btn-outline">登录</button>
+                <button id="registerBtn" class="btn btn-primary">注册</button>
+                <div id="userMenu" class="user-menu" style="display: none;">
+                    <span id="userName"></span>
+                    <button id="logoutBtn" class="btn btn-small">登出</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main>
+        <!-- 首页区域 -->
+        <section id="home" class="hero-section">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    开启你的<span class="highlight">职业新篇章</span>
+                </h1>
+                <p class="hero-subtitle">
+                    专业的求职辅导平台，结合MBTI人格测试，为你量身定制职业发展方案
+                </p>
+                <div class="hero-actions">
+                    <button id="startMbtiBtn" class="btn btn-primary btn-large">
+                        <i class="fas fa-brain"></i>
+                        免费MBTI测试
+                    </button>
+                    <button id="consultBtn" class="btn btn-outline btn-large">
+                        <i class="fas fa-comments"></i>
+                        立即咨询
+                    </button>
+                </div>
+            </div>
+            <div class="hero-image">
+                <i class="fas fa-chart-line"></i>
+            </div>
+        </section>
+
+        <!-- 成功统计 -->
+        <section class="success-stats">
+            <div class="stats-container">
+                <div class="stat-item">
+                    <div class="stat-number" data-target="5000">0</div>
+                    <div class="stat-label">成功案例</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-target="98">0</div>
+                    <div class="stat-label">成功率%</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-target="200">0</div>
+                    <div class="stat-label">合作企业</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-target="50">0</div>
+                    <div class="stat-label">专业顾问</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 服务介绍 -->
+        <section id="services" class="services-section">
+            <div class="container">
+                <h2 class="section-title">我们的服务</h2>
+                <div class="services-grid">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <h3>简历优化</h3>
+                        <p>AI驱动的简历优化，突出你的核心竞争力，提升面试机会</p>
+                        <button class="btn btn-outline">了解更多</button>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <h3>面试指导</h3>
+                        <p>模拟面试训练，提供专业反馈，让你在面试中脱颖而出</p>
+                        <button class="btn btn-outline">了解更多</button>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="fas fa-route"></i>
+                        </div>
+                        <h3>职业规划</h3>
+                        <p>基于MBTI测试结果，为你制定个性化的职业发展路径</p>
+                        <button class="btn btn-outline">了解更多</button>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h3>MBTI测试</h3>
+                        <p>专业的MBTI人格测试，了解你的性格特点，找到最适合的职业方向</p>
+                        <button id="mbtiTestBtn" class="btn btn-primary">开始测试</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MBTI测试区域 -->
+        <section id="mbti" class="mbti-section">
+            <div class="container">
+                <h2 class="section-title">MBTI人格测试</h2>
+                <p class="section-subtitle">了解你的性格类型，找到最适合的职业方向</p>
+                
+                <div id="mbtiTestContainer" class="mbti-test-container" style="display: none;">
+                    <div class="test-progress">
+                        <div class="progress-bar">
+                            <div id="progressFill" class="progress-fill"></div>
+                        </div>
+                        <span id="progressText">问题 1 / 32</span>
+                    </div>
+                    
+                    <div id="questionContainer" class="question-container">
+                        <h3 id="questionText">正在加载问题...</h3>
+                        <div class="answer-options">
+                            <button class="answer-btn" data-value="A">
+                                <span class="option-label">A</span>
+                                <span class="option-text">完全同意</span>
+                            </button>
+                            <button class="answer-btn" data-value="B">
+                                <span class="option-label">B</span>
+                                <span class="option-text">比较同意</span>
+                            </button>
+                            <button class="answer-btn" data-value="C">
+                                <span class="option-label">C</span>
+                                <span class="option-text">比较不同意</span>
+                            </button>
+                            <button class="answer-btn" data-value="D">
+                                <span class="option-label">D</span>
+                                <span class="option-text">完全不同意</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="resultContainer" class="result-container" style="display: none;">
+                        <h3>你的MBTI类型：<span id="mbtiType"></span></h3>
+                        <div class="result-content">
+                            <div class="result-section">
+                                <h4>人格描述</h4>
+                                <p id="personalityDescription"></p>
+                            </div>
+                            <div class="result-section">
+                                <h4>职业建议</h4>
+                                <p id="careerSuggestions"></p>
+                            </div>
+                            <div class="result-section">
+                                <h4>优势分析</h4>
+                                <p id="strengths"></p>
+                            </div>
+                            <div class="result-section">
+                                <h4>改进建议</h4>
+                                <p id="weaknesses"></p>
+                            </div>
+                        </div>
+                        <button id="saveResultBtn" class="btn btn-primary">保存结果</button>
+                        <button id="retakeTestBtn" class="btn btn-outline">重新测试</button>
+                    </div>
+                </div>
+                
+                <div id="mbtiIntro" class="mbti-intro">
+                    <div class="intro-content">
+                        <h3>什么是MBTI测试？</h3>
+                        <p>MBTI（迈尔斯-布里格斯类型指标）是一个基于荣格类型学理论的人格类型评估工具，帮助人们了解自己的性格偏好。</p>
+                        <div class="mbti-dimensions">
+                            <div class="dimension">
+                                <h4>E - I (外向 - 内向)</h4>
+                                <p>你倾向于从外部世界还是内心世界获得能量</p>
+                            </div>
+                            <div class="dimension">
+                                <h4>S - N (感觉 - 直觉)</h4>
+                                <p>你更关注具体事实还是抽象概念</p>
+                            </div>
+                            <div class="dimension">
+                                <h4>T - F (思考 - 情感)</h4>
+                                <p>你做决定时更依赖逻辑还是价值观</p>
+                            </div>
+                            <div class="dimension">
+                                <h4>J - P (判断 - 感知)</h4>
+                                <p>你更喜欢计划还是保持灵活性</p>
+                            </div>
+                        </div>
+                        <button id="startTestBtn" class="btn btn-primary btn-large">开始测试</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 咨询表单 -->
+        <section id="consultation" class="consultation-section">
+            <div class="container">
+                <h2 class="section-title">免费咨询</h2>
+                <p class="section-subtitle">填写表单，获得专业顾问的个性化建议</p>
+                
+                <form id="consultationForm" class="consultation-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">姓名 *</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">手机号码 *</label>
+                            <input type="tel" id="phone" name="phone" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email">邮箱</label>
+                            <input type="email" id="email" name="email">
+                        </div>
+                        <div class="form-group">
+                            <label for="wechat">微信号</label>
+                            <input type="text" id="wechat" name="wechat">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="consultationType">咨询类型 *</label>
+                        <select id="consultationType" name="consultationType" required>
+                            <option value="">请选择咨询类型</option>
+                            <option value="resume">简历优化</option>
+                            <option value="interview">面试指导</option>
+                            <option value="career">职业规划</option>
+                            <option value="mbti">MBTI测试</option>
+                            <option value="other">其他</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="currentSituation">当前情况</label>
+                        <textarea id="currentSituation" name="currentSituation" rows="3" placeholder="请描述你当前的工作或学习情况..."></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="targetPosition">目标职位</label>
+                            <input type="text" id="targetPosition" name="targetPosition" placeholder="如：软件工程师">
+                        </div>
+                        <div class="form-group">
+                            <label for="targetCompany">目标公司</label>
+                            <input type="text" id="targetCompany" name="targetCompany" placeholder="如：腾讯、阿里">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="urgencyLevel">紧急程度</label>
+                            <select id="urgencyLevel" name="urgencyLevel">
+                                <option value="low">不急</option>
+                                <option value="medium" selected>一般</option>
+                                <option value="high">紧急</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="budgetRange">预算范围</label>
+                            <select id="budgetRange" name="budgetRange">
+                                <option value="">请选择</option>
+                                <option value="1000-3000">1000-3000元</option>
+                                <option value="3000-5000">3000-5000元</option>
+                                <option value="5000-10000">5000-10000元</option>
+                                <option value="10000+">10000元以上</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="preferredTime">偏好时间</label>
+                        <input type="text" id="preferredTime" name="preferredTime" placeholder="如：工作日晚上、周末">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="additionalNotes">备注</label>
+                        <textarea id="additionalNotes" name="additionalNotes" rows="3" placeholder="其他需要说明的信息..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-large">
+                        <i class="fas fa-paper-plane"></i>
+                        提交咨询
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 用户注册/登录模态框 -->
+        <div id="authModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <div class="auth-tabs">
+                    <button class="tab-btn active" data-tab="login">登录</button>
+                    <button class="tab-btn" data-tab="register">注册</button>
+                </div>
+                
+                <!-- 登录表单 -->
+                <form id="loginForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="loginEmail">邮箱</label>
+                        <input type="email" id="loginEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">密码</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">登录</button>
+                </form>
+                
+                <!-- 注册表单 -->
+                <form id="registerForm" class="auth-form" style="display: none;">
+                    <div class="form-group">
+                        <label for="registerUsername">用户名</label>
+                        <input type="text" id="registerUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">邮箱</label>
+                        <input type="email" id="registerEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">密码</label>
+                        <input type="password" id="registerPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPhone">手机号码</label>
+                        <input type="tel" id="registerPhone">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEducation">教育背景</label>
+                        <select id="registerEducation">
+                            <option value="">请选择</option>
+                            <option value="高中">高中</option>
+                            <option value="专科">专科</option>
+                            <option value="本科">本科</option>
+                            <option value="硕士">硕士</option>
+                            <option value="博士">博士</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerTargetJob">目标职位</label>
+                        <input type="text" id="registerTargetJob" placeholder="如：软件工程师">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerExperience">工作经验</label>
+                        <select id="registerExperience">
+                            <option value="">请选择</option>
+                            <option value="0">应届毕业生</option>
+                            <option value="1">1年以下</option>
+                            <option value="1-3">1-3年</option>
+                            <option value="3-5">3-5年</option>
+                            <option value="5-10">5-10年</option>
+                            <option value="10+">10年以上</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">注册</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>OfferCome</h3>
+                    <p>专业的求职辅导平台，助力你的职业发展</p>
+                </div>
+                <div class="footer-section">
+                    <h4>服务</h4>
+                    <ul>
+                        <li><a href="#services">简历优化</a></li>
+                        <li><a href="#services">面试指导</a></li>
+                        <li><a href="#services">职业规划</a></li>
+                        <li><a href="#mbti">MBTI测试</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>联系我们</h4>
+                    <p>邮箱: contact@offercome.com</p>
+                    <p>电话: 400-123-4567</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 OfferCome. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 加载脚本 -->
+    <script src="js/api-client.js"></script>
+    <script src="js/state-manager.js"></script>
+    <script src="app-enhanced.js"></script>
+</body>
+</html> 

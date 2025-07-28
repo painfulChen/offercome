@@ -2,12 +2,16 @@
   "name": "api",
   "version": "1.0.0",
   "main": "index.js",
-  "files": ["index.js", "utils/"],
-  "engines": { 
-    "node": ">=16.13" 
+  "files": [
+    "index.js",
+    "utils/"
+  ],
+  "engines": {
+    "node": ">=16.13"
   },
   "dependencies": {
-    "moonshot-node": "^0.0.5",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "mongoose": "^8.16.5",
+    "moonshot-node": "^0.0.5"
   }
 }
