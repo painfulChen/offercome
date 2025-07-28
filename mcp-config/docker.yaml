@@ -1,0 +1,6 @@
+mcpServers:
+  docker:
+    command: npx -y @modelcontextprotocol/server-docker
+    args:
+      - --host
+      - "unix:///var/run/docker.sock"

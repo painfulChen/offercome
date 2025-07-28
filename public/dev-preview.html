@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OfferCome - 实时开发预览</title>
+    <link rel="stylesheet" href="styles-new.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .dev-toolbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #333;
+            color: white;
+            padding: 10px;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .dev-toolbar button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        .dev-toolbar button:hover {
+            background: #0056b3;
+        }
+        .dev-status {
+            font-size: 12px;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        .dev-status.online { background: #28a745; }
+        .dev-status.offline { background: #dc3545; }
+        .dev-panel {
+            position: fixed;
+            right: 20px;
+            top: 80px;
+            width: 300px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 999;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .dev-panel-header {
+            background: #f8f9fa;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            font-weight: bold;
+        }
+        .dev-panel-content {
+            padding: 10px;
+        }
+        .dev-log {
+            font-family: monospace;
+            font-size: 12px;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 5px 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .main-content {
+            margin-top: 60px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 开发工具栏 -->
+    <div class="dev-toolbar">
+        <div>
+            <span class="dev-status online" id="wsStatus">🟢 实时连接</span>
+            <button onclick="toggleDevPanel()">📊 开发面板</button>
+            <button onclick="testAPI()">🧪 测试API</button>
+            <button onclick="refreshPage()">🔄 刷新</button>
+        </div>
+        <div>
+            <span id="lastUpdate">最后更新: 刚刚</span>
+        </div>
+    </div>
+
+    <!-- 开发面板 -->
+    <div class="dev-panel" id="devPanel" style="display: none;">
+        <div class="dev-panel-header">
+            🛠️ 开发工具
+        </div>
+        <div class="dev-panel-content">
+            <h4>📝 文件变化</h4>
+            <div class="dev-log" id="fileLog">等待文件变化...</div>
+            
+            <h4>🧪 API测试</h4>
+            <div class="dev-log" id="apiLog">点击"测试API"按钮</div>
+            
+            <h4>⚡ 快速操作</h4>
+            <button onclick="window.open('http://localhost:3000/dev', '_blank')">开发工具</button>
+            <button onclick="window.open('https://offercome2025-9g14jitp22f4ddfc-1256790827.tcloudbaseapp.com', '_blank')">生产环境</button>
+        </div>
+    </div>
+
+    <!-- 主要内容区域 -->
+    <div class="main-content">
+        <div class="container">
+            <!-- 导航栏 -->
+            <nav class="navbar">
+                <div class="nav-brand">
+                    <i class="fas fa-rocket"></i>
+                    <span>OfferCome</span>
+                </div>
+                <div class="nav-menu">
+                    <a href="#home" class="nav-link">首页</a>
+                    <a href="#services" class="nav-link">服务</a>
+                    <a href="#about" class="nav-link">关于</a>
+                    <a href="#contact" class="nav-link">联系</a>
+                </div>
+                <div class="nav-buttons">
+                    <button id="loginBtn" class="nav-btn">登录</button>
+                    <button id="registerBtn" class="nav-btn primary">注册</button>
+                </div>
+            </nav>
+
+            <!-- 欢迎页面 -->
+            <div id="welcomePage" class="page active">
+                <!-- Hero Section -->
+                <section class="hero-section">
+                    <div class="hero-content">
+                        <div class="hero-text">
+                            <h1 class="hero-title">
+                                <span class="gradient-text">校招求职</span>
+                                <br>专业辅导平台
+                            </h1>
+                            <p class="hero-subtitle">
+                                基于AI技术的智能求职助手，帮你优化简历、准备面试、制定职业规划
+                            </p>
+                            <div class="hero-buttons">
+                                <button id="startConsultationBtn" class="btn btn-primary">
+                                    <i class="fas fa-comments"></i>
+                                    开始AI咨询
+                                </button>
+                                <button id="learnMoreBtn" class="btn btn-secondary">
+                                    <i class="fas fa-play"></i>
+                                    了解更多
+                                </button>
+                            </div>
+                        </div>
+                        <div class="hero-image">
+                            <div class="hero-illustration">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 服务特色 -->
+                <section id="services" class="services-section">
+                    <div class="section-header">
+                        <h2>我们的服务</h2>
+                        <p>专业的求职辅导服务，助你成功求职</p>
+                    </div>
+                    <div class="services-grid">
+                        <div class="service-card">
+                            <div class="service-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <h3>简历优化</h3>
+                            <p>AI智能分析简历，提供个性化优化建议</p>
+                            <button class="service-btn" onclick="startResumeOptimization()">
+                                开始优化
+                            </button>
+                        </div>
+                        <div class="service-card">
+                            <div class="service-icon">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <h3>面试辅导</h3>
+                            <p>模拟面试训练，提升面试技巧和信心</p>
+                            <button class="service-btn" onclick="startInterviewCoaching()">
+                                开始辅导
+                            </button>
+                        </div>
+                        <div class="service-card">
+                            <div class="service-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <h3>职业规划</h3>
+                            <p>个性化职业发展建议，明确职业方向</p>
+                            <button class="service-btn" onclick="startCareerPlanning()">
+                                开始规划
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 聊天页面 -->
+            <div id="chatPage" class="page">
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <button class="back-btn" onclick="showPage('welcomePage')">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <h3>AI求职助手</h3>
+                    </div>
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message bot-message">
+                            <div class="message-avatar">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content">
+                                <div class="message-text">
+                                    你好！我是OfferCome的AI求职助手。我可以帮助你：
+                                    <br>• 简历优化和制作
+                                    <br>• 面试技巧指导
+                                    <br>• 职业规划咨询
+                                    <br>• 求职策略建议
+                                    <br><br>请告诉我你的具体需求，我会为你提供专业的建议！
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="chatInput" placeholder="输入你的问题..." />
+                        <button id="sendBtn" onclick="sendMessage()">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // 开发工具功能
+        let ws = null;
+        let devPanelVisible = false;
+
+        // 连接WebSocket
+        function connectWebSocket() {
+            ws = new WebSocket('ws://localhost:3001');
+            
+            ws.onopen = () => {
+                document.getElementById('wsStatus').textContent = '🟢 实时连接';
+                document.getElementById('wsStatus').className = 'dev-status online';
+            };
+            
+            ws.onclose = () => {
+                document.getElementById('wsStatus').textContent = '🔴 连接断开';
+                document.getElementById('wsStatus').className = 'dev-status offline';
+                // 尝试重连
+                setTimeout(connectWebSocket, 3000);
+            };
+            
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.type === 'fileChanged') {
+                    updateFileLog(data.file);
+                    updateLastUpdate();
+                }
+            };
+        }
+
+        // 更新文件日志
+        function updateFileLog(file) {
+            const log = document.getElementById('fileLog');
+            const time = new Date().toLocaleTimeString();
+            log.innerHTML += `<div>[${time}] ${file}</div>`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // 更新最后更新时间
+        function updateLastUpdate() {
+            const now = new Date().toLocaleTimeString();
+            document.getElementById('lastUpdate').textContent = `最后更新: ${now}`;
+        }
+
+        // 切换开发面板
+        function toggleDevPanel() {
+            const panel = document.getElementById('devPanel');
+            devPanelVisible = !devPanelVisible;
+            panel.style.display = devPanelVisible ? 'block' : 'none';
+        }
+
+        // 测试API
+        async function testAPI() {
+            const log = document.getElementById('apiLog');
+            log.innerHTML = '测试中...';
+            
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                log.innerHTML = JSON.stringify(data, null, 2);
+            } catch (error) {
+                log.innerHTML = 'API测试失败: ' + error.message;
+            }
+        }
+
+        // 刷新页面
+        function refreshPage() {
+            location.reload();
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            connectWebSocket();
+            updateLastUpdate();
+            
+            // 添加键盘快捷键
+            document.addEventListener('keydown', function(e) {
+                // Ctrl+Shift+D 切换开发面板
+                if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+                    e.preventDefault();
+                    toggleDevPanel();
+                }
+                // Ctrl+R 刷新页面
+                if (e.ctrlKey && e.key === 'r') {
+                    e.preventDefault();
+                    refreshPage();
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

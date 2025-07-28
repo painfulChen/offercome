@@ -1,0 +1,36 @@
+{
+  "mysql": {
+    "instance": {
+      "id": "cdb-l8rfujds",
+      "name": "cdb440993",
+      "status": "running"
+    },
+    "connection": {
+      "internal": {
+        "host": "172.17.16.7",
+        "port": 3306
+      },
+      "external": {
+        "host": "sh-cdb-l8rfujds.sql.tencentcdb.com",
+        "port": 21736
+      }
+    },
+    "network": {
+      "vpcId": "vpc-7vtxdezs",
+      "subnetId": "subnet-22joea9p",
+      "securityGroupId": "sg-askzjc3u"
+    },
+    "credentials": {
+      "username": "root",
+      "password": "Offercome2024!",
+      "database": "offercome"
+    },
+    "config": {
+      "charset": "utf8mb4",
+      "timezone": "+08:00",
+      "connectionLimit": 10,
+      "acquireTimeout": 60000,
+      "timeout": 60000
+    }
+  }
+} 

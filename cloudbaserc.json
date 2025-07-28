@@ -1,16 +1,41 @@
 {
-  "envId": "offercome2025-9g14jitp22f4ddfc",
-  "functionRoot": "./server",
-  "functions": [
-    {
-      "name": "api",
-      "runtime": "Nodejs16.13",
-      "memorySize": 256,
-      "timeout": 30,
-      "entry": "index.js"
+    "envId": "offercome2025-9g14jitp22f4ddfc",
+    "version": "2.0",
+    "$schema": "https://framework-1258016615.tcloudbaseapp.com/schema/latest.json",
+    "functionRoot": "./server",
+    "functions": [
+        {
+            "name": "api",
+            "runtime": "Nodejs16.13",
+            "memorySize": 256,
+            "timeout": 30,
+            "entry": "index.main",
+            "ignore": [
+                "cloudbase-function.js",
+                "tests/**",
+                "logs/**"
+            ]
+        }
+    ],
+    "hosting": {
+        "public": "./public"
+    },
+    "service": {
+        "name": "offercome-api",
+        "path": "api",
+        "target": "api"
+    },
+    "framework": {
+        "name": "project",
+        "plugins": {
+            "container": {
+                "use": "@cloudbase/framework-plugin-container",
+                "inputs": {
+                    "serviceName": "project",
+                    "servicePath": "/project",
+                    "containerPort": "80"
+                }
+            }
+        }
     }
-  ],
-  "hosting": {
-    "public": "./public"
-  }
-} 
+}

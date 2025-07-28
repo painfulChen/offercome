@@ -1,0 +1,10 @@
+mcpServers:
+  github:
+    command: npx -y @modelcontextprotocol/server-github
+    args:
+      - --token
+      - "your_github_token"
+      - --owner
+      - "painfulChen"
+      - --repo
+      - "offercome"

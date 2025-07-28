@@ -1,0 +1,8 @@
+mcpServers:
+  mysql:
+    command: npx -y @modelcontextprotocol/server-mysql
+    args:
+      - --connection-string
+      - "mysql://root:Offercome2024!@sh-cdb-l8rfujds.sql.tencentcdb.com:21736/offercome"
+      - --ssl
+      - "false"

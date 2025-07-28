@@ -1,0 +1,31 @@
+{
+  "billing_mode": "pay-as-you-go",
+  "region": "ap-beijing",
+  "database_version": "MySQL8.0",
+  "engine": "InnoDB",
+  "instance_config": {
+    "name": "offercome-mysql",
+    "spec": "2核4GB",
+    "storage": "20GB SSD",
+    "admin_password": "Offercome2024!"
+  },
+  "network_config": {
+    "network_type": "VPC",
+    "security_group": {
+      "port": 3306,
+      "protocol": "TCP",
+      "source": "CloudBase和服务器IP"
+    },
+    "whitelist": [
+      "CloudBase IP",
+      "服务器 IP"
+    ]
+  },
+  "database_config": {
+    "charset": "utf8mb4",
+    "timezone": "+08:00",
+    "user": "offercome_user",
+    "password": "Offercome2024!",
+    "database": "offercome"
+  }
+}

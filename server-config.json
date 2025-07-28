@@ -1,0 +1,70 @@
+{
+  "servers": {
+    "production": {
+      "host": "your-production-server.com",
+      "user": "root",
+      "password": "",
+      "port": 22,
+      "database": {
+        "host": "localhost",
+        "port": 3306,
+        "user": "offercome_user",
+        "password": "Offercome2024!",
+        "name": "offercome"
+      }
+    },
+    "staging": {
+      "host": "your-staging-server.com",
+      "user": "root",
+      "password": "",
+      "port": 22,
+      "database": {
+        "host": "localhost",
+        "port": 3306,
+        "user": "offercome_user",
+        "password": "Offercome2024!",
+        "name": "offercome"
+      }
+    },
+    "development": {
+      "host": "localhost",
+      "user": "root",
+      "password": "",
+      "port": 22,
+      "database": {
+        "host": "localhost",
+        "port": 3306,
+        "user": "root",
+        "password": "",
+        "name": "offercome"
+      }
+    }
+  },
+  "environments": {
+    "production": {
+      "name": "生产环境",
+      "description": "正式运营环境",
+      "server": "production"
+    },
+    "staging": {
+      "name": "测试环境",
+      "description": "预发布测试环境",
+      "server": "staging"
+    },
+    "development": {
+      "name": "开发环境",
+      "description": "本地开发环境",
+      "server": "development"
+    }
+  },
+  "backup": {
+    "schedule": "0 2 * * *",
+    "retention_days": 7,
+    "backup_dir": "/opt/offercome/backups"
+  },
+  "monitoring": {
+    "enabled": true,
+    "check_interval": 300,
+    "alert_email": "admin@offercome.com"
+  }
+} 

@@ -1,0 +1,6 @@
+{
+  "name": "offercome-api",
+  "path": "/api/*",
+  "target": "api",
+  "envId": "offercome2025-9g14jitp22f4ddfc"
+} 

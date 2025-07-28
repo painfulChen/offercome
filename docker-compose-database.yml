@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  # MySQL 数据库
+  mysql:
+    image: mysql:8.0
+    container_name: offercome-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: Offercome2024!
+      MYSQL_DATABASE: offercome
+      MYSQL_USER: offercome_user
+      MYSQL_PASSWORD: Offercome2024!
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./server/database-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./server/init-data.sql:/docker-entrypoint-initdb.d/02-data.sql
+      - ./backups:/backups
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - offercome-network
+
+  # Redis 缓存
+  redis:
+    image: redis:7-alpine
+    container_name: offercome-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - offercome-network
+
+  # phpMyAdmin (可选，用于数据库管理)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: offercome-phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: offercome_user
+      PMA_PASSWORD: Offercome2024!
+      MYSQL_ROOT_PASSWORD: Offercome2024!
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+    networks:
+      - offercome-network
+
+  # 数据库备份服务
+  backup:
+    image: alpine:latest
+    container_name: offercome-backup
+    restart: unless-stopped
+    volumes:
+      - ./backup-script.sh:/backup-script.sh
+      - ./backups:/backups
+    environment:
+      DB_HOST: mysql
+      DB_USER: offercome_user
+      DB_PASSWORD: Offercome2024!
+      DB_NAME: offercome
+    depends_on:
+      - mysql
+    networks:
+      - offercome-network
+    command: >
+      sh -c "
+        apk add --no-cache mysql-client &&
+        chmod +x /backup-script.sh &&
+        /backup-script.sh
+      "
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  offercome-network:
+    driver: bridge 

@@ -1,0 +1,6 @@
+server/cloudbase-function.js
+server/tests/**
+logs/**
+*.md
+node_modules
+.env* 

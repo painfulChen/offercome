@@ -1,51 +1,73 @@
 const jwt = require('jsonwebtoken');
-const { logger } = require('../utils/logger');
+const db = require('../config/database-cloud');
 
 // JWT认证中间件
-const auth = (req, res, next) => {
+const authMiddleware = async (req, res, next) => {
   try {
     // 从请求头获取token
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-    
-    if (!token) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({
         success: false,
-        error: '访问令牌缺失'
+        error: '未提供认证令牌'
       });
     }
-
-    // 验证token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    
+    const token = authHeader.split(' ')[1];
+    
+    // 验证JWT token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'offercome_secret');
+    
+    // 从数据库获取用户信息
+    const user = await db.getUserById(decoded.userId);
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        error: '用户不存在'
+      });
+    }
     
     // 将用户信息添加到请求对象
-    req.user = decoded;
-    
+    req.user = user;
     next();
+    
   } catch (error) {
-    logger.error('认证失败:', error);
+    console.error('认证错误:', error);
+    
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({
+        success: false,
+        error: '无效的认证令牌'
+      });
+    }
     
     if (error.name === 'TokenExpiredError') {
       return res.status(401).json({
         success: false,
-        error: '访问令牌已过期'
+        error: '认证令牌已过期'
       });
     }
     
-    return res.status(401).json({
+    return res.status(500).json({
       success: false,
-      error: '无效的访问令牌'
+      error: '认证失败'
     });
   }
 };
 
 // 可选认证中间件（不强制要求认证）
-const optionalAuth = (req, res, next) => {
+const optionalAuthMiddleware = async (req, res, next) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    const authHeader = req.headers.authorization;
     
-    if (token) {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
-      req.user = decoded;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'offercome_secret');
+      const user = await db.getUserById(decoded.userId);
+      
+      if (user) {
+        req.user = user;
+      }
     }
     
     next();
@@ -55,7 +77,7 @@ const optionalAuth = (req, res, next) => {
   }
 };
 
-// 角色权限验证中间件
+// 角色验证中间件
 const requireRole = (roles) => {
   return (req, res, next) => {
     if (!req.user) {
@@ -64,42 +86,51 @@ const requireRole = (roles) => {
         error: '需要认证'
       });
     }
-
+    
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,
         error: '权限不足'
       });
     }
-
+    
     next();
   };
 };
 
-// 生成JWT令牌
-const generateToken = (payload) => {
-  return jwt.sign(payload, process.env.JWT_SECRET || 'your-secret-key', {
-    expiresIn: process.env.JWT_EXPIRES_IN || '7d'
-  });
-};
-
-// 刷新令牌
-const refreshToken = (token) => {
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key', { ignoreExpiration: true });
-    delete decoded.exp;
-    delete decoded.iat;
+// 速率限制中间件
+const rateLimit = (windowMs = 15 * 60 * 1000, max = 100) => {
+  const requests = new Map();
+  
+  return (req, res, next) => {
+    const ip = req.ip || req.connection.remoteAddress;
+    const now = Date.now();
     
-    return generateToken(decoded);
-  } catch (error) {
-    throw new Error('无效的令牌');
-  }
+    // 清理过期的请求记录
+    if (requests.has(ip)) {
+      const userRequests = requests.get(ip);
+      const validRequests = userRequests.filter(time => now - time < windowMs);
+      
+      if (validRequests.length >= max) {
+        return res.status(429).json({
+          success: false,
+          error: '请求过于频繁，请稍后再试'
+        });
+      }
+      
+      validRequests.push(now);
+      requests.set(ip, validRequests);
+    } else {
+      requests.set(ip, [now]);
+    }
+    
+    next();
+  };
 };
 
 module.exports = {
-  auth,
-  optionalAuth,
+  authMiddleware,
+  optionalAuthMiddleware,
   requireRole,
-  generateToken,
-  refreshToken
+  rateLimit
 }; 

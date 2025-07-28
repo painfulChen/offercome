@@ -2,14 +2,12 @@
   "name": "api",
   "version": "1.0.0",
   "main": "index.js",
-  "files": ["index.js"],
+  "files": ["index.js", "utils/"],
   "engines": { 
     "node": ">=16.13" 
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "helmet": "^7.0.0",
+    "moonshot-node": "^0.0.5",
     "dotenv": "^16.3.1"
   }
 }

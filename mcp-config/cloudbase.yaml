@@ -1,0 +1,12 @@
+mcpServers:
+  cloudbase:
+    command: npx -y @modelcontextprotocol/server-tencent-cloud
+    args:
+      - --secret-id
+      - "your_secret_id"
+      - --secret-key
+      - "your_secret_key"
+      - --region
+      - "ap-shanghai"
+      - --env-id
+      - "offercome2025-9g14jitp22f4ddfc"

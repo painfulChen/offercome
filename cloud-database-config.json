@@ -1,0 +1,221 @@
+{
+  "providers": {
+    "tencent": {
+      "name": "腾讯云TDSQL-C",
+      "description": "腾讯云分布式数据库",
+      "regions": [
+        "ap-beijing",
+        "ap-shanghai", 
+        "ap-guangzhou",
+        "ap-shenzhen",
+        "ap-hongkong"
+      ],
+      "config": {
+        "host": "your-tdsql-c-instance.tencentcloudapi.com",
+        "port": 3306,
+        "user": "offercome_user",
+        "password": "Offercome2024!",
+        "database": "offercome",
+        "ssl": true,
+        "timeout": 30000,
+        "pool": {
+          "min": 5,
+          "max": 20
+        }
+      },
+      "setup_steps": [
+        "1. 登录腾讯云控制台",
+        "2. 进入TDSQL-C产品页面",
+        "3. 创建TDSQL-C实例",
+        "4. 选择地域和配置",
+        "5. 设置管理员密码",
+        "6. 创建数据库用户",
+        "7. 获取连接地址",
+        "8. 更新配置文件"
+      ]
+    },
+    "aliyun": {
+      "name": "阿里云RDS",
+      "description": "阿里云关系型数据库服务",
+      "regions": [
+        "cn-hangzhou",
+        "cn-shanghai",
+        "cn-beijing",
+        "cn-shenzhen",
+        "cn-hongkong"
+      ],
+      "config": {
+        "host": "your-rds-instance.mysql.rds.aliyuncs.com",
+        "port": 3306,
+        "user": "offercome_user",
+        "password": "Offercome2024!",
+        "database": "offercome",
+        "ssl": true,
+        "timeout": 30000,
+        "pool": {
+          "min": 5,
+          "max": 20
+        }
+      },
+      "setup_steps": [
+        "1. 登录阿里云控制台",
+        "2. 进入RDS产品页面",
+        "3. 创建RDS实例",
+        "4. 选择MySQL引擎",
+        "5. 配置实例规格",
+        "6. 设置管理员密码",
+        "7. 创建数据库用户",
+        "8. 获取连接地址",
+        "9. 更新配置文件"
+      ]
+    },
+    "aws": {
+      "name": "AWS RDS",
+      "description": "亚马逊云关系型数据库服务",
+      "regions": [
+        "us-east-1",
+        "us-west-2",
+        "ap-southeast-1",
+        "ap-northeast-1",
+        "eu-west-1"
+      ],
+      "config": {
+        "host": "your-rds-instance.region.rds.amazonaws.com",
+        "port": 3306,
+        "user": "offercome_user",
+        "password": "Offercome2024!",
+        "database": "offercome",
+        "ssl": true,
+        "timeout": 30000,
+        "pool": {
+          "min": 5,
+          "max": 20
+        }
+      },
+      "setup_steps": [
+        "1. 登录AWS控制台",
+        "2. 进入RDS服务页面",
+        "3. 创建数据库实例",
+        "4. 选择MySQL引擎",
+        "5. 配置实例规格",
+        "6. 设置管理员密码",
+        "7. 创建数据库用户",
+        "8. 获取连接地址",
+        "9. 更新配置文件"
+      ]
+    },
+    "huawei": {
+      "name": "华为云RDS",
+      "description": "华为云关系型数据库服务",
+      "regions": [
+        "cn-north-1",
+        "cn-east-2",
+        "cn-south-1",
+        "ap-southeast-1"
+      ],
+      "config": {
+        "host": "your-rds-instance.rds.myhuaweicloud.com",
+        "port": 3306,
+        "user": "offercome_user",
+        "password": "Offercome2024!",
+        "database": "offercome",
+        "ssl": true,
+        "timeout": 30000,
+        "pool": {
+          "min": 5,
+          "max": 20
+        }
+      },
+      "setup_steps": [
+        "1. 登录华为云控制台",
+        "2. 进入RDS产品页面",
+        "3. 创建RDS实例",
+        "4. 选择MySQL引擎",
+        "5. 配置实例规格",
+        "6. 设置管理员密码",
+        "7. 创建数据库用户",
+        "8. 获取连接地址",
+        "9. 更新配置文件"
+      ]
+    }
+  },
+  "environments": {
+    "development": {
+      "name": "开发环境",
+      "description": "用于开发和测试",
+      "recommended_provider": "tencent",
+      "config": {
+        "instance_type": "small",
+        "storage": "20GB",
+        "backup_retention": 7,
+        "monitoring": false
+      }
+    },
+    "staging": {
+      "name": "测试环境",
+      "description": "用于预发布测试",
+      "recommended_provider": "aliyun",
+      "config": {
+        "instance_type": "medium",
+        "storage": "100GB",
+        "backup_retention": 14,
+        "monitoring": true
+      }
+    },
+    "production": {
+      "name": "生产环境",
+      "description": "用于正式运营",
+      "recommended_provider": "aws",
+      "config": {
+        "instance_type": "large",
+        "storage": "500GB",
+        "backup_retention": 30,
+        "monitoring": true,
+        "high_availability": true
+      }
+    }
+  },
+  "security": {
+    "ssl_required": true,
+    "password_policy": {
+      "min_length": 12,
+      "require_uppercase": true,
+      "require_lowercase": true,
+      "require_numbers": true,
+      "require_special_chars": true
+    },
+    "network_access": {
+      "whitelist_ips": [],
+      "vpc_only": false,
+      "public_access": false
+    }
+  },
+  "backup": {
+    "schedule": "0 2 * * *",
+    "retention_days": 30,
+    "encryption": true,
+    "cross_region": false
+  },
+  "monitoring": {
+    "enabled": true,
+    "metrics": [
+      "cpu_usage",
+      "memory_usage",
+      "disk_usage",
+      "connection_count",
+      "slow_queries"
+    ],
+    "alerts": {
+      "cpu_threshold": 80,
+      "memory_threshold": 80,
+      "disk_threshold": 85,
+      "connection_threshold": 1000
+    }
+  },
+  "cost_optimization": {
+    "reserved_instances": true,
+    "auto_scaling": false,
+    "storage_optimization": true,
+    "backup_optimization": true
+  }
+} 
