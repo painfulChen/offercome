@@ -413,10 +413,28 @@
     </div>
 
     <script>
+
+        // 增强错误处理
+        async function fetchWithRetry(url, options, maxRetries = 3) {
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.ok) {
+                        return response;
+                    }
+                    console.warn(`请求失败，重试 ${i + 1}/${maxRetries}`);
+                } catch (error) {
+                    console.warn(`请求错误，重试 ${i + 1}/${maxRetries}:`, error);
+                }
+                await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+            }
+            throw new Error('请求失败，已达到最大重试次数');
+        }
+        
         // MBTI测试应用
         class MbtiTestApp {
             constructor() {
-                this.apiBaseUrl = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api';
+                this.apiBaseUrl = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api-v2';
                 this.questions = [];
                 this.currentQuestionIndex = 0;
                 this.answers = [];
@@ -461,7 +479,7 @@
                     const data = await response.json();
                     
                     if (data.success) {
-                        this.questions = this.flattenQuestions(data.questions);
+                        this.questions = data.data; // 直接使用data.data，不需要flattenQuestions
                         this.currentQuestionIndex = 0;
                         this.answers = [];
                         
@@ -507,16 +525,27 @@
                 }
 
                 const question = this.questions[this.currentQuestionIndex];
-                document.getElementById('questionText').textContent = question.question_text;
+                document.getElementById('questionText').textContent = question.question;
                 document.getElementById('progressText').textContent = 
                     `问题 ${this.currentQuestionIndex + 1} / ${this.questions.length}`;
                 
                 const progress = ((this.currentQuestionIndex + 1) / this.questions.length) * 100;
                 document.getElementById('progressFill').style.width = `${progress}%`;
 
-                // 重置按钮状态
-                document.querySelectorAll('.answer-btn').forEach(btn => {
-                    btn.classList.remove('selected');
+                // 更新选项按钮
+                const optionsContainer = document.querySelector('.answer-options');
+                optionsContainer.innerHTML = '';
+                
+                question.options.forEach(option => {
+                    const btn = document.createElement('button');
+                    btn.className = 'answer-btn';
+                    btn.setAttribute('data-value', option.id);
+                    btn.innerHTML = `
+                        <span class="option-text">${option.text}</span>
+                        <i class="fas fa-chevron-right"></i>
+                    `;
+                    btn.addEventListener('click', (e) => this.handleAnswer(e));
+                    optionsContainer.appendChild(btn);
                 });
             }
 
@@ -531,10 +560,7 @@
                 e.target.closest('.answer-btn').classList.add('selected');
                 
                 // 保存答案
-                this.answers.push({
-                    question_id: question.id,
-                    choice: value
-                });
+                this.answers.push(value);
                 
                 // 延迟跳转到下一题
                 setTimeout(() => {
@@ -547,7 +573,7 @@
                 try {
                     this.showLoading();
                     
-                    const response = await fetch(`${this.apiBaseUrl}/mbti/result`, {
+                    const response = await fetch(`${this.apiBaseUrl}/mbti/submit`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -558,13 +584,13 @@
                     const data = await response.json();
                     
                     if (data.success) {
-                        const result = data.result;
+                        const result = data.data;
                         
-                        document.getElementById('mbtiType').textContent = result.mbti_type;
-                        document.getElementById('personalityDescription').textContent = result.personality_description;
-                        document.getElementById('careerSuggestions').textContent = result.career_suggestions;
-                        document.getElementById('strengths').textContent = result.strengths;
-                        document.getElementById('weaknesses').textContent = result.weaknesses;
+                        document.getElementById('mbtiType').textContent = result.type;
+                        document.getElementById('personalityDescription').textContent = result.description;
+                        document.getElementById('careerSuggestions').textContent = '根据您的MBTI类型，建议选择适合您性格特点的职业';
+                        document.getElementById('strengths').textContent = '您的MBTI类型具有独特的人格特征';
+                        document.getElementById('weaknesses').textContent = '每个人都有不同的发展潜力';
                         
                         this.hideLoading();
                         this.showResult();

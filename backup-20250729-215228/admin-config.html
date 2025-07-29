@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OfferCome - 后台配置管理</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .admin-header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .admin-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .admin-header p {
+            opacity: 0.9;
+        }
+        
+        .config-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .config-section h2 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .config-item {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .config-item:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+        
+        .config-item h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .config-item label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .config-item input,
+        .config-item textarea,
+        .config-item select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+        
+        .config-item input:focus,
+        .config-item textarea:focus,
+        .config-item select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .config-item textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .array-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid #e1e5e9;
+        }
+        
+        .array-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .array-item-title {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .remove-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        
+        .add-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-top: 1rem;
+        }
+        
+        .add-btn:hover {
+            background: #218838;
+        }
+        
+        .save-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .preview-section {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+        }
+        
+        .preview-section h4 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        
+        .preview-content {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #e1e5e9;
+        }
+        
+        .status-bar {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .status-bar.show {
+            transform: translateX(0);
+        }
+        
+        .status-bar.success {
+            background: #28a745;
+        }
+        
+        .status-bar.error {
+            background: #dc3545;
+        }
+        
+        .status-bar.info {
+            background: #17a2b8;
+        }
+        
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .back-btn:hover {
+            background: white;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <button class="back-btn" onclick="window.location.href='index.html'">
+            <i class="fas fa-arrow-left"></i>
+            返回首页
+        </button>
+        
+        <div class="admin-header">
+            <h1><i class="fas fa-cogs"></i> 后台配置管理</h1>
+            <p>管理OfferCome主页的所有可配置内容</p>
+        </div>
+        
+        <form id="configForm">
+            <!-- Hero Section 配置 -->
+            <div class="config-section">
+                <h2><i class="fas fa-star"></i> Hero Section 配置</h2>
+                <div class="config-grid">
+                    <div class="config-item">
+                        <label for="heroTitle">主标题</label>
+                        <input type="text" id="heroTitle" name="hero.title" value="校招求职专业辅导平台" required>
+                    </div>
+                    <div class="config-item">
+                        <label for="heroSubtitle">副标题</label>
+                        <textarea id="heroSubtitle" name="hero.subtitle" rows="3">专注互联网校招，提供一站式求职解决方案</textarea>
+                    </div>
+                    <div class="config-item">
+                        <label for="heroStatsCases">成功案例数量</label>
+                        <input type="text" id="heroStatsCases" name="hero.stats.cases" value="500+">
+                    </div>
+                    <div class="config-item">
+                        <label for="heroStatsSuccessRate">成功率</label>
+                        <input type="text" id="heroStatsSuccessRate" name="hero.stats.success_rate" value="95%">
+                    </div>
+                    <div class="config-item">
+                        <label for="heroStatsCompanies">合作企业数量</label>
+                        <input type="text" id="heroStatsCompanies" name="hero.stats.companies" value="50+">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 服务配置 -->
+            <div class="config-section">
+                <h2><i class="fas fa-briefcase"></i> 服务配置</h2>
+                <div id="servicesConfig">
+                    <!-- 服务项目将通过JavaScript动态生成 -->
+                </div>
+                <button type="button" class="add-btn" onclick="addService()">
+                    <i class="fas fa-plus"></i> 添加服务
+                </button>
+            </div>
+            
+            <!-- 成功案例配置 -->
+            <div class="config-section">
+                <h2><i class="fas fa-trophy"></i> 成功案例配置</h2>
+                <div id="casesConfig">
+                    <!-- 成功案例将通过JavaScript动态生成 -->
+                </div>
+                <button type="button" class="add-btn" onclick="addCase()">
+                    <i class="fas fa-plus"></i> 添加案例
+                </button>
+            </div>
+            
+            <!-- 联系信息配置 -->
+            <div class="config-section">
+                <h2><i class="fas fa-phone"></i> 联系信息配置</h2>
+                <div class="config-grid">
+                    <div class="config-item">
+                        <label for="contactPhone">电话</label>
+                        <input type="text" id="contactPhone" name="contact.phone" value="400-123-4567">
+                    </div>
+                    <div class="config-item">
+                        <label for="contactEmail">邮箱</label>
+                        <input type="email" id="contactEmail" name="contact.email" value="contact@offercome.com">
+                    </div>
+                    <div class="config-item">
+                        <label for="contactWechat">微信</label>
+                        <input type="text" id="contactWechat" name="contact.wechat" value="offercome2025">
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit" class="save-btn">
+                <i class="fas fa-save"></i> 保存配置
+            </button>
+        </form>
+    </div>
+    
+    <div id="statusBar" class="status-bar"></div>
+    
+    <script>
+        let configData = {
+            hero: {
+                title: "校招求职专业辅导平台",
+                subtitle: "专注互联网校招，提供一站式求职解决方案",
+                stats: {
+                    cases: "500+",
+                    success_rate: "95%",
+                    companies: "50+"
+                }
+            },
+            services: [
+                {
+                    id: "service-1",
+                    title: "简历优化",
+                    description: "专业简历定制，突出核心竞争力，提升面试通过率",
+                    features: ["个性化简历设计", "关键词优化", "行业标准匹配"],
+                    icon: "fas fa-file-alt"
+                },
+                {
+                    id: "service-2",
+                    title: "面试辅导",
+                    description: "模拟面试训练，提升沟通技巧，增强面试信心",
+                    features: ["一对一模拟面试", "常见问题解答", "压力应对技巧"],
+                    icon: "fas fa-comments"
+                },
+                {
+                    id: "service-3",
+                    title: "职业规划",
+                    description: "个性化职业发展路径，明确目标方向，制定行动计划",
+                    features: ["职业兴趣测评", "发展路径规划", "技能提升建议"],
+                    icon: "fas fa-chart-line"
+                }
+            ],
+            success_cases: [
+                {
+                    id: "case-1",
+                    name: "张同学",
+                    company: "阿里巴巴 - 前端工程师",
+                    description: "通过我们的简历优化和面试辅导，成功入职阿里巴巴，薪资提升40%",
+                    tags: ["校招", "互联网", "前端"],
+                    avatar: "https://via.placeholder.com/80x80/667eea/ffffff?text=张"
+                },
+                {
+                    id: "case-2",
+                    name: "李同学",
+                    company: "腾讯 - 产品经理",
+                    description: "职业规划指导帮助明确发展方向，成功转型产品经理岗位",
+                    tags: ["校招", "互联网", "产品"],
+                    avatar: "https://via.placeholder.com/80x80/28a745/ffffff?text=李"
+                },
+                {
+                    id: "case-3",
+                    name: "王同学",
+                    company: "字节跳动 - 算法工程师",
+                    description: "面试技巧培训显著提升表现，成功通过多轮技术面试",
+                    tags: ["校招", "互联网", "算法"],
+                    avatar: "https://via.placeholder.com/80x80/dc3545/ffffff?text=王"
+                }
+            ],
+            contact: {
+                phone: "400-123-4567",
+                email: "contact@offercome.com",
+                wechat: "offercome2025"
+            }
+        };
+        
+        // 显示状态消息
+        function showStatus(message, type = 'info') {
+            const statusBar = document.getElementById('statusBar');
+            statusBar.textContent = message;
+            statusBar.className = `status-bar ${type} show`;
+            
+            setTimeout(() => {
+                statusBar.classList.remove('show');
+            }, 3000);
+        }
+        
+        // 渲染服务配置
+        function renderServices() {
+            const container = document.getElementById('servicesConfig');
+            container.innerHTML = '';
+            
+            configData.services.forEach((service, index) => {
+                const serviceDiv = document.createElement('div');
+                serviceDiv.className = 'config-item';
+                serviceDiv.innerHTML = `
+                    <div class="array-item-header">
+                        <span class="array-item-title">服务 ${index + 1}</span>
+                        <button type="button" class="remove-btn" onclick="removeService(${index})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <label>服务ID</label>
+                            <input type="text" name="services[${index}].id" value="${service.id}" required>
+                        </div>
+                        <div class="config-item">
+                            <label>服务标题</label>
+                            <input type="text" name="services[${index}].title" value="${service.title}" required>
+                        </div>
+                        <div class="config-item">
+                            <label>服务描述</label>
+                            <textarea name="services[${index}].description" rows="3" required>${service.description}</textarea>
+                        </div>
+                        <div class="config-item">
+                            <label>图标类名</label>
+                            <input type="text" name="services[${index}].icon" value="${service.icon}" required>
+                        </div>
+                        <div class="config-item">
+                            <label>特色功能 (每行一个)</label>
+                            <textarea name="services[${index}].features" rows="4" required>${service.features.join('\n')}</textarea>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(serviceDiv);
+            });
+        }
+        
+        // 渲染成功案例配置
+        function renderCases() {
+            const container = document.getElementById('casesConfig');
+            container.innerHTML = '';
+            
+            configData.success_cases.forEach((case_item, index) => {
+                const caseDiv = document.createElement('div');
+                caseDiv.className = 'config-item';
+                caseDiv.innerHTML = `
+                    <div class="array-item-header">
+                        <span class="array-item-title">案例 ${index + 1}</span>
+                        <button type="button" class="remove-btn" onclick="removeCase(${index})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <label>案例ID</label>
+                            <input type="text" name="success_cases[${index}].id" value="${case_item.id}" required>
+                        </div>
+                        <div class="config-item">
+                            <label>学员姓名</label>
+                            <input type="text" name="success_cases[${index}].name" value="${case_item.name}" required>
+                        </div>
+                        <div class="config-item">
+                            <label>入职公司</label>
+                            <input type="text" name="success_cases[${index}].company" value="${case_item.company}" required>
+                        </div>
+                        <div class="config-item">
+                            <label>成功描述</label>
+                            <textarea name="success_cases[${index}].description" rows="3" required>${case_item.description}</textarea>
+                        </div>
+                        <div class="config-item">
+                            <label>标签 (用逗号分隔)</label>
+                            <input type="text" name="success_cases[${index}].tags" value="${case_item.tags.join(', ')}" required>
+                        </div>
+                        <div class="config-item">
+                            <label>头像URL</label>
+                            <input type="text" name="success_cases[${index}].avatar" value="${case_item.avatar}" required>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(caseDiv);
+            });
+        }
+        
+        // 添加服务
+        function addService() {
+            const newService = {
+                id: `service-${Date.now()}`,
+                title: "新服务",
+                description: "服务描述",
+                features: ["特色功能1", "特色功能2", "特色功能3"],
+                icon: "fas fa-star"
+            };
+            configData.services.push(newService);
+            renderServices();
+            showStatus('服务已添加', 'success');
+        }
+        
+        // 删除服务
+        function removeService(index) {
+            configData.services.splice(index, 1);
+            renderServices();
+            showStatus('服务已删除', 'info');
+        }
+        
+        // 添加案例
+        function addCase() {
+            const newCase = {
+                id: `case-${Date.now()}`,
+                name: "新学员",
+                company: "公司 - 职位",
+                description: "成功描述",
+                tags: ["校招", "互联网"],
+                avatar: "https://via.placeholder.com/80x80/667eea/ffffff?text=新"
+            };
+            configData.success_cases.push(newCase);
+            renderCases();
+            showStatus('案例已添加', 'success');
+        }
+        
+        // 删除案例
+        function removeCase(index) {
+            configData.success_cases.splice(index, 1);
+            renderCases();
+            showStatus('案例已删除', 'info');
+        }
+        
+        // 保存配置
+        function saveConfig(formData) {
+            // 这里可以发送到后端API保存
+            console.log('保存配置:', formData);
+            
+            // 模拟保存成功
+            showStatus('配置保存成功！', 'success');
+            
+            // 更新主页的配置数据
+            localStorage.setItem('offercomeConfig', JSON.stringify(formData));
+        }
+        
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 从localStorage加载配置
+            const savedConfig = localStorage.getItem('offercomeConfig');
+            if (savedConfig) {
+                try {
+                    configData = JSON.parse(savedConfig);
+                } catch (error) {
+                    console.error('加载配置失败:', error);
+                }
+            }
+            
+            // 渲染配置表单
+            renderServices();
+            renderCases();
+            
+            // 设置表单提交事件
+            document.getElementById('configForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(e.target);
+                const config = {
+                    hero: {
+                        title: formData.get('hero.title'),
+                        subtitle: formData.get('hero.subtitle'),
+                        stats: {
+                            cases: formData.get('hero.stats.cases'),
+                            success_rate: formData.get('hero.stats.success_rate'),
+                            companies: formData.get('hero.stats.companies')
+                        }
+                    },
+                    services: [],
+                    success_cases: [],
+                    contact: {
+                        phone: formData.get('contact.phone'),
+                        email: formData.get('contact.email'),
+                        wechat: formData.get('contact.wechat')
+                    }
+                };
+                
+                // 处理服务数据
+                const serviceCount = configData.services.length;
+                for (let i = 0; i < serviceCount; i++) {
+                    const features = formData.get(`services[${i}].features`).split('\n').filter(f => f.trim());
+                    config.services.push({
+                        id: formData.get(`services[${i}].id`),
+                        title: formData.get(`services[${i}].title`),
+                        description: formData.get(`services[${i}].description`),
+                        icon: formData.get(`services[${i}].icon`),
+                        features: features
+                    });
+                }
+                
+                // 处理案例数据
+                const caseCount = configData.success_cases.length;
+                for (let i = 0; i < caseCount; i++) {
+                    const tags = formData.get(`success_cases[${i}].tags`).split(',').map(t => t.trim());
+                    config.success_cases.push({
+                        id: formData.get(`success_cases[${i}].id`),
+                        name: formData.get(`success_cases[${i}].name`),
+                        company: formData.get(`success_cases[${i}].company`),
+                        description: formData.get(`success_cases[${i}].description`),
+                        tags: tags,
+                        avatar: formData.get(`success_cases[${i}].avatar`)
+                    });
+                }
+                
+                saveConfig(config);
+            });
+            
+            showStatus('配置管理页面已加载', 'info');
+        });
+    </script>
+</body>
+</html> 

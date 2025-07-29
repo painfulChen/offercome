@@ -1,0 +1,38 @@
+{
+  "version": "2.0",
+  "envId": "offercome2025-9g14jitp22f4ddfc",
+  "framework": {
+    "name": "offercome-ai-framework",
+    "plugins": {
+      "client": {
+        "use": "@cloudbase/framework-plugin-mp",
+        "inputs": {
+          "appid": "your-miniprogram-appid",
+          "privateKeyPath": "private.key"
+        }
+      },
+      "server": {
+        "use": "@cloudbase/framework-plugin-node",
+        "inputs": {
+          "entry": "server/index.js",
+          "path": "/api",
+          "name": "api",
+          "region": "ap-shanghai",
+          "runtime": "Nodejs16.13",
+          "memory": 512,
+          "timeout": 30,
+          "envVariables": {
+            "NODE_ENV": "production",
+            "CLOUDBASE_ENV_ID": "offercome2025-9g14jitp22f4ddfc"
+          }
+        }
+      }
+    }
+  },
+  "static": {
+    "cos": {
+      "region": "ap-shanghai",
+      "bucket": "offercome-static"
+    }
+  }
+}

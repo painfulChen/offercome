@@ -7,7 +7,7 @@
       "client": {
         "use": "@cloudbase/framework-plugin-mp",
         "inputs": {
-          "appid": "your-miniprogram-appid",
+          "appid": "wxf6a4c28ccfeec802",
           "privateKeyPath": "private.key"
         }
       },

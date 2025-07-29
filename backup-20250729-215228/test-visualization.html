@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG系统可视化测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #2980b9;
+        }
+        .btn-success { background: #27ae60; }
+        .btn-success:hover { background: #229954; }
+        .btn-warning { background: #f39c12; }
+        .btn-warning:hover { background: #e67e22; }
+        .btn-danger { background: #e74c3c; }
+        .btn-danger:hover { background: #c0392b; }
+        .document-item {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            background: #f9f9f9;
+        }
+        .document-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .document-meta {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .document-preview {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin-top: 10px;
+        }
+        .log-item {
+            border-left: 3px solid #3498db;
+            padding: 10px;
+            margin: 5px 0;
+            background: #f8f9fa;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .message.success { background: #d4edda; color: #155724; }
+        .message.error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>🔍 RAG系统可视化测试</h1>
+    
+    <div class="container">
+        <h2>📊 系统状态</h2>
+        <button class="btn" onclick="checkHealth()">检查健康状态</button>
+        <button class="btn" onclick="getStats()">获取统计信息</button>
+        <div id="status"></div>
+    </div>
+
+    <div class="container">
+        <h2>📄 文档管理</h2>
+        <button class="btn" onclick="loadDocuments()">加载文档列表</button>
+        <button class="btn btn-success" onclick="uploadTestFile()">上传测试文档</button>
+        <div id="documents"></div>
+    </div>
+
+    <div class="container">
+        <h2>📋 日志管理</h2>
+        <button class="btn" onclick="loadLogs()">加载日志</button>
+        <button class="btn btn-warning" onclick="clearLogs()">清理日志</button>
+        <div id="logs"></div>
+    </div>
+
+    <script>
+        // 认证相关
+        function addAuthHeader(options = {}) {
+            const token = localStorage.getItem('rag_token');
+            if (!token) {
+                showMessage('未登录，请先登录', 'error');
+                return options;
+            }
+            
+            return {
+                ...options,
+                headers: {
+                    ...options.headers,
+                    'Authorization': `Bearer ${token}`
+                }
+            };
+        }
+
+        function showMessage(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `message ${type}`;
+            div.textContent = message;
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 5000);
+        }
+
+        // 健康检查
+        async function checkHealth() {
+            try {
+                const response = await fetch('/api/rag/health', addAuthHeader());
+                const data = await response.json();
+                document.getElementById('status').innerHTML = `
+                    <div class="message success">
+                        <h3>✅ 系统健康状态</h3>
+                        <p>状态: ${data.status}</p>
+                        <p>时间: ${new Date().toLocaleString()}</p>
+                    </div>
+                `;
+            } catch (error) {
+                showMessage('健康检查失败: ' + error.message, 'error');
+            }
+        }
+
+        // 获取统计信息
+        async function getStats() {
+            try {
+                const response = await fetch('/api/rag/stats', addAuthHeader());
+                const data = await response.json();
+                document.getElementById('status').innerHTML = `
+                    <div class="message success">
+                        <h3>📊 系统统计</h3>
+                        <p>总文档数: ${data.totalDocuments}</p>
+                        <p>总大小: ${formatBytes(data.totalSize)}</p>
+                        <p>平均内容长度: ${data.avgContentLength} 字符</p>
+                        <p>分类: ${data.categories.join(', ') || '无'}</p>
+                        <p>类型: ${data.types.join(', ') || '无'}</p>
+                    </div>
+                `;
+            } catch (error) {
+                showMessage('获取统计信息失败: ' + error.message, 'error');
+            }
+        }
+
+        // 加载文档列表
+        async function loadDocuments() {
+            try {
+                const response = await fetch('/api/rag/documents', addAuthHeader());
+                const data = await response.json();
+                
+                if (data.status === 'ok' && data.documents) {
+                    displayDocuments(data.documents);
+                } else {
+                    showMessage('加载文档列表失败', 'error');
+                }
+            } catch (error) {
+                showMessage('加载文档列表失败: ' + error.message, 'error');
+            }
+        }
+
+        // 显示文档列表
+        function displayDocuments(documents) {
+            const container = document.getElementById('documents');
+            
+            if (!documents || documents.length === 0) {
+                container.innerHTML = '<p>暂无文档</p>';
+                return;
+            }
+
+            container.innerHTML = documents.map(doc => `
+                <div class="document-item">
+                    <div class="document-title">${doc.title || doc.fileName || '未知文档'}</div>
+                    <div class="document-meta">
+                        类型: ${doc.type || '未知'} | 
+                        分类: ${doc.metadata?.category || '未知'} | 
+                        大小: ${formatBytes(doc.metadata?.fileSize || 0)} | 
+                        上传时间: ${new Date(doc.metadata?.processedAt || doc.createdAt || Date.now()).toLocaleString()}
+                    </div>
+                    ${doc.content ? `<div class="document-preview">${doc.content.substring(0, 100)}${doc.content.length > 100 ? '...' : ''}</div>` : ''}
+                    <div>
+                        <button class="btn btn-warning" onclick="viewDocument('${doc.id}')">👁️ 查看详情</button>
+                        <button class="btn btn-danger" onclick="deleteDocument('${doc.id}')">🗑️ 删除</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 查看文档详情
+        async function viewDocument(documentId) {
+            try {
+                const response = await fetch(`/api/rag/documents/${documentId}`, addAuthHeader());
+                const data = await response.json();
+                
+                if (data.status === 'ok' && data.document) {
+                    showDocumentModal(data.document);
+                } else {
+                    showMessage('获取文档详情失败', 'error');
+                }
+            } catch (error) {
+                showMessage('获取文档详情失败: ' + error.message, 'error');
+            }
+        }
+
+        // 显示文档详情模态框
+        function showDocumentModal(document) {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.style.display = 'flex';
+            
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3>📄 文档详情</h3>
+                        <button class="btn btn-danger" onclick="this.closest('.modal-overlay').remove()">✕</button>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <h4>📋 基本信息</h4>
+                        <p><strong>标题:</strong> ${document.title}</p>
+                        <p><strong>类型:</strong> ${document.type}</p>
+                        <p><strong>分类:</strong> ${document.metadata?.category || '未知'}</p>
+                        <p><strong>标签:</strong> ${document.metadata?.tags || '无'}</p>
+                        <p><strong>文件大小:</strong> ${formatBytes(document.metadata?.fileSize || 0)}</p>
+                        <p><strong>上传时间:</strong> ${new Date(document.metadata?.processedAt || document.createdAt).toLocaleString()}</p>
+                        <p><strong>内容长度:</strong> ${document.contentLength || 0} 字符</p>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <h4>📝 文档内容</h4>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; font-family: monospace; white-space: pre-wrap; max-height: 300px; overflow-y: auto;">
+                            ${document.content || '无内容'}
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <h4>🔍 元数据</h4>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 12px;">
+                            ${JSON.stringify(document.metadata, null, 2)}
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <button class="btn btn-danger" onclick="deleteDocument('${document.id}'); this.closest('.modal-overlay').remove();">🗑️ 删除文档</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        // 删除文档
+        async function deleteDocument(documentId) {
+            if (!confirm('确定要删除这个文档吗？')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/rag/documents/${documentId}`, addAuthHeader({
+                    method: 'DELETE'
+                }));
+
+                const data = await response.json();
+                
+                if (data.status === 'ok' || data.success) {
+                    showMessage('文档删除成功', 'success');
+                    loadDocuments();
+                } else {
+                    showMessage(`删除失败: ${data.error || data.message}`, 'error');
+                }
+            } catch (error) {
+                showMessage('删除失败: ' + error.message, 'error');
+            }
+        }
+
+        // 上传测试文档
+        async function uploadTestFile() {
+            const content = `这是一个测试文档，用于验证RAG系统的文档可视化功能。
+            
+文档内容包含：
+1. 基本信息
+2. 详细描述
+3. 技术要点
+4. 使用说明
+
+上传时间: ${new Date().toLocaleString()}
+文档ID: test-${Date.now()}`;
+
+            const blob = new Blob([content], { type: 'text/plain' });
+            const file = new File([blob], `test-doc-${Date.now()}.txt`, { type: 'text/plain' });
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('category', 'test');
+            formData.append('tags', 'visualization,test');
+
+            try {
+                const response = await fetch('/api/rag/upload/local', addAuthHeader({
+                    method: 'POST',
+                    body: formData
+                }));
+
+                const data = await response.json();
+                
+                if (data.status === 'ok') {
+                    showMessage('测试文档上传成功', 'success');
+                    loadDocuments();
+                } else {
+                    showMessage(`上传失败: ${data.error || data.message}`, 'error');
+                }
+            } catch (error) {
+                showMessage('上传失败: ' + error.message, 'error');
+            }
+        }
+
+        // 加载日志
+        async function loadLogs() {
+            try {
+                const response = await fetch('/api/rag/logs', addAuthHeader());
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayLogs(data.logs);
+                } else {
+                    showMessage(`加载日志失败: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showMessage('加载日志失败: ' + error.message, 'error');
+            }
+        }
+
+        // 显示日志
+        function displayLogs(logs) {
+            const container = document.getElementById('logs');
+            
+            if (!logs || logs.length === 0) {
+                container.innerHTML = '<p>暂无日志</p>';
+                return;
+            }
+
+            container.innerHTML = logs.map(log => `
+                <div class="log-item">
+                    <strong>${new Date(log.timestamp).toLocaleString()}</strong> [${log.level.toUpperCase()}]
+                    <br>${log.message}
+                    ${log.data ? '<br><small style="color: #7f8c8d;">' + JSON.stringify(log.data) + '</small>' : ''}
+                </div>
+            `).join('');
+        }
+
+        // 清理日志
+        async function clearLogs() {
+            if (!confirm('确定要清理所有日志吗？')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/rag/logs/clear', addAuthHeader({
+                    method: 'POST'
+                }));
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('日志清理成功', 'success');
+                    loadLogs();
+                } else {
+                    showMessage(`日志清理失败: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showMessage('日志清理失败: ' + error.message, 'error');
+            }
+        }
+
+        // 工具函数
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // 页面加载时检查登录状态
+        window.addEventListener('load', function() {
+            const token = localStorage.getItem('rag_token');
+            if (!token) {
+                showMessage('请先登录系统', 'error');
+                setTimeout(() => {
+                    window.location.href = '/public/login.html';
+                }, 2000);
+            } else {
+                showMessage('已登录，开始测试...', 'success');
+                checkHealth();
+            }
+        });
+    </script>
+</body>
+</html> 

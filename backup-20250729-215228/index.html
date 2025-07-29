@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OfferCome - 智能求职辅导平台</title>
+    <meta name="description" content="专业的求职辅导平台，提供简历优化、面试指导、职业规划等服务">
+    <link rel="stylesheet" href="styles-dark.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-crown"></i>
+                <span>OfferCome</span>
+            </div>
+            <div class="nav-links">
+                <a href="#home" class="nav-link">首页</a>
+                <a href="#services" class="nav-link">服务</a>
+                <a href="mbti-test.html" class="nav-link">MBTI测试</a>
+                <a href="#about" class="nav-link">关于我们</a>
+                <a href="#contact" class="nav-link">联系我们</a>
+            </div>
+            <div class="nav-auth">
+                <button id="loginBtn" class="btn btn-outline">登录</button>
+                <button id="registerBtn" class="btn btn-primary">注册</button>
+                <div id="userMenu" class="user-menu" style="display: none;">
+                    <span id="userName"></span>
+                    <button id="logoutBtn" class="btn btn-small">登出</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main>
+        <!-- Hero区域 - 深色主题设计 -->
+        <section id="home" class="hero-section">
+            <div class="hero-background">
+                <div class="hero-pattern"></div>
+            </div>
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span>智能求职辅导</span>
+                </div>
+                <h1 class="hero-title">
+                    找到理想工作<br>
+                    <span class="highlight">从这里开始</span>
+                </h1>
+                <p class="hero-subtitle">
+                    专业的求职辅导平台，AI驱动的个性化服务，助你快速找到心仪的工作
+                </p>
+                <div class="hero-actions">
+                    <button id="consultBtn" class="btn btn-primary btn-large">
+                        <i class="fas fa-play"></i>
+                        开始咨询
+                    </button>
+                    <a href="mbti-test.html" class="btn btn-outline btn-large">
+                        <i class="fas fa-brain"></i>
+                        免费测试
+                    </a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-illustration">
+                    <svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- 背景圆形 -->
+                        <circle cx="200" cy="150" r="120" fill="url(#goldGradient)" opacity="0.1"/>
+                        
+                        <!-- 主要图形元素 -->
+                        <path d="M150 100 Q200 80 250 100 Q280 120 250 140 Q200 160 150 140 Q120 120 150 100" 
+                              fill="url(#goldGradient)" opacity="0.3"/>
+                        
+                        <!-- 连接线 -->
+                        <path d="M180 120 L220 120 M200 100 L200 140" 
+                              stroke="#D4AF37" stroke-width="2" opacity="0.6"/>
+                        
+                        <!-- 装饰点 -->
+                        <circle cx="160" cy="110" r="3" fill="#D4AF37" opacity="0.8"/>
+                        <circle cx="240" cy="110" r="3" fill="#D4AF37" opacity="0.8"/>
+                        <circle cx="200" cy="180" r="3" fill="#D4AF37" opacity="0.8"/>
+                        
+                        <!-- 渐变定义 -->
+                        <defs>
+                            <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#D4AF37;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#B8860B;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- 核心数据 -->
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-number" data-target="5000">0</div>
+                    <div class="stat-label">成功案例</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="stat-number" data-target="98">0</div>
+                    <div class="stat-label">成功率%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div class="stat-number" data-target="200">0</div>
+                    <div class="stat-label">合作企业</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="stat-number" data-target="50">0</div>
+                    <div class="stat-label">专业顾问</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 核心服务 -->
+        <section id="services" class="services-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">核心服务</h2>
+                    <p class="section-subtitle">专业团队，个性化服务，助你快速实现职业目标</p>
+                </div>
+                <div class="services-grid">
+                    <div class="service-card featured">
+                        <div class="service-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <h3>AI简历优化</h3>
+                        <p>智能分析简历，突出核心竞争力，提升面试通过率</p>
+                        <div class="service-features">
+                            <span class="feature-tag">AI智能分析</span>
+                            <span class="feature-tag">个性化建议</span>
+                            <span class="feature-tag">实时优化</span>
+                        </div>
+                        <div class="service-actions">
+                            <button class="btn btn-primary">立即优化</button>
+                            <span class="price">¥299起</span>
+                        </div>
+                    </div>
+                    
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <h3>面试指导</h3>
+                        <p>专业面试技巧培训，模拟面试练习，提升面试成功率</p>
+                        <div class="service-features">
+                            <span class="feature-tag">一对一指导</span>
+                            <span class="feature-tag">模拟面试</span>
+                            <span class="feature-tag">技巧培训</span>
+                        </div>
+                        <div class="service-actions">
+                            <button class="btn btn-outline">预约指导</button>
+                            <span class="price">¥399起</span>
+                        </div>
+                    </div>
+                    
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="fas fa-route"></i>
+                        </div>
+                        <h3>职业规划</h3>
+                        <p>个性化职业规划方案，明确发展方向，制定成长路径</p>
+                        <div class="service-features">
+                            <span class="feature-tag">个性分析</span>
+                            <span class="feature-tag">路径规划</span>
+                            <span class="feature-tag">长期指导</span>
+                        </div>
+                        <div class="service-actions">
+                            <button class="btn btn-outline">开始规划</button>
+                            <span class="price">¥599起</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 成功案例 -->
+        <section id="cases" class="cases-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">成功案例</h2>
+                    <p class="section-subtitle">真实的学生求职成功故事，见证我们的专业实力</p>
+                </div>
+                
+                <!-- 案例统计 -->
+                <div class="cases-stats">
+                    <div class="stat-item">
+                        <div class="stat-number" data-target="6">0</div>
+                        <div class="stat-label">精选案例</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" data-target="95">0</div>
+                        <div class="stat-label">成功率</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" data-target="200">0</div>
+                        <div class="stat-label">平均薪资涨幅(%)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" data-target="30">0</div>
+                        <div class="stat-label">平均求职天数</div>
+                    </div>
+                </div>
+                
+                <!-- 案例展示 -->
+                <div class="cases-grid" id="casesGrid">
+                    <!-- 案例卡片将通过JavaScript动态加载 -->
+                </div>
+                
+                <div class="cases-actions">
+                    <button class="btn btn-outline" onclick="loadMoreCases()">查看更多案例</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 关于我们 -->
+        <section id="about" class="about-section">
+            <div class="container">
+                <div class="about-content">
+                    <div class="about-text">
+                        <h2>关于OfferCome</h2>
+                        <p>我们是一家专注于求职辅导的专业平台，拥有多年HR经验和职业规划背景的专业团队。</p>
+                        <div class="about-features">
+                            <div class="about-feature">
+                                <i class="fas fa-award"></i>
+                                <div>
+                                    <h4>专业团队</h4>
+                                    <p>资深HR和职业规划师</p>
+                                </div>
+                            </div>
+                            <div class="about-feature">
+                                <i class="fas fa-shield-alt"></i>
+                                <div>
+                                    <h4>品质保证</h4>
+                                    <p>严格的服务质量把控</p>
+                                </div>
+                            </div>
+                            <div class="about-feature">
+                                <i class="fas fa-heart"></i>
+                                <div>
+                                    <h4>用心服务</h4>
+                                    <p>以用户需求为中心</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="about-visual">
+                        <div class="about-image">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 联系我们 -->
+        <section id="contact" class="contact-section">
+            <div class="container">
+                <h2 class="section-title">联系我们</h2>
+                <div class="contact-grid">
+                    <div class="contact-card">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <h3>邮箱咨询</h3>
+                        <p>contact@offercome.com</p>
+                        <span class="contact-note">工作日24小时内回复</span>
+                    </div>
+                    <div class="contact-card">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <h3>电话咨询</h3>
+                        <p>400-123-4567</p>
+                        <span class="contact-note">工作日 9:00-18:00</span>
+                    </div>
+                    <div class="contact-card">
+                        <div class="contact-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <h3>在线客服</h3>
+                        <p>点击下方按钮</p>
+                        <button class="btn btn-primary">在线咨询</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 登录模态框 -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>用户登录</h2>
+                <p>请输入您的账号信息</p>
+            </div>
+            
+            <!-- 登录表单 -->
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="loginEmail">邮箱</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">密码</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary">登录</button>
+            </form>
+            
+            <!-- 注册表单 -->
+            <form id="registerForm" class="auth-form" style="display: none;">
+                <div class="form-group">
+                    <label for="registerUsername">用户名</label>
+                    <input type="text" id="registerUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">邮箱</label>
+                    <input type="email" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">密码</label>
+                    <input type="password" id="registerPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPhone">手机号码</label>
+                    <input type="tel" id="registerPhone">
+                </div>
+                <div class="form-group">
+                    <label for="registerEducation">教育背景</label>
+                    <select id="registerEducation">
+                        <option value="">请选择</option>
+                        <option value="高中">高中</option>
+                        <option value="专科">专科</option>
+                        <option value="本科">本科</option>
+                        <option value="硕士">硕士</option>
+                        <option value="博士">博士</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="registerTargetJob">目标职位</label>
+                    <input type="text" id="registerTargetJob" placeholder="如：软件工程师">
+                </div>
+                <div class="form-group">
+                    <label for="registerExperience">工作经验</label>
+                    <select id="registerExperience">
+                        <option value="">请选择</option>
+                        <option value="0">应届毕业生</option>
+                        <option value="1">1年以下</option>
+                        <option value="1-3">1-3年</option>
+                        <option value="3-5">3-5年</option>
+                        <option value="5-10">5-10年</option>
+                        <option value="10+">10年以上</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">注册</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>OfferCome</h3>
+                    <p>专业的求职辅导平台，助力你的职业发展</p>
+                </div>
+                <div class="footer-section">
+                    <h4>服务</h4>
+                    <ul>
+                        <li><a href="#services">简历优化</a></li>
+                        <li><a href="#services">面试指导</a></li>
+                        <li><a href="#services">职业规划</a></li>
+                        <li><a href="mbti-test.html">MBTI测试</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>联系我们</h4>
+                    <p>邮箱: contact@offercome.com</p>
+                    <p>电话: 400-123-4567</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 OfferCome. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 加载脚本 -->
+    <script src="js/api-client.js"></script>
+    <script src="js/state-manager.js"></script>
+    <script src="app-enhanced.js"></script>
+</body>
+</html> 

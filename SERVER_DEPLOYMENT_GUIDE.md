@@ -1,479 +1,302 @@
-# 🚀 招生管理系统 - 服务器部署完整指南
+# 🚀 RAG系统服务器部署完整指南
 
-## 📋 部署概览
+## 📋 部署概述
 
-本指南将帮助您将招生管理系统部署到服务器上，支持多种部署方式和数据库集成。
+本指南将帮助你将RAG系统完整部署到服务器上，包括：
+- ✅ 数据库安装和配置（MongoDB + Redis）
+- ✅ 文件上传功能修复
+- ✅ 数据持久化同步
+- ✅ 完整的日志系统
+- ✅ 生产环境优化
 
-### 🎯 支持的部署方式
+## 🗄️ 第一步：安装数据库
 
-1. **CloudBase云函数部署** (推荐)
-   - 腾讯云CloudBase服务
-   - 自动扩缩容
-   - 按量付费
-
-2. **Docker容器部署**
-   - 容器化部署
-   - 易于管理
-   - 跨平台支持
-
-3. **传统服务器部署**
-   - 自建服务器
-   - PM2进程管理
-   - 完全控制
-
-### 🗄️ 支持的数据库
-
-- **MongoDB**: 主数据库，存储用户、学生、辅导等数据
-- **Redis**: 缓存和会话存储
-- **MySQL**: 关系型数据存储（可选）
-- **CloudBase**: 腾讯云数据库服务
-
-## 🚀 快速开始
-
-### 1. 环境准备
+### 1.1 运行数据库安装脚本
 
 ```bash
-# 克隆项目
-git clone <repository-url>
-cd project
+# 给脚本执行权限
+chmod +x install-database.sh
 
-# 安装依赖
-npm install
-
-# 配置环境变量
-cp env.example .env
+# 运行数据库安装
+./install-database.sh
 ```
 
-### 2. 数据库集成
+这个脚本会自动：
+- 安装MongoDB和Redis
+- 配置数据库服务
+- 创建数据库用户
+- 设置自动启动
 
-#### 方式一：使用数据库管理脚本（推荐）
+### 1.2 验证数据库安装
 
 ```bash
-# 运行数据库管理工具
-./manage-database-enhanced.sh
+# 检查MongoDB状态
+sudo systemctl status mongod
+
+# 检查Redis状态
+sudo systemctl status redis-server
+
+# 测试数据库连接
+./check-database.sh
 ```
 
-选择以下选项：
-1. **安装数据库服务** - 自动安装MongoDB、Redis、MySQL
-2. **配置数据库连接** - 设置连接参数
-3. **检查数据库状态** - 验证连接状态
+## 🖥️ 第二步：部署RAG系统
 
-#### 方式二：手动安装数据库
+### 2.1 运行服务器部署脚本
 
-**安装MongoDB:**
 ```bash
-# macOS
-brew install mongodb-community@6.0
-brew services start mongodb-community@6.0
+# 给脚本执行权限
+chmod +x deploy-server-rag.sh
 
-# Ubuntu
-sudo apt-get install mongodb-org
-sudo systemctl start mongod
-sudo systemctl enable mongod
+# 运行服务器部署
+./deploy-server-rag.sh
 ```
 
-**安装Redis:**
-```bash
-# macOS
-brew install redis
-brew services start redis
+### 2.2 配置环境变量
 
-# Ubuntu
-sudo apt-get install redis-server
-sudo systemctl start redis-server
-sudo systemctl enable redis-server
-```
-
-**安装MySQL:**
-```bash
-# macOS
-brew install mysql@8.0
-brew services start mysql@8.0
-
-# Ubuntu
-sudo apt-get install mysql-server
-sudo systemctl start mysql
-sudo systemctl enable mysql
-```
-
-### 3. 配置环境变量
-
-创建 `.env` 文件：
+编辑 `server/.env` 文件：
 
 ```env
-# 服务器配置
+# RAG系统环境配置
 NODE_ENV=production
 PORT=3000
 
-# 数据库配置
-MONGODB_URI=mongodb://localhost:27017/offercome
-REDIS_URL=redis://localhost:6379
-MYSQL_HOST=localhost
-MYSQL_PORT=3306
-MYSQL_USER=root
-MYSQL_PASSWORD=your_password
-MYSQL_DATABASE=offercome
+# Kimi API配置
+KIMI_API_KEY=your_actual_kimi_api_key_here
 
-# CloudBase配置
-CLOUDBASE_ENV_ID=your_env_id
-TENCENT_SECRET_ID=your_secret_id
-TENCENT_SECRET_KEY=your_secret_key
+# MongoDB配置
+MONGODB_URI=mongodb://localhost:27017/rag_system
+# 或者使用云数据库
+# MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/rag_system
 
-# AI服务配置
-KIMI_API_KEY=your_kimi_api_key
-OPENAI_API_KEY=your_openai_api_key
-
-# JWT配置
-JWT_SECRET=your_jwt_secret_here
-JWT_EXPIRES_IN=7d
-
-# 微信小程序配置
-WECHAT_APPID=your_wechat_appid
-WECHAT_SECRET=your_wechat_secret
+# Redis配置
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=
+REDIS_DB=0
 
 # 日志配置
 LOG_LEVEL=info
-LOG_FILE=logs/app.log
-
-# 安全配置
-CORS_ORIGIN=*
-RATE_LIMIT_WINDOW_MS=900000
-RATE_LIMIT_MAX_REQUESTS=100
+LOG_DIR=./logs
 
 # 文件上传配置
-UPLOAD_PATH=uploads/
+UPLOAD_DIR=./uploads
 MAX_FILE_SIZE=10485760
+
+# 安全配置
+JWT_SECRET=your_jwt_secret_here
+CORS_ORIGIN=*
+
+# 性能配置
+MAX_CONCURRENT_UPLOADS=5
+VECTOR_STORE_SIZE=1000
 ```
 
-## 🚀 部署方式详解
-
-### 方式一：CloudBase云函数部署
-
-#### 1. 安装CloudBase CLI
+### 2.3 初始化数据库
 
 ```bash
-npm install -g @cloudbase/cli
+# 初始化数据库集合和索引
+node init-database.js
 ```
 
-#### 2. 登录CloudBase
+## 🔧 第三步：启动服务
+
+### 3.1 使用PM2启动
 
 ```bash
-tcb login
+# 启动RAG系统
+pm2 start ecosystem.config.js --env production
+
+# 保存PM2配置
+pm2 save
+
+# 设置开机自启
+pm2 startup
 ```
 
-#### 3. 运行部署脚本
+### 3.2 使用管理脚本
 
 ```bash
-./deploy-server-complete.sh
+# 启动服务
+./start-rag.sh
+
+# 检查状态
+./status-rag.sh
+
+# 查看日志
+./logs-rag.sh
 ```
 
-选择选项 `1` 进行CloudBase部署。
+## 📊 第四步：验证部署
 
-#### 4. 配置云函数
+### 4.1 健康检查
 
-确保 `cloudbaserc.json` 配置正确：
+```bash
+# 运行健康检查
+./health-check-rag.sh
 
-```json
+# 测试文件上传
+node test-upload-fix.js
+```
+
+### 4.2 访问地址
+
+- **管理界面**: http://your-server-ip:3000/rag-admin.html
+- **系统首页**: http://your-server-ip:3000/index-rag.html
+- **API健康检查**: http://your-server-ip:3000/api/rag/health
+
+## 🗄️ 数据库同步功能
+
+### 数据持久化
+
+系统现在支持完整的数据持久化：
+
+1. **文档存储**: 所有上传的文档都会保存到MongoDB
+2. **向量存储**: 文档向量也会保存到数据库
+3. **元数据管理**: 完整的文档元数据管理
+4. **搜索历史**: 记录搜索次数和相关性分数
+
+### 数据库结构
+
+```javascript
+// RAG文档集合结构
 {
-  "envId": "your_env_id",
-  "functionRoot": "./server",
-  "functions": [
-    {
-      "name": "api",
-      "runtime": "Nodejs16.13",
-      "memorySize": 256,
-      "timeout": 30,
-      "entry": "index.js"
-    }
-  ],
-  "hosting": {
-    "public": "./public"
-  }
+  documentId: "唯一标识",
+  title: "文档标题",
+  type: "文档类型",
+  fileName: "文件名",
+  filePath: "文件路径",
+  content: "文档内容",
+  vectors: [向量数据],
+  metadata: {
+    category: "分类",
+    tags: ["标签"],
+    uploadedBy: "上传者",
+    source: "来源"
+  },
+  stats: {
+    searchCount: "搜索次数",
+    lastSearched: "最后搜索时间",
+    relevanceScore: "相关性分数"
+  },
+  status: "状态",
+  createdAt: "创建时间",
+  updatedAt: "更新时间"
 }
 ```
 
-### 方式二：Docker容器部署
+### 同步机制
 
-#### 1. 构建Docker镜像
+1. **实时同步**: 文档上传后立即同步到数据库
+2. **内存缓存**: 保持内存中的快速访问
+3. **错误处理**: 数据库连接失败时使用内存存储
+4. **自动恢复**: 数据库恢复后自动加载数据
 
-```bash
-./deploy-server-complete.sh
-```
+## 🔍 监控和管理
 
-选择选项 `2` 进行Docker部署。
-
-#### 2. 手动Docker部署
-
-```bash
-# 构建镜像
-docker build -t offercome-api:1.0.0 .
-
-# 运行容器
-docker run -d \
-  --name offercome-api \
-  -p 3000:3000 \
-  --env-file .env \
-  offercome-api:1.0.0
-```
-
-#### 3. Docker Compose部署
-
-创建 `docker-compose.yml`:
-
-```yaml
-version: '3.8'
-
-services:
-  app:
-    build: .
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-    env_file:
-      - .env
-    depends_on:
-      - mongodb
-      - redis
-    networks:
-      - app-network
-
-  mongodb:
-    image: mongo:6.0
-    ports:
-      - "27017:27017"
-    environment:
-      MONGO_INITDB_DATABASE: offercome
-    volumes:
-      - mongodb_data:/data/db
-    networks:
-      - app-network
-
-  redis:
-    image: redis:7.0
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    networks:
-      - app-network
-
-volumes:
-  mongodb_data:
-  redis_data:
-
-networks:
-  app-network:
-    driver: bridge
-```
-
-运行：
-```bash
-docker-compose up -d
-```
-
-### 方式三：传统服务器部署
-
-#### 1. 安装PM2
+### 系统监控
 
 ```bash
-npm install -g pm2
-```
-
-#### 2. 运行部署脚本
-
-```bash
-./deploy-server-complete.sh
-```
-
-选择选项 `3` 进行传统部署。
-
-#### 3. 手动PM2部署
-
-```bash
-# 安装依赖
-npm install --production
-
-# 启动应用
-pm2 start ecosystem.config.js
-
-# 查看状态
+# 查看PM2状态
 pm2 status
 
-# 查看日志
-pm2 logs
+# 查看实时日志
+pm2 logs rag-system
+
+# 监控系统资源
+pm2 monit
 ```
 
-## 🗄️ 数据库管理
-
-### 数据库备份
+### 数据库管理
 
 ```bash
-./manage-database-enhanced.sh
+# 备份数据库
+./backup-database.sh
+
+# 恢复数据库
+./restore-database.sh <备份文件>
+
+# 检查数据库状态
+./check-database.sh
 ```
 
-选择选项 `4` 进行数据库备份。
-
-### 数据库恢复
+### 日志管理
 
 ```bash
-./manage-database-enhanced.sh
+# 查看应用日志
+tail -f server/logs/info.log
+
+# 查看错误日志
+tail -f server/logs/error.log
+
+# 查看上传日志
+grep "文件上传" server/logs/info.log
 ```
 
-选择选项 `5` 进行数据库恢复。
+## 🚀 生产环境优化
 
-### 性能监控
+### 1. 性能优化
 
 ```bash
-./manage-database-enhanced.sh
+# 调整PM2配置
+pm2 restart rag-system --max-memory-restart 1G
+
+# 优化MongoDB
+sudo systemctl set-property mongod CPUQuota=200%
 ```
 
-选择选项 `7` 进行性能监控。
-
-## 🔧 配置说明
-
-### 数据库连接配置
-
-#### MongoDB配置
-
-```javascript
-// server/config/database-enhanced.js
-const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/offercome';
-
-await mongoose.connect(mongoURI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  maxPoolSize: 10,
-  serverSelectionTimeoutMS: 5000,
-  socketTimeoutMS: 45000,
-});
-```
-
-#### Redis配置
-
-```javascript
-const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
-redisClient = Redis.createClient({
-  url: redisUrl,
-  retry_strategy: (options) => {
-    // 重试策略配置
-  }
-});
-```
-
-#### MySQL配置
-
-```javascript
-const mysqlConfig = {
-  host: process.env.MYSQL_HOST || 'localhost',
-  port: process.env.MYSQL_PORT || 3306,
-  user: process.env.MYSQL_USER || 'root',
-  password: process.env.MYSQL_PASSWORD || '',
-  database: process.env.MYSQL_DATABASE || 'offercome',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-  acquireTimeout: 60000,
-  timeout: 60000,
-  reconnect: true
-};
-```
-
-### 数据模型
-
-系统包含以下主要数据模型：
-
-- **User**: 用户信息
-- **Student**: 学生信息
-- **Coaching**: 辅导记录
-- **Resume**: 简历信息
-- **JobProgress**: 求职进度
-- **AICall**: AI调用记录
-- **SystemLog**: 系统日志
-
-## 📊 监控和维护
-
-### 健康检查
+### 2. 安全配置
 
 ```bash
-curl http://localhost:3000/api/health
+# 配置防火墙
+sudo ufw allow 3000
+sudo ufw allow 27017
+sudo ufw allow 6379
+
+# 设置文件权限
+chmod 600 server/.env
+chmod 755 server/uploads
 ```
 
-### 查看日志
+### 3. 备份策略
 
 ```bash
-# 应用日志
-tail -f logs/app.log
+# 创建定时备份
+crontab -e
 
-# PM2日志
-pm2 logs
-
-# Docker日志
-docker logs -f offercome-api
+# 添加每日备份任务
+0 2 * * * /path/to/rag-system/backup-database.sh
 ```
 
-### 性能监控
-
-```bash
-# 数据库性能
-./manage-database-enhanced.sh
-
-# 系统资源
-htop
-df -h
-free -h
-```
-
-## 🔒 安全配置
-
-### 1. 环境变量安全
-
-- 不要在代码中硬编码敏感信息
-- 使用环境变量存储密钥
-- 定期轮换密钥
-
-### 2. 数据库安全
-
-```bash
-# MongoDB安全配置
-mongo admin --eval "
-db.createUser({
-  user: 'offercome_user',
-  pwd: 'secure_password',
-  roles: [{ role: 'readWrite', db: 'offercome' }]
-})
-"
-
-# Redis安全配置
-redis-cli config set requirepass "secure_password"
-```
-
-### 3. 网络安全
-
-- 配置防火墙规则
-- 使用HTTPS
-- 限制API访问频率
-
-## 🚨 故障排除
+## 🐛 故障排除
 
 ### 常见问题
 
 #### 1. 数据库连接失败
 
 ```bash
-# 检查数据库服务状态
-./manage-database-enhanced.sh
-# 选择选项 3 检查数据库状态
+# 检查MongoDB服务
+sudo systemctl status mongod
+
+# 检查Redis服务
+sudo systemctl status redis-server
+
+# 测试连接
+mongo --eval "db.runCommand('ping')"
+redis-cli ping
 ```
 
-#### 2. 端口被占用
+#### 2. 文件上传失败
 
 ```bash
-# 查看端口占用
-lsof -i :3000
+# 检查上传目录权限
+ls -la server/uploads/
 
-# 杀死进程
-kill -9 <PID>
+# 检查磁盘空间
+df -h
+
+# 查看错误日志
+tail -f server/logs/error.log
 ```
 
 #### 3. 内存不足
@@ -482,55 +305,114 @@ kill -9 <PID>
 # 查看内存使用
 free -h
 
-# 清理缓存
-sudo sync && sudo sysctl -w vm.drop_caches=3
+# 重启服务
+pm2 restart rag-system
+
+# 清理临时文件
+find server/uploads -name "*.tmp" -delete
 ```
 
-#### 4. 日志文件过大
+### 调试模式
 
 ```bash
-# 清理日志
-find logs/ -name "*.log" -size +100M -delete
+# 启动调试模式
+cd server && LOG_LEVEL=debug npm start
 
-# 配置日志轮转
-logrotate /etc/logrotate.d/offercome
+# 查看详细日志
+tail -f server/logs/debug.log
+```
+
+## 📈 性能监控
+
+### 系统指标
+
+```bash
+# 查看系统资源
+htop
+
+# 查看网络连接
+netstat -tlnp
+
+# 查看磁盘IO
+iotop
+```
+
+### 应用指标
+
+```bash
+# 查看PM2指标
+pm2 show rag-system
+
+# 查看数据库统计
+mongo rag_system --eval "db.stats()"
+
+# 查看Redis信息
+redis-cli info
+```
+
+## 🔄 更新和维护
+
+### 系统更新
+
+```bash
+# 停止服务
+pm2 stop rag-system
+
+# 备份数据
+./backup-database.sh
+
+# 更新代码
+git pull origin main
+
+# 安装新依赖
+cd server && npm install
+
+# 重启服务
+pm2 start rag-system
+```
+
+### 数据维护
+
+```bash
+# 清理旧日志
+find server/logs -name "*.log" -mtime +30 -delete
+
+# 清理临时文件
+find server/uploads -name "*.tmp" -mtime +1 -delete
+
+# 优化数据库
+mongo rag_system --eval "db.runCommand('compact')"
 ```
 
 ## 📞 技术支持
 
-### 获取帮助
+### 日志文件位置
 
-1. 查看项目文档
-2. 检查日志文件
-3. 运行诊断脚本
-4. 联系技术支持
+- **应用日志**: `server/logs/`
+- **PM2日志**: `~/.pm2/logs/`
+- **MongoDB日志**: `/var/log/mongodb/`
+- **Redis日志**: `/var/log/redis/`
 
-### 有用的命令
+### 联系信息
 
-```bash
-# 查看系统状态
-./system-status.sh
+如果遇到问题，请按以下顺序排查：
 
-# 测试API接口
-./test-all-apis.sh
-
-# 监控部署状态
-./monitor-deployment.sh
-
-# 查看成本分析
-./cost-analyzer.sh
-```
-
-## 🎯 下一步
-
-部署完成后，您可以：
-
-1. **配置域名和SSL证书**
-2. **设置监控和告警**
-3. **配置自动备份**
-4. **优化性能**
-5. **添加更多功能模块**
+1. 查看应用日志: `tail -f server/logs/error.log`
+2. 运行健康检查: `./health-check-rag.sh`
+3. 检查数据库状态: `./check-database.sh`
+4. 查看系统资源: `pm2 monit`
 
 ---
 
-**祝您部署顺利！** 🚀 
+## 🎉 部署完成！
+
+恭喜！你的RAG系统已经成功部署到服务器上，并具备了：
+
+✅ **完整的数据持久化**  
+✅ **文件上传功能**  
+✅ **数据库同步**  
+✅ **日志系统**  
+✅ **监控管理**  
+✅ **备份恢复**  
+
+现在你可以开始使用这个强大的RAG系统了！ 

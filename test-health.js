@@ -1,0 +1,1 @@
+console.log("🧪 测试API..."); const https = require("https"); const req = https.request("https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api-v2/health", (res) => { console.log("健康检查状态码:", res.statusCode); res.on("data", (chunk) => console.log("响应:", chunk.toString())); }); req.end();

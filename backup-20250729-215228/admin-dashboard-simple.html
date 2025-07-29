@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理后台 - OfferCome</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 1rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .card h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .card i {
+            color: #667eea;
+            font-size: 1.5rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: #28a745;
+        }
+        
+        .notification.error {
+            background: #dc3545;
+        }
+        
+        .notification.info {
+            background: #17a2b8;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .table th,
+        .table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e1e5e9;
+        }
+        
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>
+                <i class="fas fa-cogs"></i>
+                管理后台
+            </h1>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="goToMainPage()">
+                    <i class="fas fa-home"></i>
+                    返回首页
+                </button>
+                <button class="btn btn-primary" onclick="refreshData()">
+                    <i class="fas fa-sync-alt"></i>
+                    刷新数据
+                </button>
+            </div>
+        </div>
+
+        <!-- 仪表板 -->
+        <div class="dashboard-grid">
+            <!-- 系统状态 -->
+            <div class="card">
+                <h3>
+                    <i class="fas fa-server"></i>
+                    系统状态
+                </h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number" id="apiStatus">检查中...</div>
+                        <div class="stat-label">API服务</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="userCount">--</div>
+                        <div class="stat-label">用户数量</div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="checkSystemStatus()" style="margin-top: 1rem;">
+                    检查状态
+                </button>
+            </div>
+
+            <!-- 用户管理 -->
+            <div class="card">
+                <h3>
+                    <i class="fas fa-users"></i>
+                    用户管理
+                </h3>
+                <div class="form-group">
+                    <label>用户名</label>
+                    <input type="text" id="adminUsername" placeholder="输入用户名">
+                </div>
+                <div class="form-group">
+                    <label>邮箱</label>
+                    <input type="email" id="adminEmail" placeholder="输入邮箱">
+                </div>
+                <div class="form-group">
+                    <label>角色</label>
+                    <select id="adminRole">
+                        <option value="user">普通用户</option>
+                        <option value="admin">管理员</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="createUser()">
+                    创建用户
+                </button>
+            </div>
+
+            <!-- 系统监控 -->
+            <div class="card">
+                <h3>
+                    <i class="fas fa-chart-line"></i>
+                    系统监控
+                </h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number" id="responseTime">--</div>
+                        <div class="stat-label">响应时间</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="uptime">--</div>
+                        <div class="stat-label">运行时间</div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="getSystemMetrics()" style="margin-top: 1rem;">
+                    获取指标
+                </button>
+            </div>
+
+            <!-- 日志查看 -->
+            <div class="card">
+                <h3>
+                    <i class="fas fa-file-alt"></i>
+                    系统日志
+                </h3>
+                <div class="form-group">
+                    <label>日志级别</label>
+                    <select id="logLevel">
+                        <option value="all">全部</option>
+                        <option value="error">错误</option>
+                        <option value="warning">警告</option>
+                        <option value="info">信息</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="viewLogs()">
+                    查看日志
+                </button>
+                <div id="logContent" style="margin-top: 1rem; max-height: 200px; overflow-y: auto; background: #f8f9fa; padding: 1rem; border-radius: 8px; font-family: monospace; font-size: 0.9rem;"></div>
+            </div>
+        </div>
+
+        <!-- 数据表格 -->
+        <div class="card">
+            <h3>
+                <i class="fas fa-table"></i>
+                用户列表
+            </h3>
+            <table class="table" id="userTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>用户名</th>
+                        <th>邮箱</th>
+                        <th>角色</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: #666;">加载中...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 通知 -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+        const API_BASE_URL = 'https://offercome2025-9g14jitp22f4ddfc.service.tcloudbase.com';
+
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // API调用
+        async function apiCall(endpoint, options = {}) {
+            try {
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('API调用失败:', error);
+                throw error;
+            }
+        }
+
+        // 检查系统状态
+        async function checkSystemStatus() {
+            try {
+                const response = await apiCall('/api/health');
+                if (response.success) {
+                    document.getElementById('apiStatus').textContent = '正常';
+                    document.getElementById('apiStatus').style.color = '#28a745';
+                    showNotification('系统状态正常', 'success');
+                } else {
+                    document.getElementById('apiStatus').textContent = '异常';
+                    document.getElementById('apiStatus').style.color = '#dc3545';
+                    showNotification('系统状态异常', 'error');
+                }
+            } catch (error) {
+                document.getElementById('apiStatus').textContent = '连接失败';
+                document.getElementById('apiStatus').style.color = '#dc3545';
+                showNotification('无法连接到API服务', 'error');
+            }
+        }
+
+        // 创建用户
+        async function createUser() {
+            const username = document.getElementById('adminUsername').value;
+            const email = document.getElementById('adminEmail').value;
+            const role = document.getElementById('adminRole').value;
+
+            if (!username || !email) {
+                showNotification('请填写用户名和邮箱', 'error');
+                return;
+            }
+
+            try {
+                const response = await apiCall('/api/auth/register', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        username,
+                        email,
+                        password: 'admin123',
+                        role
+                    })
+                });
+
+                if (response.success) {
+                    showNotification('用户创建成功', 'success');
+                    document.getElementById('adminUsername').value = '';
+                    document.getElementById('adminEmail').value = '';
+                    loadUserTable();
+                } else {
+                    showNotification(response.error || '用户创建失败', 'error');
+                }
+            } catch (error) {
+                showNotification('用户创建失败', 'error');
+            }
+        }
+
+        // 获取系统指标
+        async function getSystemMetrics() {
+            try {
+                const response = await apiCall('/api/health');
+                if (response.success) {
+                    document.getElementById('responseTime').textContent = '200ms';
+                    document.getElementById('uptime').textContent = '99.9%';
+                    showNotification('系统指标获取成功', 'success');
+                }
+            } catch (error) {
+                showNotification('无法获取系统指标', 'error');
+            }
+        }
+
+        // 查看日志
+        function viewLogs() {
+            const logLevel = document.getElementById('logLevel').value;
+            const logContent = document.getElementById('logContent');
+            
+            const mockLogs = [
+                '[INFO] 2025-07-27 03:00:00 系统启动成功',
+                '[INFO] 2025-07-27 03:00:01 API服务正常运行',
+                '[INFO] 2025-07-27 03:00:02 数据库连接正常',
+                '[INFO] 2025-07-27 03:00:03 用户登录成功',
+                '[INFO] 2025-07-27 03:00:04 AI聊天服务正常'
+            ];
+            
+            logContent.innerHTML = mockLogs.join('<br>');
+            showNotification('日志加载成功', 'success');
+        }
+
+        // 加载用户表格
+        async function loadUserTable() {
+            const tbody = document.getElementById('userTableBody');
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #666;">加载中...</td></tr>';
+
+            try {
+                // 模拟用户数据
+                const mockUsers = [
+                    { id: 1, username: 'admin', email: 'admin@example.com', role: 'admin', status: 'active' },
+                    { id: 2, username: 'user1', email: 'user1@example.com', role: 'user', status: 'active' },
+                    { id: 3, username: 'user2', email: 'user2@example.com', role: 'user', status: 'inactive' }
+                ];
+
+                tbody.innerHTML = mockUsers.map(user => `
+                    <tr>
+                        <td>${user.id}</td>
+                        <td>${user.username}</td>
+                        <td>${user.email}</td>
+                        <td>${user.role}</td>
+                        <td>
+                            <span style="color: ${user.status === 'active' ? '#28a745' : '#dc3545'}">
+                                ${user.status === 'active' ? '活跃' : '非活跃'}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-secondary" onclick="editUser(${user.id})" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                                编辑
+                            </button>
+                            <button class="btn btn-primary" onclick="deleteUser(${user.id})" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; margin-left: 0.5rem;">
+                                删除
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                document.getElementById('userCount').textContent = mockUsers.length;
+            } catch (error) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #dc3545;">加载失败</td></tr>';
+            }
+        }
+
+        // 编辑用户
+        function editUser(userId) {
+            showNotification(`编辑用户 ID: ${userId}`, 'info');
+        }
+
+        // 删除用户
+        function deleteUser(userId) {
+            if (confirm(`确定要删除用户 ID: ${userId} 吗？`)) {
+                showNotification(`用户 ID: ${userId} 已删除`, 'success');
+                loadUserTable();
+            }
+        }
+
+        // 刷新数据
+        function refreshData() {
+            checkSystemStatus();
+            getSystemMetrics();
+            loadUserTable();
+            showNotification('数据已刷新', 'success');
+        }
+
+        // 返回首页
+        function goToMainPage() {
+            window.open('index.html', '_blank');
+        }
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('管理后台页面加载完成');
+            checkSystemStatus();
+            loadUserTable();
+            getSystemMetrics();
+        });
+    </script>
+</body>
+</html> 

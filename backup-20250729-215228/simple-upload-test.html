@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简单文件上传测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .upload-area {
+            border: 2px dashed #ccc;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .upload-area:hover {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+        .upload-area.clicked {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        .file-input {
+            display: none;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .result.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .result.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .debug {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 简单文件上传测试</h1>
+        <p>这个页面用于测试最基本的文件上传功能</p>
+
+        <h3>测试1: 直接点击文件输入</h3>
+        <input type="file" id="directFileInput" accept=".txt,.pdf,.doc,.docx">
+        <button class="btn" onclick="testDirectClick()">测试直接点击</button>
+        <div id="directResult"></div>
+
+        <h3>测试2: 隐藏文件输入 + 按钮触发</h3>
+        <input type="file" id="hiddenFileInput" class="file-input" accept=".txt,.pdf,.doc,.docx">
+        <button class="btn" onclick="document.getElementById('hiddenFileInput').click()">点击选择文件</button>
+        <div id="hiddenResult"></div>
+
+        <h3>测试3: 区域点击触发</h3>
+        <div class="upload-area" id="uploadArea" onclick="triggerFileInput()">
+            <p>点击此区域选择文件</p>
+            <p style="font-size: 0.9em; color: #666;">支持 PDF, Word, 文本文件</p>
+        </div>
+        <input type="file" id="areaFileInput" class="file-input" accept=".txt,.pdf,.doc,.docx">
+        <div id="areaResult"></div>
+
+        <h3>测试4: 拖拽上传</h3>
+        <div class="upload-area" id="dropArea" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+            <p>拖拽文件到这里</p>
+        </div>
+        <input type="file" id="dropFileInput" class="file-input" accept=".txt,.pdf,.doc,.docx">
+        <div id="dropResult"></div>
+
+        <h3>🔍 调试信息</h3>
+        <div id="debugInfo" class="debug"></div>
+        <button class="btn" onclick="clearDebug()">清除调试信息</button>
+    </div>
+
+    <script>
+        // 调试信息
+        function log(message) {
+            const debugInfo = document.getElementById('debugInfo');
+            const timestamp = new Date().toLocaleTimeString();
+            debugInfo.textContent += `[${timestamp}] ${message}\n`;
+            console.log(message);
+        }
+
+        function clearDebug() {
+            document.getElementById('debugInfo').textContent = '';
+        }
+
+        // 显示结果
+        function showResult(elementId, message, type = 'success') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="result ${type}">${message}</div>`;
+        }
+
+        // 测试直接点击
+        function testDirectClick() {
+            log('测试直接点击文件输入');
+            const fileInput = document.getElementById('directFileInput');
+            fileInput.click();
+            log('已触发文件输入点击事件');
+        }
+
+        // 触发文件输入
+        function triggerFileInput() {
+            log('触发区域点击事件');
+            const fileInput = document.getElementById('areaFileInput');
+            const uploadArea = document.getElementById('uploadArea');
+            
+            // 添加视觉反馈
+            uploadArea.classList.add('clicked');
+            setTimeout(() => {
+                uploadArea.classList.remove('clicked');
+            }, 200);
+            
+            fileInput.click();
+            log('已触发文件输入点击事件');
+        }
+
+        // 文件选择处理
+        document.getElementById('directFileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                log(`直接文件输入选择了: ${file.name}`);
+                showResult('directResult', `已选择: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`);
+            }
+        });
+
+        document.getElementById('hiddenFileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                log(`隐藏文件输入选择了: ${file.name}`);
+                showResult('hiddenResult', `已选择: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`);
+            }
+        });
+
+        document.getElementById('areaFileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                log(`区域文件输入选择了: ${file.name}`);
+                showResult('areaResult', `已选择: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`);
+            }
+        });
+
+        document.getElementById('dropFileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                log(`拖拽文件输入选择了: ${file.name}`);
+                showResult('dropResult', `已选择: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`);
+            }
+        });
+
+        // 拖拽处理
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.style.borderColor = '#007bff';
+            e.currentTarget.style.background = '#e3f2fd';
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            e.currentTarget.style.borderColor = '#ccc';
+            e.currentTarget.style.background = '#f8f9fa';
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.style.borderColor = '#ccc';
+            e.currentTarget.style.background = '#f8f9fa';
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                const file = files[0];
+                const dropFileInput = document.getElementById('dropFileInput');
+                
+                // 创建新的FileList对象
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                dropFileInput.files = dt.files;
+                
+                log(`拖拽选择了文件: ${file.name}`);
+                showResult('dropResult', `已选择: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`);
+            }
+        }
+
+        // 页面加载时的初始化
+        window.addEventListener('load', function() {
+            log('简单上传测试页面已加载');
+            log(`当前页面URL: ${window.location.href}`);
+            log(`用户代理: ${navigator.userAgent}`);
+            
+            // 检查文件输入支持
+            const testInput = document.createElement('input');
+            testInput.type = 'file';
+            log(`文件输入支持: ${testInput.type === 'file'}`);
+            
+            // 检查点击事件支持
+            log(`点击事件支持: ${!!window.addEventListener}`);
+            
+            // 检查拖拽支持
+            log(`拖拽支持: ${!!window.DataTransfer}`);
+            
+            // 测试元素是否存在
+            const elements = ['directFileInput', 'hiddenFileInput', 'areaFileInput', 'dropFileInput'];
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                log(`元素 ${id} 存在: ${!!element}`);
+            });
+        });
+
+        // 添加全局错误处理
+        window.addEventListener('error', function(e) {
+            log(`JavaScript错误: ${e.message} at ${e.filename}:${e.lineno}`);
+        });
+
+        // 添加未处理的Promise拒绝处理
+        window.addEventListener('unhandledrejection', function(e) {
+            log(`未处理的Promise拒绝: ${e.reason}`);
+        });
+    </script>
+</body>
+</html> 

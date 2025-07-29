@@ -17,25 +17,9 @@
             ]
         }
     ],
-    "hosting": {
-        "public": "./public"
-    },
     "service": {
-        "name": "offercome-api",
-        "path": "api",
+        "name": "offercome-api-v2",
+        "path": "api-v2",
         "target": "api"
-    },
-    "framework": {
-        "name": "project",
-        "plugins": {
-            "container": {
-                "use": "@cloudbase/framework-plugin-container",
-                "inputs": {
-                    "serviceName": "project",
-                    "servicePath": "/project",
-                    "containerPort": "80"
-                }
-            }
-        }
     }
 }

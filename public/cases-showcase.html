@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#4F46E5">
+    <title>成功案例展示 - OfferCome</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles-mobile-optimized.css">
+    <style>
+        .cases-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .cases-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .cases-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .cases-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .case-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .case-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .case-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .case-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4F46E5, #667eea);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            margin-right: 20px;
+        }
+
+        .case-info h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+
+        .case-info p {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .case-type {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+
+        .case-type.intern {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .case-type.campus {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .case-type.social {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .case-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .case-content {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .case-section {
+            background: #f9fafb;
+            border-radius: 15px;
+            padding: 20px;
+            border-left: 4px solid #4F46E5;
+        }
+
+        .case-section h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .case-section h4 i {
+            margin-right: 8px;
+            color: #4F46E5;
+        }
+
+        .case-section p {
+            color: #4b5563;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .resume-preview {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .resume-preview:hover {
+            border-color: #4F46E5;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1);
+        }
+
+        .resume-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .resume-title {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .resume-toggle {
+            color: #4F46E5;
+            cursor: pointer;
+        }
+
+        .resume-content {
+            display: none;
+            font-size: 0.9rem;
+            color: #4b5563;
+            line-height: 1.5;
+        }
+
+        .resume-content.show {
+            display: block;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e5e7eb;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -22px;
+            top: 5px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4F46E5;
+        }
+
+        .timeline-date {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+
+        .timeline-content {
+            color: #4b5563;
+            font-size: 0.9rem;
+        }
+
+        .result-highlight {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .result-highlight h4 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .result-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .thank-you {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .thank-you h4 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .thank-you p {
+            font-style: italic;
+            line-height: 1.6;
+        }
+
+        .cta-section {
+            text-align: center;
+            margin-top: 40px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .cta-title {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .cta-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 25px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .cta-btn {
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cta-btn.primary {
+            background: white;
+            color: #4F46E5;
+        }
+
+        .cta-btn.secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: white;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="cases-container">
+        <div class="cases-header">
+            <h1 class="cases-title">成功案例展示</h1>
+            <p class="cases-subtitle">真实用户通过OfferCome平台获得理想offer的完整经历</p>
+        </div>
+
+        <!-- 实习案例 -->
+        <div class="case-card">
+            <div class="case-header">
+                <div class="case-avatar">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <div class="case-info">
+                    <h3>张同学 <span class="case-type intern">实习经历</span></h3>
+                    <p>985高校计算机专业 | 大三学生</p>
+                </div>
+            </div>
+
+            <div class="case-content">
+                <div class="case-section">
+                    <h4><i class="fas fa-exclamation-triangle"></i> 求职痛点</h4>
+                    <p>• 缺乏实习经验，简历空白</p>
+                    <p>• 不知道如何准备技术面试</p>
+                    <p>• 对互联网公司招聘流程不熟悉</p>
+                    <p>• 缺乏项目经验，竞争力不足</p>
+                </div>
+
+                <div class="case-section">
+                    <h4><i class="fas fa-tools"></i> 平台服务</h4>
+                    <p>• 简历优化：突出项目经验和技能</p>
+                    <p>• 面试辅导：模拟技术面试，提升表达能力</p>
+                    <p>• 项目指导：参与开源项目，积累实战经验</p>
+                    <p>• 求职规划：制定详细的求职时间线</p>
+                </div>
+
+                <div class="case-section">
+                    <h4><i class="fas fa-file-alt"></i> 简历展示</h4>
+                    <div class="resume-preview" onclick="toggleResume('intern-resume')">
+                        <div class="resume-header">
+                            <span class="resume-title">优化后的简历</span>
+                            <span class="resume-toggle"><i class="fas fa-chevron-down"></i></span>
+                        </div>
+                        <div class="resume-content" id="intern-resume">
+                            <strong>教育背景</strong><br>
+                            985高校 计算机科学与技术 2021-2025<br><br>
+                            
+                            <strong>技术技能</strong><br>
+                            • 编程语言：Java, Python, JavaScript<br>
+                            • 框架：Spring Boot, React, Vue.js<br>
+                            • 数据库：MySQL, Redis, MongoDB<br>
+                            • 工具：Git, Docker, Linux<br><br>
+                            
+                            <strong>项目经验</strong><br>
+                            • 电商平台后端开发（Spring Boot + MySQL）<br>
+                            • 在线学习系统前端开发（React + Node.js）<br>
+                            • 开源项目贡献：3个项目的PR被合并<br><br>
+                            
+                            <strong>实习经历</strong><br>
+                            • 某互联网公司后端开发实习生<br>
+                            • 负责用户系统模块开发，独立完成3个功能模块
+                        </div>
+                    </div>
+                </div>
+
+                <div class="case-section">
+                    <h4><i class="fas fa-clock"></i> 求职时间线</h4>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-date">2023年9月</div>
+                            <div class="timeline-content">开始使用OfferCome平台，进行简历优化</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">2023年10月</div>
+                            <div class="timeline-content">参与开源项目，积累实战经验</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">2023年11月</div>
+                            <div class="timeline-content">开始投递简历，获得多家公司面试机会</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">2023年12月</div>
+                            <div class="timeline-content">通过技术面试，获得实习offer</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-highlight">
+                <h4>🎉 最终结果</h4>
+                <p>成功获得某知名互联网公司后端开发实习offer</p>
+                <div class="result-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">15k</div>
+                        <div class="stat-label">月薪</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">6个月</div>
+                        <div class="stat-label">实习期</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">转正</div>
+                        <div class="stat-label">机会</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="thank-you">
+                <h4>💬 用户感言</h4>
+                <p>"OfferCome平台帮我从零基础到获得大厂实习offer，简历优化和面试辅导都非常专业。特别是开源项目指导，让我在面试中有了很多谈资。强烈推荐给所有想要进入互联网行业的同学！"</p>
+            </div>
+        </div>
+
+        <!-- 校招案例 -->
+        <div class="case-card">
+            <div class="case-header">
+                <div class="case-avatar">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <div class="case-info">
+                    <h3>李同学 <span class="case-type campus">校招经历</span></h3>
+                    <p>211高校软件工程专业 | 应届毕业生</p>
+                </div>
+            </div>
+
+            <div class="case-content">
+                <div class="case-section">
+                    <h4><i class="fas fa-exclamation-triangle"></i> 求职痛点</h4>
+                    <p>• 校招竞争激烈，缺乏差异化优势</p>
+                    <p>• 技术栈不够深入，面试容易被问倒</p>
+                    <p>• 缺乏大厂实习经验，简历竞争力不足</p>
+                    <p>• 对薪资谈判没有经验</p>
+                </div>
+
+                <div class="case-section">
+                    <h4><i class="fas fa-tools"></i> 平台服务</h4>
+                    <p>• 技术深度提升：系统学习核心技能</p>
+                    <p>• 面试技巧培训：模拟面试，提升表达能力</p>
+                    <p>• 薪资谈判指导：了解市场行情，掌握谈判技巧</p>
+                    <p>• 职业规划：制定长期发展路径</p>
+                </div>
+
+                <div class="case-section">
+                    <h4><i class="fas fa-file-alt"></i> 简历展示</h4>
+                    <div class="resume-preview" onclick="toggleResume('campus-resume')">
+                        <div class="resume-header">
+                            <span class="resume-title">优化后的简历</span>
+                            <span class="resume-toggle"><i class="fas fa-chevron-down"></i></span>
+                        </div>
+                        <div class="resume-content" id="campus-resume">
+                            <strong>教育背景</strong><br>
+                            211高校 软件工程 2020-2024<br><br>
+                            
+                            <strong>技术技能</strong><br>
+                            • 后端：Java, Spring Boot, MySQL, Redis<br>
+                            • 前端：JavaScript, React, Vue.js<br>
+                            • 运维：Docker, Kubernetes, Linux<br>
+                            • 算法：LeetCode 300+题，算法竞赛获奖<br><br>
+                            
+                            <strong>项目经验</strong><br>
+                            • 分布式电商系统（Spring Cloud + MySQL）<br>
+                            • 实时聊天应用（WebSocket + Redis）<br>
+                            • 微服务架构设计，性能优化经验<br><br>
+                            
+                            <strong>实习经历</strong><br>
+                            • 某知名互联网公司后端开发实习生<br>
+                            • 独立负责核心业务模块开发<br>
+                            • 获得优秀实习生称号
+                        </div>
+                    </div>
+                </div>
+
+                <div class="case-section">
+                    <h4><i class="fas fa-clock"></i> 求职时间线</h4>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-date">2023年7月</div>
+                            <div class="timeline-content">开始使用OfferCome平台，制定求职计划</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">2023年8月</div>
+                            <div class="timeline-content">技术深度提升，算法刷题300+</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">2023年9月</div>
+                            <div class="timeline-content">参加秋招，获得多家大厂面试机会</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">2023年10月</div>
+                            <div class="timeline-content">通过多轮面试，获得理想offer</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-highlight">
+                <h4>🎉 最终结果</h4>
+                <p>成功获得某一线互联网公司后端开发工程师offer</p>
+                <div class="result-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">25k</div>
+                        <div class="stat-label">月薪</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">16薪</div>
+                        <div class="stat-label">年终奖</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">股票</div>
+                        <div class="stat-label">期权</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="thank-you">
+                <h4>💬 用户感言</h4>
+                <p>"OfferCome平台不仅帮我优化了简历，更重要的是提供了系统的技术提升方案。面试技巧培训让我在面试中更加自信，薪资谈判指导帮我争取到了更好的待遇。感谢平台的专业指导！"</p>
+            </div>
+        </div>
+
+        <!-- 社招案例 -->
+        <div class="case-card">
+            <div class="case-header">
+                <div class="case-avatar">
+                    <i class="fas fa-user-cog"></i>
+                </div>
+                <div class="case-info">
+                    <h3>王同学 <span class="case-type social">社招经历</span></h3>
+                    <p>传统行业转互联网 | 3年工作经验</p>
+                </div>
+            </div>
+
+            <div class="case-content">
+                <div class="case-section">
+                    <h4><i class="fas fa-exclamation-triangle"></i> 求职痛点</h4>
+                    <p>• 传统行业背景，缺乏互联网经验</p>
+                    <p>• 技术栈落后，需要快速学习新技术</p>
+                    <p>• 年龄偏大，担心竞争力不足</p>
+                    <p>• 对互联网公司文化不适应</p>
+                </div>
+
+                <div class="case-section">
+                    <h4><i class="fas fa-tools"></i> 平台服务</h4>
+                    <p>• 技术转型指导：制定学习计划，快速掌握新技术</p>
+                    <p>• 行业认知培训：了解互联网公司文化和运作模式</p>
+                    <p>• 简历重构：突出可迁移技能和经验</p>
+                    <p>• 心理辅导：建立信心，克服转型焦虑</p>
+                </div>
+
+                <div class="case-section">
+                    <h4><i class="fas fa-file-alt"></i> 简历展示</h4>
+                    <div class="resume-preview" onclick="toggleResume('social-resume')">
+                        <div class="resume-header">
+                            <span class="resume-title">优化后的简历</span>
+                            <span class="resume-toggle"><i class="fas fa-chevron-down"></i></span>
+                        </div>
+                        <div class="resume-content" id="social-resume">
+                            <strong>工作经历</strong><br>
+                            某传统企业 系统工程师 2020-2023<br>
+                            • 负责企业级系统开发和维护<br>
+                            • 管理5人开发团队，完成多个重要项目<br>
+                            • 优化系统性能，提升用户体验30%<br><br>
+                            
+                            <strong>技术技能</strong><br>
+                            • 后端：Java, Spring Boot, MySQL<br>
+                            • 前端：JavaScript, Vue.js, React<br>
+                            • 运维：Docker, Linux, 云服务<br>
+                            • 项目管理：敏捷开发，团队协作<br><br>
+                            
+                            <strong>项目经验</strong><br>
+                            • 企业ERP系统重构（Java + Vue.js）<br>
+                            • 微服务架构设计，提升系统可扩展性<br>
+                            • 带领团队完成数字化转型项目
+                        </div>
+                    </div>
+                </div>
+
+                <div class="case-section">
+                    <h4><i class="fas fa-clock"></i> 求职时间线</h4>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-date">2023年3月</div>
+                            <div class="timeline-content">开始使用OfferCome平台，制定转型计划</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">2023年4-6月</div>
+                            <div class="timeline-content">系统学习新技术，完成个人项目</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">2023年7月</div>
+                            <div class="timeline-content">开始投递简历，获得面试机会</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">2023年8月</div>
+                            <div class="timeline-content">通过多轮面试，成功转型</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-highlight">
+                <h4>🎉 最终结果</h4>
+                <p>成功转型到互联网公司，担任高级开发工程师</p>
+                <div class="result-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">35k</div>
+                        <div class="stat-label">月薪</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">+75%</div>
+                        <div class="stat-label">薪资提升</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">高级</div>
+                        <div class="stat-label">职级</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="thank-you">
+                <h4>💬 用户感言</h4>
+                <p>"OfferCome平台帮我实现了从传统行业到互联网的成功转型。技术学习计划很实用，行业认知培训让我快速适应了互联网文化。现在的工作更有挑战性，薪资也大幅提升。感谢平台的专业指导！"</p>
+            </div>
+        </div>
+
+        <!-- CTA区域 -->
+        <div class="cta-section">
+            <h2 class="cta-title">🚀 开始您的求职之旅</h2>
+            <p class="cta-subtitle">加入OfferCome，让专业团队助您获得理想offer</p>
+            <div class="cta-buttons">
+                <a href="/phone-auth.html" class="cta-btn primary">
+                    <i class="fas fa-user-plus"></i>
+                    立即注册
+                </a>
+                <a href="/mbti-test.html" class="cta-btn secondary">
+                    <i class="fas fa-clipboard-list"></i>
+                    免费测试
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载状态 -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>正在加载案例数据...</p>
+    </div>
+
+    <script>
+        // 切换简历显示
+        function toggleResume(resumeId) {
+            const content = document.getElementById(resumeId);
+            const toggle = content.previousElementSibling.querySelector('.resume-toggle i');
+            
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                toggle.classList.remove('fa-chevron-up');
+                toggle.classList.add('fa-chevron-down');
+            } else {
+                content.classList.add('show');
+                toggle.classList.remove('fa-chevron-down');
+                toggle.classList.add('fa-chevron-up');
+            }
+        }
+
+        // 页面加载动画
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.case-card');
+            
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(30px)';
+                    card.style.transition = 'all 0.6s ease';
+                    
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 200);
+            });
+        });
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 响应式处理
+        function handleResize() {
+            const cards = document.querySelectorAll('.case-card');
+            cards.forEach(card => {
+                if (window.innerWidth < 768) {
+                    card.querySelector('.case-content').style.gridTemplateColumns = '1fr';
+                } else {
+                    card.querySelector('.case-content').style.gridTemplateColumns = '1fr 1fr';
+                }
+            });
+        }
+
+        window.addEventListener('resize', handleResize);
+        handleResize();
+    </script>
+</body>
+</html> 

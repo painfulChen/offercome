@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG组件演示</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="components/rag-ui.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+
+        .demo-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .demo-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .component-demo {
+            margin-bottom: 40px;
+        }
+
+        .component-demo h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .code-example {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin: 5px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .toc-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .toc-toggle:hover {
+            background: rgba(255, 255, 255, 1);
+        }
+    </style>
+</head>
+<body>
+    <!-- TOC切换按钮 -->
+    <button class="toc-toggle" onclick="toggleTOC()" title="切换目录">
+        <i class="fas fa-list"></i>
+    </button>
+
+    <div class="container">
+        <!-- 页面标题 -->
+        <div class="header">
+            <h1><i class="fas fa-cube"></i> RAG组件库演示</h1>
+            <p>可复用的RAG系统UI组件</p>
+        </div>
+
+        <!-- TOC组件演示 -->
+        <section id="section-toc" class="demo-section">
+            <h2><i class="fas fa-list"></i> TOC目录组件</h2>
+            <div class="component-demo">
+                <h3>功能说明</h3>
+                <p>自动生成页面目录，支持滚动跟踪和快速导航。</p>
+                
+                <h3>使用方法</h3>
+                <div class="code-example">
+// 创建TOC组件
+const sections = [
+    { id: 'section-upload', title: '文档上传' },
+    { id: 'section-search', title: '智能搜索' },
+    { id: 'section-documents', title: '文档管理' }
+];
+const tocId = ragUI.createTOC(container, sections);
+                </div>
+                
+                <h3>演示效果</h3>
+                <p>右侧会显示当前页面的目录导航。</p>
+            </div>
+        </section>
+
+        <!-- 上传组件演示 -->
+        <section id="section-upload" class="demo-section">
+            <h2><i class="fas fa-cloud-upload-alt"></i> 文档上传组件</h2>
+            <div class="component-demo">
+                <h3>功能说明</h3>
+                <p>支持拖拽上传、进度显示、文件预览等功能。</p>
+                
+                <h3>使用方法</h3>
+                <div class="code-example">
+// 创建上传组件
+const uploaderId = ragUI.createUploader(container, {
+    onSuccess: function(result) {
+        console.log('上传成功:', result);
+    }
+});
+                </div>
+                
+                <h3>演示效果</h3>
+                <div id="upload-demo"></div>
+            </div>
+        </section>
+
+        <!-- 搜索组件演示 -->
+        <section id="section-search" class="demo-section">
+            <h2><i class="fas fa-search"></i> 智能搜索组件</h2>
+            <div class="component-demo">
+                <h3>功能说明</h3>
+                <p>支持关键词搜索、相关度排序、结果高亮等功能。</p>
+                
+                <h3>使用方法</h3>
+                <div class="code-example">
+// 创建搜索组件
+const searchId = ragUI.createSearch(container, {
+    onResults: function(results) {
+        console.log('搜索结果:', results);
+    }
+});
+                </div>
+                
+                <h3>演示效果</h3>
+                <div id="search-demo"></div>
+            </div>
+        </section>
+
+        <!-- 文档管理组件演示 -->
+        <section id="section-documents" class="demo-section">
+            <h2><i class="fas fa-folder-open"></i> 文档管理组件</h2>
+            <div class="component-demo">
+                <h3>功能说明</h3>
+                <p>支持文档列表、查看、删除、统计等功能。</p>
+                
+                <h3>使用方法</h3>
+                <div class="code-example">
+// 创建文档管理组件
+const managerId = ragUI.createDocumentManager(container, {
+    onDocumentUpdate: function() {
+        console.log('文档已更新');
+    }
+});
+                </div>
+                
+                <h3>演示效果</h3>
+                <div id="documents-demo"></div>
+            </div>
+        </section>
+
+        <!-- 主题切换演示 -->
+        <section id="section-themes" class="demo-section">
+            <h2><i class="fas fa-palette"></i> 主题切换</h2>
+            <div class="component-demo">
+                <h3>功能说明</h3>
+                <p>支持多种主题样式，可动态切换。</p>
+                
+                <h3>使用方法</h3>
+                <div class="code-example">
+// 初始化时指定主题
+const ragUI = new RAGUI({
+    theme: 'dark', // 可选: default, dark, luxury
+    apiBase: '/api/rag',
+    token: 'your-token'
+});
+                </div>
+                
+                <h3>演示效果</h3>
+                <button class="btn" onclick="switchTheme('default')">默认主题</button>
+                <button class="btn" onclick="switchTheme('dark')">暗色主题</button>
+                <button class="btn" onclick="switchTheme('luxury')">豪华主题</button>
+            </div>
+        </section>
+
+        <!-- 完整示例 -->
+        <section id="section-complete" class="demo-section">
+            <h2><i class="fas fa-rocket"></i> 完整示例</h2>
+            <div class="component-demo">
+                <h3>功能说明</h3>
+                <p>展示如何组合使用所有组件创建完整的RAG管理系统。</p>
+                
+                <h3>使用方法</h3>
+                <div class="code-example">
+// 完整系统初始化
+const ragUI = new RAGUI({
+    apiBase: '/api/rag',
+    token: localStorage.getItem('rag_token'),
+    theme: 'default'
+});
+
+// 创建TOC
+const sections = [
+    { id: 'section-upload', title: '文档上传' },
+    { id: 'section-search', title: '智能搜索' },
+    { id: 'section-documents', title: '文档管理' }
+];
+ragUI.createTOC(document.body, sections);
+
+// 创建各个组件
+ragUI.createUploader(uploadContainer, { onSuccess: handleUpload });
+ragUI.createSearch(searchContainer, { onResults: handleResults });
+ragUI.createDocumentManager(docsContainer, { onUpdate: handleUpdate });
+                </div>
+                
+                <h3>演示效果</h3>
+                <button class="btn" onclick="openCompleteDemo()">
+                    <i class="fas fa-external-link-alt"></i> 打开完整示例
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // 全局配置
+        const RAG_CONFIG = {
+            apiBase: '/api/rag',
+            token: 'demo-token',
+            theme: 'default'
+        };
+
+        // 初始化RAG UI
+        let ragUI;
+        let tocId;
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDemo();
+        });
+
+        // 初始化演示
+        function initializeDemo() {
+            try {
+                // 初始化RAG UI
+                ragUI = new RAGUI(RAG_CONFIG);
+
+                // 创建TOC
+                const sections = [
+                    { id: 'section-toc', title: 'TOC目录组件' },
+                    { id: 'section-upload', title: '文档上传组件' },
+                    { id: 'section-search', title: '智能搜索组件' },
+                    { id: 'section-documents', title: '文档管理组件' },
+                    { id: 'section-themes', title: '主题切换' },
+                    { id: 'section-complete', title: '完整示例' }
+                ];
+                tocId = ragUI.createTOC(document.body, sections);
+
+                // 初始化演示组件
+                initializeDemoComponents();
+
+            } catch (error) {
+                console.error('初始化失败:', error);
+                showError('演示初始化失败: ' + error.message);
+            }
+        }
+
+        // 初始化演示组件
+        function initializeDemoComponents() {
+            // 创建上传组件演示
+            ragUI.createUploader(
+                document.getElementById('upload-demo'),
+                {
+                    onSuccess: function(result) {
+                        console.log('演示上传成功:', result);
+                        showSuccess('演示上传成功！');
+                    }
+                }
+            );
+
+            // 创建搜索组件演示
+            ragUI.createSearch(
+                document.getElementById('search-demo'),
+                {
+                    onResults: function(results) {
+                        console.log('演示搜索结果:', results);
+                    }
+                }
+            );
+
+            // 创建文档管理组件演示
+            ragUI.createDocumentManager(
+                document.getElementById('documents-demo'),
+                {
+                    onDocumentUpdate: function() {
+                        console.log('演示文档已更新');
+                    }
+                }
+            );
+        }
+
+        // 切换主题
+        function switchTheme(theme) {
+            try {
+                // 重新初始化RAG UI
+                RAG_CONFIG.theme = theme;
+                ragUI = new RAGUI(RAG_CONFIG);
+                
+                // 重新创建TOC
+                const sections = [
+                    { id: 'section-toc', title: 'TOC目录组件' },
+                    { id: 'section-upload', title: '文档上传组件' },
+                    { id: 'section-search', title: '智能搜索组件' },
+                    { id: 'section-documents', title: '文档管理组件' },
+                    { id: 'section-themes', title: '主题切换' },
+                    { id: 'section-complete', title: '完整示例' }
+                ];
+                
+                // 移除旧的TOC
+                if (tocId) {
+                    const oldToc = document.getElementById(tocId);
+                    if (oldToc) oldToc.remove();
+                }
+                
+                tocId = ragUI.createTOC(document.body, sections);
+                
+                showSuccess(`已切换到${theme}主题`);
+                
+            } catch (error) {
+                console.error('切换主题失败:', error);
+                showError('切换主题失败: ' + error.message);
+            }
+        }
+
+        // 切换TOC显示
+        function toggleTOC() {
+            const toc = document.querySelector('.rag-toc');
+            if (toc) {
+                toc.style.display = toc.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+
+        // 打开完整示例
+        function openCompleteDemo() {
+            window.open('/public/rag-universal.html', '_blank');
+        }
+
+        // 显示成功消息
+        function showSuccess(message) {
+            const alert = document.createElement('div');
+            alert.textContent = message;
+            alert.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: 10000;
+                padding: 15px 30px;
+                border-radius: 8px;
+                background: rgba(39, 174, 96, 0.1);
+                border: 1px solid #27ae60;
+                color: #27ae60;
+                font-weight: 500;
+            `;
+            
+            document.body.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 3000);
+        }
+
+        // 显示错误消息
+        function showError(message) {
+            const alert = document.createElement('div');
+            alert.textContent = message;
+            alert.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: 10000;
+                padding: 15px 30px;
+                border-radius: 8px;
+                background: rgba(231, 76, 60, 0.1);
+                border: 1px solid #e74c3c;
+                color: #e74c3c;
+                font-weight: 500;
+            `;
+            
+            document.body.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html> 

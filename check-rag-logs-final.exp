@@ -1,0 +1,47 @@
+#!/usr/bin/expect -f
+
+# 检查RAG系统最终日志的expect脚本
+set timeout 30
+set server_ip "124.222.117.47"
+set username "ubuntu"
+set password "Somkouny2016@g"
+
+spawn ssh $username@$server_ip
+
+expect {
+    "password:" {
+        send "$password\r"
+    }
+    "yes/no" {
+        send "yes\r"
+        expect "password:"
+        send "$password\r"
+    }
+    "Permission denied" {
+        puts "❌ 密码错误或连接被拒绝"
+        exit 1
+    }
+}
+
+expect {
+    "$ " {
+        puts "✅ SSH连接成功！"
+        send "pm2 logs rag-system --lines 15\r"
+        expect "$ "
+        send "netstat -tlnp | grep node\r"
+        expect "$ "
+        send "ps aux | grep rag-system\r"
+        expect "$ "
+        send "exit\r"
+    }
+    "Permission denied" {
+        puts "❌ 密码错误，请检查密码"
+        exit 1
+    }
+    timeout {
+        puts "❌ 连接超时"
+        exit 1
+    }
+}
+
+expect eof 

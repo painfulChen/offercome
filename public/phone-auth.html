@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#4F46E5">
+    <title>手机注册登录 - OfferCome</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles-mobile-optimized.css">
+    <style>
+        .auth-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .auth-logo {
+            font-size: 32px;
+            font-weight: 700;
+            color: #4F46E5;
+            margin-bottom: 10px;
+        }
+
+        .auth-subtitle {
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            background: #f3f4f6;
+            padding: 4px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .auth-tab.active {
+            background: #4F46E5;
+            color: white;
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #4F46E5;
+        }
+
+        .form-input.error {
+            border-color: #ef4444;
+        }
+
+        .code-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .code-input {
+            flex: 1;
+        }
+
+        .send-code-btn {
+            padding: 15px 20px;
+            background: #4F46E5;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .send-code-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #4F46E5, #667eea);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .auth-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 14px;
+            margin-top: 5px;
+            text-align: left;
+        }
+
+        .success-message {
+            color: #10b981;
+            font-size: 14px;
+            margin-top: 5px;
+            text-align: left;
+        }
+
+        .countdown {
+            color: #6b7280;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #4F46E5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .password-toggle {
+            position: relative;
+        }
+
+        .password-toggle i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #6b7280;
+        }
+
+        .password-toggle input {
+            padding-right: 45px;
+        }
+
+        .switch-form {
+            margin-top: 20px;
+            color: #6b7280;
+        }
+
+        .switch-form a {
+            color: #4F46E5;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .switch-form a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-logo">
+                <i class="fas fa-graduation-cap"></i>
+                OfferCome
+            </div>
+            <p class="auth-subtitle">智能求职辅导平台</p>
+
+            <!-- 标签切换 -->
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="switchTab('register')">
+                    <i class="fas fa-user-plus"></i> 注册
+                </div>
+                <div class="auth-tab" onclick="switchTab('login')">
+                    <i class="fas fa-sign-in-alt"></i> 登录
+                </div>
+            </div>
+
+            <!-- 注册表单 -->
+            <form id="registerForm" class="auth-form active">
+                <div class="form-group">
+                    <label class="form-label">手机号</label>
+                    <input type="tel" class="form-input" id="registerPhone" placeholder="请输入手机号" maxlength="11">
+                    <div class="error-message" id="registerPhoneError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">验证码</label>
+                    <div class="code-input-group">
+                        <input type="text" class="form-input code-input" id="registerCode" placeholder="请输入验证码" maxlength="6">
+                        <button type="button" class="send-code-btn" id="registerSendCode" onclick="sendCode('register')">
+                            发送验证码
+                        </button>
+                    </div>
+                    <div class="error-message" id="registerCodeError"></div>
+                    <div class="countdown" id="registerCountdown"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">用户名</label>
+                    <input type="text" class="form-input" id="registerUsername" placeholder="请输入用户名" maxlength="30">
+                    <div class="error-message" id="registerUsernameError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">密码</label>
+                    <div class="password-toggle">
+                        <input type="password" class="form-input" id="registerPassword" placeholder="请输入密码" minlength="6">
+                        <i class="fas fa-eye" onclick="togglePassword('registerPassword')"></i>
+                    </div>
+                    <div class="error-message" id="registerPasswordError"></div>
+                </div>
+
+                <button type="submit" class="auth-btn" id="registerBtn">
+                    注册
+                </button>
+            </form>
+
+            <!-- 登录表单 -->
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label class="form-label">手机号</label>
+                    <input type="tel" class="form-input" id="loginPhone" placeholder="请输入手机号" maxlength="11">
+                    <div class="error-message" id="loginPhoneError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">验证码</label>
+                    <div class="code-input-group">
+                        <input type="text" class="form-input code-input" id="loginCode" placeholder="请输入验证码" maxlength="6">
+                        <button type="button" class="send-code-btn" id="loginSendCode" onclick="sendCode('login')">
+                            发送验证码
+                        </button>
+                    </div>
+                    <div class="error-message" id="loginCodeError"></div>
+                    <div class="countdown" id="loginCountdown"></div>
+                </div>
+
+                <button type="submit" class="auth-btn" id="loginBtn">
+                    登录
+                </button>
+
+                <div class="switch-form">
+                    已有密码？<a href="#" onclick="switchToPasswordLogin()">密码登录</a>
+                </div>
+            </form>
+
+            <!-- 密码登录表单 -->
+            <form id="passwordLoginForm" class="auth-form">
+                <div class="form-group">
+                    <label class="form-label">手机号</label>
+                    <input type="tel" class="form-input" id="passwordLoginPhone" placeholder="请输入手机号" maxlength="11">
+                    <div class="error-message" id="passwordLoginPhoneError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">密码</label>
+                    <div class="password-toggle">
+                        <input type="password" class="form-input" id="passwordLoginPassword" placeholder="请输入密码">
+                        <i class="fas fa-eye" onclick="togglePassword('passwordLoginPassword')"></i>
+                    </div>
+                    <div class="error-message" id="passwordLoginPasswordError"></div>
+                </div>
+
+                <button type="submit" class="auth-btn" id="passwordLoginBtn">
+                    登录
+                </button>
+
+                <div class="switch-form">
+                    忘记密码？<a href="#" onclick="switchToCodeLogin()">验证码登录</a>
+                </div>
+            </form>
+
+            <!-- 加载状态 -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>处理中...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api-v2';
+        let currentTab = 'register';
+        let countdownTimers = {};
+
+        // 切换标签
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // 更新标签样式
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // 更新表单显示
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            document.getElementById(tab + 'Form').classList.add('active');
+            
+            // 重置错误信息
+            clearErrors();
+        }
+
+        // 切换到密码登录
+        function switchToPasswordLogin() {
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            document.getElementById('passwordLoginForm').classList.add('active');
+            clearErrors();
+        }
+
+        // 切换到验证码登录
+        function switchToCodeLogin() {
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            document.getElementById('loginForm').classList.add('active');
+            clearErrors();
+        }
+
+        // 发送验证码
+        async function sendCode(type) {
+            const phone = document.getElementById(type + 'Phone').value;
+            const sendBtn = document.getElementById(type + 'SendCode');
+            const countdown = document.getElementById(type + 'Countdown');
+            
+            // 验证手机号
+            if (!phone || !/^1[3-9]\d{9}$/.test(phone)) {
+                showError(type + 'Phone', '请输入有效的手机号');
+                return;
+            }
+
+            try {
+                sendBtn.disabled = true;
+                sendBtn.textContent = '发送中...';
+
+                const response = await fetch(`${API_BASE}/phone-auth/send-code`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        phone: phone,
+                        type: type
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess(type + 'Code', '验证码已发送');
+                    startCountdown(type, data.expiresIn);
+                } else {
+                    showError(type + 'Phone', data.message);
+                    sendBtn.disabled = false;
+                    sendBtn.textContent = '发送验证码';
+                }
+            } catch (error) {
+                console.error('发送验证码失败:', error);
+                showError(type + 'Phone', '发送验证码失败，请稍后重试');
+                sendBtn.disabled = false;
+                sendBtn.textContent = '发送验证码';
+            }
+        }
+
+        // 开始倒计时
+        function startCountdown(type, duration) {
+            const sendBtn = document.getElementById(type + 'SendCode');
+            const countdown = document.getElementById(type + 'Countdown');
+            let timeLeft = duration;
+
+            countdownTimers[type] = setInterval(() => {
+                if (timeLeft > 0) {
+                    sendBtn.textContent = `${timeLeft}s后重发`;
+                    countdown.textContent = `验证码有效期：${timeLeft}秒`;
+                    timeLeft--;
+                } else {
+                    clearInterval(countdownTimers[type]);
+                    sendBtn.disabled = false;
+                    sendBtn.textContent = '发送验证码';
+                    countdown.textContent = '';
+                }
+            }, 1000);
+        }
+
+        // 注册
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const phone = document.getElementById('registerPhone').value;
+            const code = document.getElementById('registerCode').value;
+            const username = document.getElementById('registerUsername').value;
+            const password = document.getElementById('registerPassword').value;
+
+            // 验证表单
+            if (!validateRegisterForm(phone, code, username, password)) {
+                return;
+            }
+
+            try {
+                showLoading(true);
+                
+                const response = await fetch(`${API_BASE}/phone-auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        phone: phone,
+                        code: code,
+                        username: username,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // 保存token
+                    localStorage.setItem('token', data.data.token);
+                    localStorage.setItem('user', JSON.stringify(data.data.user));
+                    
+                    // 跳转到主页
+                    window.location.href = '/';
+                } else {
+                    showError('register', data.message);
+                }
+            } catch (error) {
+                console.error('注册失败:', error);
+                showError('register', '注册失败，请稍后重试');
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        // 验证码登录
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const phone = document.getElementById('loginPhone').value;
+            const code = document.getElementById('loginCode').value;
+
+            // 验证表单
+            if (!validateLoginForm(phone, code)) {
+                return;
+            }
+
+            try {
+                showLoading(true);
+                
+                const response = await fetch(`${API_BASE}/phone-auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        phone: phone,
+                        code: code
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // 保存token
+                    localStorage.setItem('token', data.data.token);
+                    localStorage.setItem('user', JSON.stringify(data.data.user));
+                    
+                    // 跳转到主页
+                    window.location.href = '/';
+                } else {
+                    showError('login', data.message);
+                }
+            } catch (error) {
+                console.error('登录失败:', error);
+                showError('login', '登录失败，请稍后重试');
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        // 密码登录
+        document.getElementById('passwordLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const phone = document.getElementById('passwordLoginPhone').value;
+            const password = document.getElementById('passwordLoginPassword').value;
+
+            // 验证表单
+            if (!validatePasswordLoginForm(phone, password)) {
+                return;
+            }
+
+            try {
+                showLoading(true);
+                
+                const response = await fetch(`${API_BASE}/phone-auth/login-password`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        phone: phone,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // 保存token
+                    localStorage.setItem('token', data.data.token);
+                    localStorage.setItem('user', JSON.stringify(data.data.user));
+                    
+                    // 跳转到主页
+                    window.location.href = '/';
+                } else {
+                    showError('passwordLogin', data.message);
+                }
+            } catch (error) {
+                console.error('登录失败:', error);
+                showError('passwordLogin', '登录失败，请稍后重试');
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        // 验证注册表单
+        function validateRegisterForm(phone, code, username, password) {
+            clearErrors();
+            let isValid = true;
+
+            if (!phone || !/^1[3-9]\d{9}$/.test(phone)) {
+                showError('registerPhone', '请输入有效的手机号');
+                isValid = false;
+            }
+
+            if (!code || code.length !== 6) {
+                showError('registerCode', '请输入6位验证码');
+                isValid = false;
+            }
+
+            if (!username || username.length < 2 || username.length > 30) {
+                showError('registerUsername', '用户名长度应在2-30个字符之间');
+                isValid = false;
+            }
+
+            if (!password || password.length < 6) {
+                showError('registerPassword', '密码至少6个字符');
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        // 验证登录表单
+        function validateLoginForm(phone, code) {
+            clearErrors();
+            let isValid = true;
+
+            if (!phone || !/^1[3-9]\d{9}$/.test(phone)) {
+                showError('loginPhone', '请输入有效的手机号');
+                isValid = false;
+            }
+
+            if (!code || code.length !== 6) {
+                showError('loginCode', '请输入6位验证码');
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        // 验证密码登录表单
+        function validatePasswordLoginForm(phone, password) {
+            clearErrors();
+            let isValid = true;
+
+            if (!phone || !/^1[3-9]\d{9}$/.test(phone)) {
+                showError('passwordLoginPhone', '请输入有效的手机号');
+                isValid = false;
+            }
+
+            if (!password) {
+                showError('passwordLoginPassword', '请输入密码');
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        // 显示错误信息
+        function showError(field, message) {
+            const errorElement = document.getElementById(field + 'Error');
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+            }
+        }
+
+        // 显示成功信息
+        function showSuccess(field, message) {
+            const successElement = document.getElementById(field + 'Success');
+            if (successElement) {
+                successElement.textContent = message;
+                successElement.style.display = 'block';
+            }
+        }
+
+        // 清除错误信息
+        function clearErrors() {
+            document.querySelectorAll('.error-message, .success-message').forEach(el => {
+                el.textContent = '';
+                el.style.display = 'none';
+            });
+        }
+
+        // 显示/隐藏加载状态
+        function showLoading(show) {
+            const loading = document.getElementById('loading');
+            if (show) {
+                loading.classList.add('show');
+            } else {
+                loading.classList.remove('show');
+            }
+        }
+
+        // 切换密码显示
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = input.nextElementSibling;
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // 输入时清除错误
+        document.querySelectorAll('.form-input').forEach(input => {
+            input.addEventListener('input', function() {
+                const errorElement = this.parentElement.querySelector('.error-message');
+                if (errorElement) {
+                    errorElement.textContent = '';
+                    errorElement.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

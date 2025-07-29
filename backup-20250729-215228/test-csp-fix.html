@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSP修复测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .file-input {
+            display: none;
+        }
+        .upload-area {
+            border: 2px dashed #ccc;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .upload-area:hover {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 CSP修复测试页面</h1>
+        <p>这个页面用于测试CSP修复是否成功</p>
+
+        <div class="test-section">
+            <h3>测试1: 内联JavaScript</h3>
+            <button class="btn" onclick="testInlineScript()">测试内联脚本</button>
+            <div id="inlineResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>测试2: 内联样式</h3>
+            <div style="background: #e3f2fd; padding: 10px; border-radius: 5px; margin: 10px 0;">
+                这是内联样式测试
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>测试3: 文件上传</h3>
+            <div class="upload-area" onclick="document.getElementById('testFileInput').click()">
+                <p>点击此区域选择文件</p>
+                <p style="font-size: 0.9em; color: #666;">测试文件选择功能</p>
+            </div>
+            <input type="file" id="testFileInput" class="file-input" accept=".txt,.pdf,.doc,.docx">
+            <div id="fileResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>测试4: 动态内容</h3>
+            <button class="btn" onclick="testDynamicContent()">测试动态内容</button>
+            <div id="dynamicResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔍 调试信息</h3>
+            <div id="debugInfo" style="background: #f8f9fa; padding: 10px; border-radius: 5px; font-family: monospace; font-size: 12px;"></div>
+        </div>
+    </div>
+
+    <script>
+        // 调试信息
+        function log(message) {
+            const debugInfo = document.getElementById('debugInfo');
+            const timestamp = new Date().toLocaleTimeString();
+            debugInfo.innerHTML += `[${timestamp}] ${message}<br>`;
+            console.log(message);
+        }
+
+        // 测试内联脚本
+        function testInlineScript() {
+            log('测试内联脚本执行');
+            const result = document.getElementById('inlineResult');
+            result.innerHTML = '<div class="success">✅ 内联脚本执行成功！</div>';
+            log('内联脚本执行完成');
+        }
+
+        // 测试动态内容
+        function testDynamicContent() {
+            log('测试动态内容创建');
+            const result = document.getElementById('dynamicResult');
+            result.innerHTML = '<div class="success">✅ 动态内容创建成功！</div>';
+            log('动态内容创建完成');
+        }
+
+        // 文件选择处理
+        document.getElementById('testFileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                log(`选择了文件: ${file.name}`);
+                const result = document.getElementById('fileResult');
+                result.innerHTML = `<div class="success">✅ 文件选择成功: ${file.name} (${(file.size / 1024).toFixed(2)} KB)</div>`;
+            }
+        });
+
+        // 页面加载时的初始化
+        window.addEventListener('load', function() {
+            log('CSP测试页面已加载');
+            log(`当前页面URL: ${window.location.href}`);
+            log(`用户代理: ${navigator.userAgent}`);
+            
+            // 检查各种功能
+            log('检查内联脚本支持...');
+            try {
+                eval('console.log("内联脚本测试")');
+                log('✅ 内联脚本支持正常');
+            } catch (error) {
+                log(`❌ 内联脚本支持异常: ${error.message}`);
+            }
+            
+            log('检查动态内容创建...');
+            try {
+                const testDiv = document.createElement('div');
+                testDiv.innerHTML = '<span>动态内容测试</span>';
+                log('✅ 动态内容创建正常');
+            } catch (error) {
+                log(`❌ 动态内容创建异常: ${error.message}`);
+            }
+            
+            log('检查文件输入支持...');
+            try {
+                const testInput = document.createElement('input');
+                testInput.type = 'file';
+                log('✅ 文件输入支持正常');
+            } catch (error) {
+                log(`❌ 文件输入支持异常: ${error.message}`);
+            }
+        });
+
+        // 错误处理
+        window.addEventListener('error', function(e) {
+            log(`JavaScript错误: ${e.message} at ${e.filename}:${e.lineno}`);
+        });
+
+        window.addEventListener('unhandledrejection', function(e) {
+            log(`未处理的Promise拒绝: ${e.reason}`);
+        });
+    </script>
+</body>
+</html> 

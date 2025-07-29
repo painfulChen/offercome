@@ -1,0 +1,37 @@
+{
+  "name": "offercome",
+  "version": "1.0.0",
+  "description": "OfferCome智能求职辅导平台",
+  "main": "dev-server.js",
+  "scripts": {
+    "dev": "node dev-server.js",
+    "start": "node dev-server.js",
+    "deploy": "tcb fn deploy api -e offercome2025-9g14jitp22f4ddfc --force",
+    "deploy-frontend": "tcb hosting deploy public/ -e offercome2025-9g14jitp22f4ddfc",
+    "test": "node server/test-ai.js",
+    "build": "echo '构建完成'"
+  },
+  "devDependencies": {
+    "chokidar": "^3.5.3",
+    "express": "^4.18.2",
+    "nodemon": "^3.0.1",
+    "ws": "^8.14.2"
+  },
+  "dependencies": {
+    "axios": "^1.11.0",
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^16.3.1",
+    "form-data": "^4.0.4",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.14.2",
+    "tencentcloud-sdk-nodejs": "^4.1.85"
+  },
+  "keywords": [
+    "求职",
+    "AI",
+    "简历优化",
+    "面试辅导"
+  ],
+  "author": "OfferCome Team",
+  "license": "MIT"
+}

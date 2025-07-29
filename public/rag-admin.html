@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG知识库管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            text-align: center;
+            font-size: 1.1em;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .panel h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60, #229954);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        .file-upload-area {
+            border: 2px dashed #3498db;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-area:hover {
+            border-color: #2980b9;
+            background: rgba(52, 152, 219, 0.05);
+        }
+
+        .file-upload-area.dragover {
+            border-color: #27ae60;
+            background: rgba(39, 174, 96, 0.1);
+        }
+
+        .search-results {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .result-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3498db;
+        }
+
+        .result-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .result-content {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .result-meta {
+            margin-top: 10px;
+            font-size: 0.8em;
+            color: #95a5a6;
+        }
+
+        .document-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .document-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #27ae60;
+        }
+
+        .document-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .document-meta {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-bottom: 8px;
+        }
+
+        .document-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .tag {
+            background: #3498db;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.8em;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+        }
+
+        .error {
+            background: #e74c3c;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .success {
+            background: #27ae60;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            border-bottom-color: #3498db;
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 RAG知识库管理系统</h1>
+            <p>智能文档处理与检索系统 - 求职陪跑专业版</p>
+        </div>
+
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalDocs">-</div>
+                <div class="stat-label">总文档数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalSize">-</div>
+                <div class="stat-label">总大小</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="lastUpdate">-</div>
+                <div class="stat-label">最后更新</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="searchCount">-</div>
+                <div class="stat-label">搜索次数</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="panel">
+                <h2>📤 文档上传</h2>
+                
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('local')">本地文件</div>
+                    <div class="tab" onclick="switchTab('feishu')">飞书文档</div>
+                    <div class="tab" onclick="switchTab('batch')">批量上传</div>
+                </div>
+
+                <div class="tab-content active" id="localTab">
+                    <div class="form-group">
+                        <label>选择文件</label>
+                        <div class="file-upload-area" id="fileUploadArea">
+                            <p>拖拽文件到此处或点击选择文件</p>
+                            <input type="file" id="fileInput" style="display: none;" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.gif,.bmp,.webp,.txt,.md">
+                            <button class="btn" onclick="document.getElementById('fileInput').click()">选择文件</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>分类</label>
+                        <select class="form-control" id="category">
+                            <option value="resume">简历模板</option>
+                            <option value="interview">面试技巧</option>
+                            <option value="career">职业规划</option>
+                            <option value="skills">技能提升</option>
+                            <option value="industry">行业分析</option>
+                            <option value="general">通用文档</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>标签 (用逗号分隔)</label>
+                        <input type="text" class="form-control" id="tags" placeholder="求职,面试,简历,技巧">
+                    </div>
+
+                    <button class="btn btn-success" onclick="uploadFile()">上传文件</button>
+                </div>
+
+                <div class="tab-content" id="feishuTab">
+                    <div class="form-group">
+                        <label>飞书文档链接</label>
+                        <input type="url" class="form-control" id="feishuUrl" placeholder="https://feishu.cn/...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>文档类型</label>
+                        <select class="form-control" id="feishuType">
+                            <option value="document">飞书文档</option>
+                            <option value="spreadsheet">飞书表格</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>分类</label>
+                        <select class="form-control" id="feishuCategory">
+                            <option value="resume">简历模板</option>
+                            <option value="interview">面试技巧</option>
+                            <option value="career">职业规划</option>
+                            <option value="skills">技能提升</option>
+                            <option value="industry">行业分析</option>
+                            <option value="general">通用文档</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>标签 (用逗号分隔)</label>
+                        <input type="text" class="form-control" id="feishuTags" placeholder="求职,面试,简历,技巧">
+                    </div>
+
+                    <button class="btn btn-success" onclick="uploadFeishu()">处理飞书文档</button>
+                </div>
+
+                <div class="tab-content" id="batchTab">
+                    <div class="form-group">
+                        <label>选择多个文件</label>
+                        <div class="file-upload-area" id="batchUploadArea">
+                            <p>拖拽多个文件到此处或点击选择文件</p>
+                            <input type="file" id="batchFileInput" style="display: none;" multiple accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.gif,.bmp,.webp,.txt,.md">
+                            <button class="btn" onclick="document.getElementById('batchFileInput').click()">选择文件</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>分类</label>
+                        <select class="form-control" id="batchCategory">
+                            <option value="resume">简历模板</option>
+                            <option value="interview">面试技巧</option>
+                            <option value="career">职业规划</option>
+                            <option value="skills">技能提升</option>
+                            <option value="industry">行业分析</option>
+                            <option value="general">通用文档</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>标签 (用逗号分隔)</label>
+                        <input type="text" class="form-control" id="batchTags" placeholder="求职,面试,简历,技巧">
+                    </div>
+
+                    <button class="btn btn-success" onclick="uploadBatch()">批量上传</button>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>🔍 智能搜索</h2>
+                
+                <div class="form-group">
+                    <label>搜索查询</label>
+                    <input type="text" class="form-control" id="searchQuery" placeholder="输入你的问题，如：如何写一份好的简历？">
+                </div>
+
+                <div class="form-group">
+                    <label>分类过滤</label>
+                    <select class="form-control" id="searchCategory">
+                        <option value="">所有分类</option>
+                        <option value="resume">简历模板</option>
+                        <option value="interview">面试技巧</option>
+                        <option value="career">职业规划</option>
+                        <option value="skills">技能提升</option>
+                        <option value="industry">行业分析</option>
+                        <option value="general">通用文档</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>标签过滤</label>
+                    <input type="text" class="form-control" id="searchTags" placeholder="用逗号分隔多个标签">
+                </div>
+
+                <button class="btn btn-success" onclick="searchDocuments()">搜索</button>
+
+                <div id="searchResults" class="search-results" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>📚 文档管理</h2>
+            
+            <div class="form-group">
+                <label>分类过滤</label>
+                <select class="form-control" id="filterCategory" onchange="loadDocuments()">
+                    <option value="">所有分类</option>
+                    <option value="resume">简历模板</option>
+                    <option value="interview">面试技巧</option>
+                    <option value="career">职业规划</option>
+                    <option value="skills">技能提升</option>
+                    <option value="industry">行业分析</option>
+                    <option value="general">通用文档</option>
+                </select>
+            </div>
+
+            <div id="documentList" class="document-list"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/rag';
+        let searchCount = 0;
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStats();
+            loadDocuments();
+            setupFileUpload();
+        });
+
+        // 切换标签页
+        function switchTab(tabName) {
+            // 隐藏所有标签内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 移除所有标签的active类
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 显示选中的标签内容
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            
+            // 添加active类到选中的标签
+            event.target.classList.add('active');
+        }
+
+        // 设置文件上传
+        function setupFileUpload() {
+            const fileUploadArea = document.getElementById('fileUploadArea');
+            const batchUploadArea = document.getElementById('batchUploadArea');
+            const fileInput = document.getElementById('fileInput');
+            const batchFileInput = document.getElementById('batchFileInput');
+
+            // 拖拽上传
+            [fileUploadArea, batchUploadArea].forEach(area => {
+                area.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    area.classList.add('dragover');
+                });
+
+                area.addEventListener('dragleave', () => {
+                    area.classList.remove('dragover');
+                });
+
+                area.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    area.classList.remove('dragover');
+                    const files = e.dataTransfer.files;
+                    if (area === fileUploadArea && files.length > 0) {
+                        fileInput.files = files;
+                    } else if (area === batchUploadArea) {
+                        batchFileInput.files = files;
+                    }
+                });
+            });
+
+            // 文件选择
+            fileInput.addEventListener('change', () => {
+                if (fileInput.files.length > 0) {
+                    fileUploadArea.innerHTML = `<p>已选择: ${fileInput.files[0].name}</p>`;
+                }
+            });
+
+            batchFileInput.addEventListener('change', () => {
+                if (batchFileInput.files.length > 0) {
+                    batchUploadArea.innerHTML = `<p>已选择 ${batchFileInput.files.length} 个文件</p>`;
+                }
+            });
+        }
+
+        // 上传单个文件
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const category = document.getElementById('category').value;
+            const tags = document.getElementById('tags').value;
+
+            if (!fileInput.files[0]) {
+                showMessage('请选择文件', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            formData.append('category', category);
+            formData.append('tags', tags);
+
+            try {
+                const response = await fetch(`${API_BASE}/upload/local`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage('文件上传成功！', 'success');
+                    loadStats();
+                    loadDocuments();
+                    resetFileInput();
+                } else {
+                    showMessage('上传失败: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showMessage('上传失败: ' + error.message, 'error');
+            }
+        }
+
+        // 上传飞书文档
+        async function uploadFeishu() {
+            const url = document.getElementById('feishuUrl').value;
+            const type = document.getElementById('feishuType').value;
+            const category = document.getElementById('feishuCategory').value;
+            const tags = document.getElementById('feishuTags').value;
+
+            if (!url) {
+                showMessage('请输入飞书文档链接', 'error');
+                return;
+            }
+
+            const endpoint = type === 'spreadsheet' ? 'feishu-spreadsheet' : 'feishu-document';
+
+            try {
+                const response = await fetch(`${API_BASE}/upload/${endpoint}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        feishuUrl: url,
+                        category: category,
+                        tags: tags
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage('飞书文档处理成功！', 'success');
+                    loadStats();
+                    loadDocuments();
+                    resetFeishuInput();
+                } else {
+                    showMessage('处理失败: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showMessage('处理失败: ' + error.message, 'error');
+            }
+        }
+
+        // 批量上传
+        async function uploadBatch() {
+            const fileInput = document.getElementById('batchFileInput');
+            const category = document.getElementById('batchCategory').value;
+            const tags = document.getElementById('batchTags').value;
+
+            if (!fileInput.files.length) {
+                showMessage('请选择文件', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            for (let file of fileInput.files) {
+                formData.append('files', file);
+            }
+            formData.append('category', category);
+            formData.append('tags', tags);
+
+            try {
+                const response = await fetch(`${API_BASE}/upload/batch`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage(`批量上传完成！成功: ${result.summary.success}，失败: ${result.summary.failed}`, 'success');
+                    loadStats();
+                    loadDocuments();
+                    resetBatchInput();
+                } else {
+                    showMessage('批量上传失败: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showMessage('批量上传失败: ' + error.message, 'error');
+            }
+        }
+
+        // 搜索文档
+        async function searchDocuments() {
+            const query = document.getElementById('searchQuery').value;
+            const category = document.getElementById('searchCategory').value;
+            const tags = document.getElementById('searchTags').value;
+
+            if (!query) {
+                showMessage('请输入搜索查询', 'error');
+                return;
+            }
+
+            const searchResults = document.getElementById('searchResults');
+            searchResults.innerHTML = '<div class="loading">搜索中...</div>';
+
+            try {
+                const response = await fetch(`${API_BASE}/search`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        category: category || undefined,
+                        tags: tags ? tags.split(',').map(t => t.trim()) : undefined
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    searchCount++;
+                    displaySearchResults(result);
+                } else {
+                    searchResults.innerHTML = '<div class="error">搜索失败: ' + result.error + '</div>';
+                }
+            } catch (error) {
+                searchResults.innerHTML = '<div class="error">搜索失败: ' + error.message + '</div>';
+            }
+        }
+
+        // 显示搜索结果
+        function displaySearchResults(result) {
+            const searchResults = document.getElementById('searchResults');
+            
+            let html = `<h3>搜索结果 (${result.totalFound} 个结果)</h3>`;
+            
+            if (result.aiAnalysis) {
+                html += `<div class="result-item">
+                    <div class="result-title">🤖 AI 分析</div>
+                    <div class="result-content">${result.aiAnalysis}</div>
+                </div>`;
+            }
+
+            result.results.forEach(doc => {
+                html += `<div class="result-item">
+                    <div class="result-title">${doc.title}</div>
+                    <div class="result-content">${doc.content}</div>
+                    <div class="result-meta">
+                        相关性: ${(doc.relevance * 100).toFixed(1)}% | 
+                        分类: ${doc.metadata.category} | 
+                        标签: ${doc.metadata.tags.join(', ')}
+                    </div>
+                </div>`;
+            });
+
+            searchResults.innerHTML = html;
+        }
+
+        // 加载文档列表
+        async function loadDocuments() {
+            const category = document.getElementById('filterCategory').value;
+            const documentList = document.getElementById('documentList');
+            
+            documentList.innerHTML = '<div class="loading">加载中...</div>';
+
+            try {
+                const url = new URL(`${API_BASE}/documents`);
+                if (category) url.searchParams.append('category', category);
+
+                const response = await fetch(url);
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayDocuments(result.documents);
+                } else {
+                    documentList.innerHTML = '<div class="error">加载失败: ' + result.error + '</div>';
+                }
+            } catch (error) {
+                documentList.innerHTML = '<div class="error">加载失败: ' + error.message + '</div>';
+            }
+        }
+
+        // 显示文档列表
+        function displayDocuments(documents) {
+            const documentList = document.getElementById('documentList');
+            
+            if (documents.length === 0) {
+                documentList.innerHTML = '<div class="loading">暂无文档</div>';
+                return;
+            }
+
+            let html = '';
+            documents.forEach(doc => {
+                html += `<div class="document-item">
+                    <div class="document-title">${doc.title}</div>
+                    <div class="document-meta">
+                        类型: ${doc.type} | 
+                        大小: ${(doc.contentLength / 1024).toFixed(1)}KB | 
+                        分类: ${doc.metadata.category}
+                    </div>
+                    <div class="document-tags">
+                        ${doc.metadata.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                    </div>
+                    <button class="btn btn-danger" onclick="deleteDocument('${doc.id}')" style="margin-top: 10px;">删除</button>
+                </div>`;
+            });
+
+            documentList.innerHTML = html;
+        }
+
+        // 删除文档
+        async function deleteDocument(documentId) {
+            if (!confirm('确定要删除这个文档吗？')) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/documents/${documentId}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage('文档删除成功！', 'success');
+                    loadStats();
+                    loadDocuments();
+                } else {
+                    showMessage('删除失败: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showMessage('删除失败: ' + error.message, 'error');
+            }
+        }
+
+        // 加载统计信息
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE}/stats`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('totalDocs').textContent = result.stats.totalDocuments;
+                    document.getElementById('totalSize').textContent = Object.keys(result.stats.typeDistribution).length;
+                    document.getElementById('lastUpdate').textContent = new Date().toLocaleDateString();
+                    document.getElementById('searchCount').textContent = searchCount;
+                }
+            } catch (error) {
+                console.error('加载统计信息失败:', error);
+            }
+        }
+
+        // 重置文件输入
+        function resetFileInput() {
+            document.getElementById('fileInput').value = '';
+            document.getElementById('fileUploadArea').innerHTML = `
+                <p>拖拽文件到此处或点击选择文件</p>
+                <input type="file" id="fileInput" style="display: none;" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.gif,.bmp,.webp,.txt,.md">
+                <button class="btn" onclick="document.getElementById('fileInput').click()">选择文件</button>
+            `;
+            setupFileUpload();
+        }
+
+        // 重置飞书输入
+        function resetFeishuInput() {
+            document.getElementById('feishuUrl').value = '';
+            document.getElementById('feishuTags').value = '';
+        }
+
+        // 重置批量输入
+        function resetBatchInput() {
+            document.getElementById('batchFileInput').value = '';
+            document.getElementById('batchUploadArea').innerHTML = `
+                <p>拖拽多个文件到此处或点击选择文件</p>
+                <input type="file" id="batchFileInput" style="display: none;" multiple accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.gif,.bmp,.webp,.txt,.md">
+                <button class="btn" onclick="document.getElementById('batchFileInput').click()">选择文件</button>
+            `;
+            setupFileUpload();
+        }
+
+        // 显示消息
+        function showMessage(message, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type;
+            messageDiv.textContent = message;
+            
+            document.querySelector('.container').insertBefore(messageDiv, document.querySelector('.stats-grid'));
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html> 

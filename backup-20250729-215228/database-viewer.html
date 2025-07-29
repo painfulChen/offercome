@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据库查看工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            background: #f9f9f9;
+        }
+        
+        .section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 5px;
+            transition: transform 0.2s;
+        }
+        
+        .button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .user-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .user-card h3 {
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .user-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .info-item {
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #666;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗄️ 数据库查看工具</h1>
+            <p>CloudBase数据库状态监控和用户管理</p>
+        </div>
+        
+        <div class="content">
+            <!-- 统计信息 -->
+            <div class="section">
+                <h2>📊 系统统计</h2>
+                <div class="stats" id="stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalUsers">-</div>
+                        <div class="stat-label">总用户数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="activeUsers">-</div>
+                        <div class="stat-label">活跃用户</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="todayRegistrations">-</div>
+                        <div class="stat-label">今日注册</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="apiStatus">-</div>
+                        <div class="stat-label">API状态</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 数据库操作 -->
+            <div class="section">
+                <h2>🔧 数据库操作</h2>
+                <button class="button" onclick="checkApiHealth()">检查API健康状态</button>
+                <button class="button" onclick="testDatabaseConnection()">测试数据库连接</button>
+                <button class="button" onclick="getAllUsers()">获取所有用户</button>
+                <button class="button" onclick="clearResults()">清空结果</button>
+                
+                <div id="dbResult" class="result" style="display: none;"></div>
+            </div>
+            
+            <!-- 用户列表 -->
+            <div class="section">
+                <h2>👥 用户列表</h2>
+                <div id="userList">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>点击"获取所有用户"查看用户列表</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 测试功能 -->
+            <div class="section">
+                <h2>🧪 测试功能</h2>
+                <button class="button" onclick="testRegistration()">测试用户注册</button>
+                <button class="button" onclick="testLogin()">测试用户登录</button>
+                <button class="button" onclick="testDuplicateRegistration()">测试重复注册</button>
+                <button class="button" onclick="testWithRealUser()">使用真实用户测试</button>
+                
+                <div id="testResult" class="result" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE_URL = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com';
+        
+        // 显示结果
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `result ${type}`;
+            element.style.display = 'block';
+        }
+        
+        // 清空结果
+        function clearResults() {
+            document.getElementById('dbResult').style.display = 'none';
+            document.getElementById('testResult').style.display = 'none';
+        }
+        
+        // 检查API健康状态
+        async function checkApiHealth() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/health`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult('dbResult', 
+                        `✅ API健康检查成功！\n\n` +
+                        `响应时间: ${new Date().toLocaleString()}\n` +
+                        `服务状态: 正常运行\n` +
+                        `版本: ${data.version}\n` +
+                        `环境: ${data.environment}\n\n` +
+                        `完整响应:\n${JSON.stringify(data, null, 2)}`, 
+                        'success'
+                    );
+                    
+                    document.getElementById('apiStatus').textContent = '✅ 正常';
+                } else {
+                    showResult('dbResult', 
+                        `❌ API健康检查失败\n\n` +
+                        `错误信息: ${data.message || '未知错误'}`, 
+                        'error'
+                    );
+                    
+                    document.getElementById('apiStatus').textContent = '❌ 异常';
+                }
+            } catch (error) {
+                showResult('dbResult', 
+                    `❌ API连接失败\n\n` +
+                    `错误信息: ${error.message}`, 
+                    'error'
+                );
+                
+                document.getElementById('apiStatus').textContent = '❌ 连接失败';
+            }
+        }
+        
+        // 测试数据库连接
+        async function testDatabaseConnection() {
+            showResult('dbResult', '🔄 正在测试数据库连接...', 'info');
+            
+            try {
+                // 通过注册测试来验证数据库连接
+                const testUser = {
+                    username: `test_${Date.now()}`,
+                    email: `test_${Date.now()}@example.com`,
+                    password: '123456'
+                };
+                
+                const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testUser)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult('dbResult', 
+                        `✅ 数据库连接测试成功！\n\n` +
+                        `测试用户已创建:\n` +
+                        `用户名: ${testUser.username}\n` +
+                        `邮箱: ${testUser.email}\n` +
+                        `用户ID: ${data.user.id}\n\n` +
+                        `数据库操作正常，数据已成功保存。`, 
+                        'success'
+                    );
+                } else {
+                    showResult('dbResult', 
+                        `❌ 数据库连接测试失败\n\n` +
+                        `错误信息: ${data.message || data.error}`, 
+                        'error'
+                    );
+                }
+            } catch (error) {
+                showResult('dbResult', 
+                    `❌ 数据库连接测试失败\n\n` +
+                    `错误信息: ${error.message}`, 
+                    'error'
+                );
+            }
+        }
+        
+        // 获取所有用户
+        async function getAllUsers() {
+            showResult('dbResult', '🔄 正在获取用户列表...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/admin/users`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const users = data.users || data.data || [];
+                    
+                    // 更新统计信息
+                    document.getElementById('totalUsers').textContent = users.length;
+                    document.getElementById('activeUsers').textContent = users.length;
+                    document.getElementById('todayRegistrations').textContent = users.length;
+                    
+                    // 显示用户列表
+                    const userList = document.getElementById('userList');
+                    userList.innerHTML = '';
+                    
+                    if (users.length === 0) {
+                        userList.innerHTML = '<div class="loading"><p>暂无用户数据</p></div>';
+                    } else {
+                        users.forEach((user, index) => {
+                            const userCard = document.createElement('div');
+                            userCard.className = 'user-card';
+                            userCard.innerHTML = `
+                                <h3>用户 #${index + 1}</h3>
+                                <div class="user-info">
+                                    <div class="info-item">
+                                        <span class="info-label">用户ID:</span> ${user.id || user._id || 'N/A'}
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">用户名:</span> ${user.username}
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">邮箱:</span> ${user.email}
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">角色:</span> ${user.role}
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">状态:</span> <span style="color: green;">${user.status || '活跃'}</span>
+                                    </div>
+                                    ${user.createdAt ? `<div class="info-item">
+                                        <span class="info-label">创建时间:</span> ${new Date(user.createdAt).toLocaleString()}
+                                    </div>` : ''}
+                                </div>
+                            `;
+                            userList.appendChild(userCard);
+                        });
+                    }
+                    
+                    showResult('dbResult', 
+                        `✅ 用户列表获取成功！\n\n` +
+                        `总用户数: ${users.length}\n` +
+                        `数据来源: CloudBase数据库\n\n` +
+                        `完整响应:\n${JSON.stringify(data, null, 2)}`, 
+                        'success'
+                    );
+                    
+                } else {
+                    showResult('dbResult', 
+                        `❌ 获取用户列表失败\n\n` +
+                        `错误信息: ${data.message || data.error}`, 
+                        'error'
+                    );
+                }
+                
+            } catch (error) {
+                showResult('dbResult', 
+                    `❌ 获取用户列表失败\n\n` +
+                    `错误信息: ${error.message}`, 
+                    'error'
+                );
+            }
+        }
+        
+        // 测试用户注册
+        async function testRegistration() {
+            const testUser = {
+                username: `test_${Date.now()}`,
+                email: `test_${Date.now()}@example.com`,
+                password: '123456'
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testUser)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult('testResult', 
+                        `✅ 用户注册测试成功！\n\n` +
+                        `用户名: ${testUser.username}\n` +
+                        `邮箱: ${testUser.email}\n` +
+                        `用户ID: ${data.user.id}\n` +
+                        `角色: ${data.user.role}\n` +
+                        `状态: ${data.user.status}\n\n` +
+                        `用户已成功保存到数据库！`, 
+                        'success'
+                    );
+                } else {
+                    showResult('testResult', 
+                        `❌ 用户注册测试失败\n\n` +
+                        `错误信息: ${data.message || data.error}`, 
+                        'error'
+                    );
+                }
+            } catch (error) {
+                showResult('testResult', 
+                    `❌ 用户注册测试失败\n\n` +
+                    `错误信息: ${error.message}`, 
+                    'error'
+                );
+            }
+        }
+        
+        // 测试用户登录
+        async function testLogin() {
+            try {
+                // 先获取数据库中的真实用户
+                const usersResponse = await fetch(`${API_BASE_URL}/api/admin/users`);
+                const usersData = await usersResponse.json();
+                
+                if (!usersData.success || !usersData.users || usersData.users.length === 0) {
+                    showResult('testResult', 
+                        `❌ 登录测试失败 - 数据库中没有用户\n\n` +
+                        `请先注册一些用户，然后再进行登录测试。`, 
+                        'error'
+                    );
+                    return;
+                }
+                
+                // 选择第一个用户进行登录测试
+                const testUser = usersData.users[0];
+                
+                showResult('testResult', 
+                    `🔄 正在使用数据库中的真实用户进行登录测试...\n\n` +
+                    `测试用户: ${testUser.username}\n` +
+                    `邮箱: ${testUser.email}\n` +
+                    `用户ID: ${testUser.id}\n\n` +
+                    `注意: 由于密码已加密，无法直接测试登录。\n` +
+                    `建议使用新注册的用户进行登录测试。`, 
+                    'info'
+                );
+                
+                // 注册一个新用户用于登录测试
+                const newTestUser = {
+                    username: `login_test_${Date.now()}`,
+                    email: `login_test_${Date.now()}@example.com`,
+                    password: '123456'
+                };
+                
+                const registerResponse = await fetch(`${API_BASE_URL}/api/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newTestUser)
+                });
+                
+                const registerData = await registerResponse.json();
+                
+                if (!registerData.success) {
+                    showResult('testResult', 
+                        `❌ 登录测试失败 - 用户注册失败\n\n` +
+                        `错误信息: ${registerData.message || registerData.error}`, 
+                        'error'
+                    );
+                    return;
+                }
+                
+                // 然后立即登录
+                const loginResponse = await fetch(`${API_BASE_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: newTestUser.username,
+                        password: newTestUser.password
+                    })
+                });
+                
+                const loginData = await loginResponse.json();
+                
+                if (loginData.success) {
+                    showResult('testResult', 
+                        `✅ 用户登录测试成功！\n\n` +
+                        `数据库中的真实用户数量: ${usersData.users.length}\n` +
+                        `测试用户: ${newTestUser.username}\n` +
+                        `用户名: ${loginData.user.username}\n` +
+                        `邮箱: ${loginData.user.email}\n` +
+                        `用户ID: ${loginData.user.id}\n` +
+                        `角色: ${loginData.user.role}\n` +
+                        `Token: ${loginData.token}\n\n` +
+                        `登录验证成功，密码加密和验证功能正常！`, 
+                        'success'
+                    );
+                } else {
+                    showResult('testResult', 
+                        `❌ 用户登录测试失败\n\n` +
+                        `错误信息: ${loginData.message || loginData.error}`, 
+                        'error'
+                    );
+                }
+            } catch (error) {
+                showResult('testResult', 
+                    `❌ 用户登录测试失败\n\n` +
+                    `错误信息: ${error.message}`, 
+                    'error'
+                );
+            }
+        }
+        
+        // 测试重复注册
+        async function testDuplicateRegistration() {
+            try {
+                // 先获取数据库中的真实用户
+                const usersResponse = await fetch(`${API_BASE_URL}/api/admin/users`);
+                const usersData = await usersResponse.json();
+                
+                if (!usersData.success || !usersData.users || usersData.users.length === 0) {
+                    showResult('testResult', 
+                        `❌ 重复注册测试失败 - 数据库中没有用户\n\n` +
+                        `请先注册一些用户，然后再进行重复注册测试。`, 
+                        'error'
+                    );
+                    return;
+                }
+                
+                // 选择第一个用户进行重复注册测试
+                const existingUser = usersData.users[0];
+                
+                showResult('testResult', 
+                    `🔄 正在使用数据库中的真实用户进行重复注册测试...\n\n` +
+                    `现有用户: ${existingUser.username}\n` +
+                    `邮箱: ${existingUser.email}\n` +
+                    `用户ID: ${existingUser.id}\n\n` +
+                    `正在测试重复注册...`, 
+                    'info'
+                );
+                
+                // 尝试重复注册相同用户
+                const duplicateResponse = await fetch(`${API_BASE_URL}/api/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: existingUser.username,
+                        email: existingUser.email,
+                        password: '123456'
+                    })
+                });
+                
+                const duplicateData = await duplicateResponse.json();
+                
+                if (!duplicateData.success) {
+                    showResult('testResult', 
+                        `✅ 重复注册测试成功！\n\n` +
+                        `测试用户: ${existingUser.username}\n` +
+                        `错误信息: ${duplicateData.message || duplicateData.error}\n\n` +
+                        `这说明数据库查重功能正常工作，` +
+                        `防止了重复注册相同用户名或邮箱的用户。\n\n` +
+                        `数据库中的真实用户数量: ${usersData.users.length}`, 
+                        'success'
+                    );
+                } else {
+                    showResult('testResult', 
+                        `❌ 重复注册测试失败\n\n` +
+                        `用户被重复注册了，这不应该发生。\n` +
+                        `响应: ${JSON.stringify(duplicateData, null, 2)}`, 
+                        'error'
+                    );
+                }
+            } catch (error) {
+                showResult('testResult', 
+                    `❌ 重复注册测试失败\n\n` +
+                    `错误信息: ${error.message}`, 
+                    'error'
+                );
+            }
+        }
+        
+        // 使用真实用户测试
+        async function testWithRealUser() {
+            try {
+                // 获取数据库中的真实用户
+                const usersResponse = await fetch(`${API_BASE_URL}/api/admin/users`);
+                const usersData = await usersResponse.json();
+                
+                if (!usersData.success || !usersData.users || usersData.users.length === 0) {
+                    showResult('testResult', 
+                        `❌ 测试失败 - 数据库中没有用户\n\n` +
+                        `请先注册一些用户，然后再进行测试。`, 
+                        'error'
+                    );
+                    return;
+                }
+                
+                // 显示真实用户列表供选择
+                let userListHtml = `📊 数据库中的真实用户列表 (共${usersData.users.length}个用户):\n\n`;
+                
+                usersData.users.forEach((user, index) => {
+                    userListHtml += `${index + 1}. ${user.username} (${user.email})\n`;
+                    userListHtml += `   ID: ${user.id} | 角色: ${user.role} | 状态: ${user.status}\n`;
+                    if (user.createdAt) {
+                        userListHtml += `   创建时间: ${new Date(user.createdAt).toLocaleString()}\n`;
+                    }
+                    userListHtml += `\n`;
+                });
+                
+                userListHtml += `\n🔍 测试说明:\n`;
+                userListHtml += `• 这些是数据库中真实存在的用户\n`;
+                userListHtml += `• 由于密码已加密存储，无法直接测试登录\n`;
+                userListHtml += `• 可以测试重复注册功能（使用现有用户名）\n`;
+                userListHtml += `• 建议使用"测试用户注册"功能创建新用户进行登录测试\n\n`;
+                
+                userListHtml += `📋 完整用户数据:\n${JSON.stringify(usersData.users, null, 2)}`;
+                
+                showResult('testResult', userListHtml, 'info');
+                
+            } catch (error) {
+                showResult('testResult', 
+                    `❌ 获取真实用户失败\n\n` +
+                    `错误信息: ${error.message}`, 
+                    'error'
+                );
+            }
+        }
+        
+        // 页面加载时自动检查API状态
+        window.addEventListener('load', () => {
+            checkApiHealth();
+        });
+    </script>
+</body>
+</html> 

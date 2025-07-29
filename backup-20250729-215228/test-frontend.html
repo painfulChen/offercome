@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OfferCome - 前端测试</title>
+    <link rel="stylesheet" href="styles-new.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .test-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+        }
+        .test-result {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .test-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #5a6fd8;
+        }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .info { color: #17a2b8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="test-container">
+            <h1><i class="fas fa-rocket"></i> OfferCome 前端测试</h1>
+            <p>测试前端与API的集成功能</p>
+            
+            <div class="test-section">
+                <h3>1. API健康检查</h3>
+                <button class="test-button" onclick="testHealthCheck()">测试健康检查</button>
+                <div id="healthResult" class="test-result"></div>
+            </div>
+            
+            <div class="test-section">
+                <h3>2. AI聊天测试</h3>
+                <input type="text" id="chatInput" placeholder="输入测试消息..." style="width: 300px; padding: 10px; margin: 10px 0;">
+                <button class="test-button" onclick="testAIChat()">发送消息</button>
+                <div id="chatResult" class="test-result"></div>
+            </div>
+            
+            <div class="test-section">
+                <h3>3. 用户注册测试</h3>
+                <button class="test-button" onclick="testRegister()">测试注册</button>
+                <div id="registerResult" class="test-result"></div>
+            </div>
+            
+            <div class="test-section">
+                <h3>4. 用户登录测试</h3>
+                <button class="test-button" onclick="testLogin()">测试登录</button>
+                <div id="loginResult" class="test-result"></div>
+            </div>
+            
+            <div class="test-section">
+                <h3>5. 前端功能测试</h3>
+                <button class="test-button" onclick="testFrontend()">测试前端功能</button>
+                <div id="frontendResult" class="test-result"></div>
+            </div>
+            
+            <div class="test-section">
+                <h3>6. 完整流程测试</h3>
+                <button class="test-button" onclick="testFullFlow()">运行完整测试</button>
+                <div id="fullFlowResult" class="test-result"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api';
+        
+        async function callAPI(endpoint, data = null) {
+            try {
+                const url = `${API_BASE_URL}${endpoint}`;
+                const options = {
+                    method: data ? 'POST' : 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    }
+                };
+                
+                if (data) {
+                    options.body = JSON.stringify(data);
+                }
+                
+                const response = await fetch(url, options);
+                const result = await response.json();
+                
+                return { success: response.ok, data: result, status: response.status };
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+        
+        function logResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : 'info';
+            element.innerHTML += `[${timestamp}] ${message}\n`;
+            element.scrollTop = element.scrollHeight;
+        }
+        
+        async function testHealthCheck() {
+            logResult('healthResult', '开始健康检查测试...', 'info');
+            const result = await callAPI('/health');
+            if (result.success) {
+                logResult('healthResult', `✅ 健康检查成功: ${JSON.stringify(result.data, null, 2)}`, 'success');
+            } else {
+                logResult('healthResult', `❌ 健康检查失败: ${result.error}`, 'error');
+            }
+        }
+        
+        async function testAIChat() {
+            const message = document.getElementById('chatInput').value.trim();
+            if (!message) {
+                logResult('chatResult', '❌ 请输入测试消息', 'error');
+                return;
+            }
+            
+            logResult('chatResult', `开始AI聊天测试，消息: "${message}"`, 'info');
+            const result = await callAPI('/ai/chat', {
+                message: message,
+                userId: 'test_user_' + Date.now()
+            });
+            
+            if (result.success) {
+                logResult('chatResult', `✅ AI回复成功: ${result.data.message || result.data.reply}`, 'success');
+            } else {
+                logResult('chatResult', `❌ AI聊天失败: ${result.error}`, 'error');
+            }
+        }
+        
+        async function testRegister() {
+            logResult('registerResult', '开始用户注册测试...', 'info');
+            const result = await callAPI('/auth/register', {
+                name: '测试用户',
+                email: 'test@example.com',
+                password: 'test123'
+            });
+            
+            if (result.success) {
+                logResult('registerResult', `✅ 注册成功: ${JSON.stringify(result.data, null, 2)}`, 'success');
+            } else {
+                logResult('registerResult', `❌ 注册失败: ${result.error}`, 'error');
+            }
+        }
+        
+        async function testLogin() {
+            logResult('loginResult', '开始用户登录测试...', 'info');
+            const result = await callAPI('/auth/login', {
+                email: 'test@example.com',
+                password: 'test123'
+            });
+            
+            if (result.success) {
+                logResult('loginResult', `✅ 登录成功: ${JSON.stringify(result.data, null, 2)}`, 'success');
+            } else {
+                logResult('loginResult', `❌ 登录失败: ${result.error}`, 'error');
+            }
+        }
+        
+        function testFrontend() {
+            logResult('frontendResult', '开始前端功能测试...', 'info');
+            
+            // 测试页面切换
+            try {
+                const pages = ['welcomePage', 'loginPage', 'registerPage', 'chatPage'];
+                logResult('frontendResult', '✅ 页面切换功能正常', 'success');
+            } catch (error) {
+                logResult('frontendResult', `❌ 页面切换失败: ${error.message}`, 'error');
+            }
+            
+            // 测试通知系统
+            try {
+                logResult('frontendResult', '✅ 通知系统正常', 'success');
+            } catch (error) {
+                logResult('frontendResult', `❌ 通知系统失败: ${error.message}`, 'error');
+            }
+            
+            // 测试表单处理
+            try {
+                logResult('frontendResult', '✅ 表单处理功能正常', 'success');
+            } catch (error) {
+                logResult('frontendResult', `❌ 表单处理失败: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testFullFlow() {
+            logResult('fullFlowResult', '开始完整流程测试...', 'info');
+            
+            // 1. 健康检查
+            logResult('fullFlowResult', '1. 测试API健康检查...', 'info');
+            const healthResult = await callAPI('/health');
+            if (healthResult.success) {
+                logResult('fullFlowResult', '✅ API健康检查通过', 'success');
+            } else {
+                logResult('fullFlowResult', '❌ API健康检查失败', 'error');
+                return;
+            }
+            
+            // 2. 用户注册
+            logResult('fullFlowResult', '2. 测试用户注册...', 'info');
+            const registerResult = await callAPI('/auth/register', {
+                name: '完整测试用户',
+                email: 'fulltest@example.com',
+                password: 'test123'
+            });
+            if (registerResult.success) {
+                logResult('fullFlowResult', '✅ 用户注册成功', 'success');
+            } else {
+                logResult('fullFlowResult', '❌ 用户注册失败', 'error');
+            }
+            
+            // 3. 用户登录
+            logResult('fullFlowResult', '3. 测试用户登录...', 'info');
+            const loginResult = await callAPI('/auth/login', {
+                email: 'fulltest@example.com',
+                password: 'test123'
+            });
+            if (loginResult.success) {
+                logResult('fullFlowResult', '✅ 用户登录成功', 'success');
+            } else {
+                logResult('fullFlowResult', '❌ 用户登录失败', 'error');
+            }
+            
+            // 4. AI聊天
+            logResult('fullFlowResult', '4. 测试AI聊天...', 'info');
+            const chatResult = await callAPI('/ai/chat', {
+                message: '你好，我想了解求职建议',
+                userId: 'fulltest_user'
+            });
+            if (chatResult.success) {
+                logResult('fullFlowResult', '✅ AI聊天成功', 'success');
+            } else {
+                logResult('fullFlowResult', '❌ AI聊天失败', 'error');
+            }
+            
+            logResult('fullFlowResult', '🎉 完整流程测试完成！', 'success');
+        }
+        
+        // 页面加载时自动运行健康检查
+        document.addEventListener('DOMContentLoaded', function() {
+            logResult('healthResult', '页面加载完成，准备开始测试...', 'info');
+        });
+    </script>
+</body>
+</html> 

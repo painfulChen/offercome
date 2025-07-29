@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简单测试页面</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .result { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>🤖 简单API测试</h1>
+    
+    <button onclick="testHealth()">测试健康状态</button>
+    <button onclick="testChat()">测试AI聊天</button>
+    <button onclick="testCost()">测试成本统计</button>
+    
+    <div id="result" class="result">点击按钮开始测试...</div>
+    
+    <script>
+        const PROXY_URL = 'http://localhost:3001';
+        
+        async function callAPI(path, options = {}) {
+            try {
+                const response = await fetch(`${PROXY_URL}/api/proxy`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        path: path,
+                        method: options.method || 'GET',
+                        body: options.body || null
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                return await response.json();
+            } catch (error) {
+                console.error('API调用失败:', error);
+                return { success: false, error: error.message };
+            }
+        }
+        
+        async function testHealth() {
+            document.getElementById('result').textContent = '正在测试健康状态...';
+            const result = await callAPI('/api/health');
+            document.getElementById('result').textContent = JSON.stringify(result, null, 2);
+        }
+        
+        async function testChat() {
+            document.getElementById('result').textContent = '正在测试AI聊天...';
+            const result = await callAPI('/api/ai/chat', {
+                method: 'POST',
+                body: JSON.stringify({ message: '你好，请简单介绍一下自己' })
+            });
+            document.getElementById('result').textContent = JSON.stringify(result, null, 2);
+        }
+        
+        async function testCost() {
+            document.getElementById('result').textContent = '正在测试成本统计...';
+            const result = await callAPI('/api/cost/stats');
+            document.getElementById('result').textContent = JSON.stringify(result, null, 2);
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>上传功能演示</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .demo-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .upload-area {
+            border: 2px dashed #3498db;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .upload-area:hover {
+            border-color: #2980b9;
+            background: #e3f2fd;
+        }
+        .file-preview {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 2px dashed #3498db;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+            position: relative;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .btn-success {
+            background: #28a745;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 上传功能演示</h1>
+        <p>这个页面演示了增强的文件上传功能，包括文件预览、确认对话框和准确的上传进度显示。</p>
+
+        <div class="demo-section">
+            <h3>📤 单文件上传演示</h3>
+            <div class="upload-area" id="uploadArea">
+                <p>点击或拖拽文件到此处上传</p>
+                <p style="font-size: 0.9em; color: #7f8c8d;">支持 PDF, Word, 图片, 文本文件</p>
+            </div>
+            <input type="file" id="fileInput" style="display: none;" accept=".pdf,.doc,.docx,.txt,.md,.png,.jpg,.jpeg,.gif,.bmp,.webp">
+            
+            <div class="form-group">
+                <label>分类:</label>
+                <select id="category" class="form-control">
+                    <option value="resume">简历</option>
+                    <option value="interview">面试资料</option>
+                    <option value="career">职业规划</option>
+                    <option value="skills">技能培训</option>
+                    <option value="general">通用文档</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>标签 (用逗号分隔):</label>
+                <input type="text" id="tags" class="form-control" placeholder="例如: javascript,前端,React">
+            </div>
+            
+            <button class="btn btn-primary" id="uploadFileBtn">上传文件</button>
+            
+            <!-- 文件预览区域 -->
+            <div id="filePreview" class="file-preview" style="margin-top: 20px; display: none;"></div>
+            
+            <!-- 上传确认对话框 -->
+            <div id="uploadConfirmDialog" class="modal-overlay" style="display: none;">
+                <div class="modal-content">
+                    <h3>📤 确认上传</h3>
+                    <div id="confirmFileInfo"></div>
+                    <div class="modal-actions">
+                        <button class="btn btn-primary" id="confirmUploadBtn">确认上传</button>
+                        <button class="btn btn-secondary" onclick="cancelUpload()">取消</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="uploadProgress" class="progress-bar" style="display: none;">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                <div class="progress-text" id="progressText"></div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h3>📤 批量上传演示</h3>
+            <div class="upload-area" id="batchUploadArea">
+                <p>点击或拖拽多个文件到此处批量上传</p>
+                <p style="font-size: 0.9em; color: #7f8c8d;">支持同时上传多个文件</p>
+            </div>
+            <input type="file" id="batchFileInput" multiple style="display: none;" accept=".pdf,.doc,.docx,.txt,.md,.png,.jpg,.jpeg,.gif,.bmp,.webp">
+            
+            <div class="form-group">
+                <label>批量分类:</label>
+                <select id="batchCategory" class="form-control">
+                    <option value="batch">批量文档</option>
+                    <option value="resume">简历</option>
+                    <option value="interview">面试资料</option>
+                    <option value="career">职业规划</option>
+                </select>
+            </div>
+            
+            <button class="btn btn-success" id="uploadBatchBtn">批量上传</button>
+            
+            <!-- 批量文件预览区域 -->
+            <div id="batchFilePreview" class="file-preview" style="margin-top: 20px; display: none;"></div>
+            
+            <div id="batchProgress" class="progress-bar" style="display: none;">
+                <div class="progress-fill" id="batchProgressFill" style="width: 0%"></div>
+                <div class="progress-text" id="batchProgressText"></div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h3>✨ 功能特性</h3>
+            <ul>
+                <li><strong>文件预览:</strong> 选择文件后立即显示文件信息和内容预览</li>
+                <li><strong>确认对话框:</strong> 上传前可以确认文件信息</li>
+                <li><strong>准确进度:</strong> 实时显示上传进度百分比</li>
+                <li><strong>拖拽上传:</strong> 支持拖拽文件到上传区域</li>
+                <li><strong>批量上传:</strong> 支持同时上传多个文件</li>
+                <li><strong>文件类型支持:</strong> PDF, Word, 图片, 文本文件</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // 文件预览和确认
+        function showFilePreview(file) {
+            const previewContainer = document.getElementById('filePreview');
+            const confirmButton = document.getElementById('confirmUploadBtn');
+            
+            if (!file) {
+                previewContainer.innerHTML = '';
+                previewContainer.style.display = 'none';
+                confirmButton.style.display = 'none';
+                return;
+            }
+
+            // 文件信息
+            const fileInfo = `
+                <div class="file-preview-info">
+                    <h4>📄 文件信息</h4>
+                    <p><strong>文件名:</strong> ${file.name}</p>
+                    <p><strong>文件大小:</strong> ${formatBytes(file.size)}</p>
+                    <p><strong>文件类型:</strong> ${file.type || '未知'}</p>
+                    <p><strong>最后修改:</strong> ${new Date(file.lastModified).toLocaleString()}</p>
+                </div>
+            `;
+
+            // 文件内容预览
+            let contentPreview = '';
+            if (file.type.startsWith('text/') || file.name.endsWith('.txt') || file.name.endsWith('.md')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const content = e.target.result;
+                    const preview = content.length > 500 ? content.substring(0, 500) + '...' : content;
+                    contentPreview = `
+                        <div class="file-preview-content">
+                            <h4>📝 内容预览</h4>
+                            <div class="content-preview" style="max-height: 200px; overflow-y: auto; background: #f8f9fa; padding: 10px; border-radius: 5px; font-family: monospace; font-size: 12px;">
+                                ${preview.replace(/\n/g, '<br>')}
+                            </div>
+                        </div>
+                    `;
+                    previewContainer.innerHTML = fileInfo + contentPreview;
+                    previewContainer.style.display = 'block';
+                };
+                reader.readAsText(file);
+            } else {
+                contentPreview = `
+                    <div class="file-preview-content">
+                        <h4>📄 文件预览</h4>
+                        <p style="color: #666;">此文件类型不支持内容预览，但可以正常上传。</p>
+                    </div>
+                `;
+                previewContainer.innerHTML = fileInfo + contentPreview;
+                previewContainer.style.display = 'block';
+            }
+
+            confirmButton.style.display = 'block';
+        }
+
+        // 批量文件预览
+        function showBatchFilePreview(files) {
+            const previewContainer = document.getElementById('batchFilePreview');
+            if (!previewContainer) return;
+            
+            let previewHTML = '<div class="file-preview-info"><h4>📁 批量文件信息</h4>';
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                previewHTML += `
+                    <div style="border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 5px;">
+                        <p><strong>文件 ${i + 1}:</strong> ${file.name}</p>
+                        <p><strong>大小:</strong> ${formatBytes(file.size)}</p>
+                        <p><strong>类型:</strong> ${file.type || '未知'}</p>
+                    </div>
+                `;
+            }
+            
+            previewHTML += '</div>';
+            previewContainer.innerHTML = previewHTML;
+            previewContainer.style.display = 'block';
+        }
+
+        // 文件选择处理
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                showFilePreview(file);
+            }
+        }
+
+        // 批量文件选择处理
+        function handleBatchFileSelect(event) {
+            const files = event.target.files;
+            if (files.length > 0) {
+                showBatchFilePreview(files);
+            }
+        }
+
+        // 上传文件
+        function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('请选择要上传的文件');
+                return;
+            }
+
+            // 显示确认对话框
+            const confirmDialog = document.getElementById('uploadConfirmDialog');
+            const confirmFileInfo = document.getElementById('confirmFileInfo');
+            
+            confirmFileInfo.innerHTML = `
+                <p><strong>文件名:</strong> ${file.name}</p>
+                <p><strong>文件大小:</strong> ${formatBytes(file.size)}</p>
+                <p><strong>文件类型:</strong> ${file.type || '未知'}</p>
+            `;
+            
+            confirmDialog.style.display = 'block';
+        }
+
+        // 确认上传
+        function confirmUpload() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            // 隐藏确认对话框
+            document.getElementById('uploadConfirmDialog').style.display = 'none';
+
+            // 显示进度条
+            const progressContainer = document.getElementById('uploadProgress');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            
+            progressContainer.style.display = 'block';
+            progressFill.style.width = '0%';
+            progressText.textContent = '准备上传...';
+
+            // 模拟上传进度
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 10;
+                if (progress > 90) progress = 90;
+                
+                progressFill.style.width = progress + '%';
+                progressText.textContent = `上传中... ${Math.round(progress)}%`;
+                
+                if (progress >= 90) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        progressFill.style.width = '100%';
+                        progressText.textContent = '上传完成!';
+                        setTimeout(() => {
+                            progressContainer.style.display = 'none';
+                            fileInput.value = '';
+                            showFilePreview(null);
+                            alert('文件上传成功!');
+                        }, 1000);
+                    }, 500);
+                }
+            }, 100);
+        }
+
+        // 取消上传
+        function cancelUpload() {
+            document.getElementById('uploadConfirmDialog').style.display = 'none';
+        }
+
+        // 批量上传
+        function uploadBatch() {
+            const fileInput = document.getElementById('batchFileInput');
+            const files = Array.from(fileInput.files);
+
+            if (files.length === 0) {
+                alert('请选择要上传的文件');
+                return;
+            }
+
+            // 显示进度条
+            const progressContainer = document.getElementById('batchProgress');
+            const progressFill = document.getElementById('batchProgressFill');
+            const progressText = document.getElementById('batchProgressText');
+            
+            progressContainer.style.display = 'block';
+            progressFill.style.width = '0%';
+            progressText.textContent = '准备批量上传...';
+
+            // 模拟批量上传进度
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 8;
+                if (progress > 90) progress = 90;
+                
+                progressFill.style.width = progress + '%';
+                progressText.textContent = `批量上传中... ${Math.round(progress)}%`;
+                
+                if (progress >= 90) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        progressFill.style.width = '100%';
+                        progressText.textContent = '批量上传完成!';
+                        setTimeout(() => {
+                            progressContainer.style.display = 'none';
+                            fileInput.value = '';
+                            const batchPreview = document.getElementById('batchFilePreview');
+                            if (batchPreview) {
+                                batchPreview.style.display = 'none';
+                            }
+                            alert(`批量上传完成! 共上传 ${files.length} 个文件`);
+                        }, 1000);
+                    }, 500);
+                }
+            }, 100);
+        }
+
+        // 格式化字节数
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // 页面加载完成后初始化事件监听器
+        window.addEventListener('load', function() {
+            // 为上传区域添加点击事件
+            const uploadArea = document.getElementById('uploadArea');
+            const batchUploadArea = document.getElementById('batchUploadArea');
+            const fileInput = document.getElementById('fileInput');
+            const batchFileInput = document.getElementById('batchFileInput');
+            
+            if (uploadArea && fileInput) {
+                uploadArea.addEventListener('click', function() {
+                    fileInput.click();
+                });
+                
+                fileInput.addEventListener('change', handleFileSelect);
+            }
+            
+            if (batchUploadArea && batchFileInput) {
+                batchUploadArea.addEventListener('click', function() {
+                    batchFileInput.click();
+                });
+                
+                batchFileInput.addEventListener('change', handleBatchFileSelect);
+            }
+            
+            // 设置按钮事件监听器
+            const uploadFileBtn = document.getElementById('uploadFileBtn');
+            const uploadBatchBtn = document.getElementById('uploadBatchBtn');
+            const confirmUploadBtn = document.getElementById('confirmUploadBtn');
+            
+            if (uploadFileBtn) {
+                uploadFileBtn.addEventListener('click', uploadFile);
+            }
+            
+            if (uploadBatchBtn) {
+                uploadBatchBtn.addEventListener('click', uploadBatch);
+            }
+            
+            if (confirmUploadBtn) {
+                confirmUploadBtn.addEventListener('click', confirmUpload);
+            }
+            
+            // 添加拖拽功能
+            if (uploadArea) {
+                uploadArea.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    uploadArea.style.borderColor = '#007bff';
+                    uploadArea.style.background = '#e3f2fd';
+                });
+                
+                uploadArea.addEventListener('dragleave', function(e) {
+                    e.preventDefault();
+                    uploadArea.style.borderColor = '#3498db';
+                    uploadArea.style.background = '#f8f9fa';
+                });
+                
+                uploadArea.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    uploadArea.style.borderColor = '#3498db';
+                    uploadArea.style.background = '#f8f9fa';
+                    
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        const dt = new DataTransfer();
+                        dt.items.add(files[0]);
+                        fileInput.files = dt.files;
+                        handleFileSelect({ target: { files: [files[0]] } });
+                    }
+                });
+            }
+            
+            if (batchUploadArea) {
+                batchUploadArea.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    batchUploadArea.style.borderColor = '#007bff';
+                    batchUploadArea.style.background = '#e3f2fd';
+                });
+                
+                batchUploadArea.addEventListener('dragleave', function(e) {
+                    e.preventDefault();
+                    batchUploadArea.style.borderColor = '#3498db';
+                    batchUploadArea.style.background = '#f8f9fa';
+                });
+                
+                batchUploadArea.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    batchUploadArea.style.borderColor = '#3498db';
+                    batchUploadArea.style.background = '#f8f9fa';
+                    
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        const dt = new DataTransfer();
+                        for (let file of files) {
+                            dt.items.add(file);
+                        }
+                        batchFileInput.files = dt.files;
+                        handleBatchFileSelect({ target: { files: files } });
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html> 

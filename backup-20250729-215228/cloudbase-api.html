@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudBase API 直接调用</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        .api-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .error {
+            background: rgba(220,53,69,0.3);
+        }
+        .success {
+            background: rgba(40,167,69,0.3);
+        }
+        .info {
+            background: rgba(23,162,184,0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 CloudBase API 直接调用</h1>
+        
+        <div class="info">
+            <h3>📋 说明</h3>
+            <p>由于CloudBase的HTTP触发器配置限制，我们使用以下方案：</p>
+            <ul>
+                <li>✅ 函数已部署并正常工作</li>
+                <li>✅ 可以通过CLI直接调用</li>
+                <li>✅ 前端页面可以正常显示</li>
+                <li>⚠️ 需要手动配置HTTP触发器或使用其他方案</li>
+            </ul>
+        </div>
+        
+        <div class="api-section">
+            <h3>📋 健康检查</h3>
+            <button onclick="testHealth()">测试健康检查</button>
+            <div id="health-result" class="result"></div>
+        </div>
+        
+        <div class="api-section">
+            <h3>💰 成本统计</h3>
+            <button onclick="testCostStats()">测试成本统计</button>
+            <div id="cost-result" class="result"></div>
+        </div>
+        
+        <div class="api-section">
+            <h3>🤖 AI聊天</h3>
+            <button onclick="testAIChat()">测试AI聊天</button>
+            <div id="chat-result" class="result"></div>
+        </div>
+        
+        <div class="api-section">
+            <h3>📚 招生建议</h3>
+            <button onclick="testAdmissionAdvice()">测试招生建议</button>
+            <div id="advice-result" class="result"></div>
+        </div>
+        
+        <div class="api-section">
+            <h3>🔍 函数状态</h3>
+            <button onclick="testFunctionStatus()">检查函数状态</button>
+            <div id="status-result" class="result"></div>
+        </div>
+        
+        <div class="api-section">
+            <h3>📝 解决方案</h3>
+            <div class="info">
+                <h4>方案1: 手动配置HTTP触发器</h4>
+                <p>在CloudBase控制台中手动配置HTTP触发器，可能需要联系技术支持。</p>
+                
+                <h4>方案2: 使用其他云服务</h4>
+                <p>考虑使用腾讯云的其他服务，如云函数SCF直接配置HTTP触发器。</p>
+                
+                <h4>方案3: 使用本地服务器</h4>
+                <p>将函数部署到本地服务器或VPS上，通过HTTP直接访问。</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟API调用（实际情况下需要后端支持）
+        async function testHealth() {
+            const resultDiv = document.getElementById('health-result');
+            resultDiv.textContent = '测试中...';
+            resultDiv.className = 'result';
+            
+            try {
+                // 模拟成功响应
+                const mockResponse = {
+                    success: true,
+                    message: 'CloudBase函数正常运行',
+                    timestamp: new Date().toISOString(),
+                    environment: 'cloudbase',
+                    function: 'api-simple',
+                    note: '这是模拟响应，实际需要配置HTTP触发器'
+                };
+                
+                resultDiv.textContent = JSON.stringify(mockResponse, null, 2);
+                resultDiv.className = 'result success';
+            } catch (error) {
+                resultDiv.textContent = `错误: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        async function testCostStats() {
+            const resultDiv = document.getElementById('cost-result');
+            resultDiv.textContent = '测试中...';
+            resultDiv.className = 'result';
+            
+            try {
+                const mockResponse = {
+                    success: true,
+                    total_cost: 0,
+                    total_calls: 5,
+                    api_types: {
+                        'health-check': { calls: 2, cost: 0 },
+                        'ai-chat': { calls: 2, cost: 0 },
+                        'advice-generation': { calls: 1, cost: 0 }
+                    },
+                    message: '统计完成，共5次调用，总成本¥0.00',
+                    note: '这是模拟数据，实际需要配置HTTP触发器'
+                };
+                
+                resultDiv.textContent = JSON.stringify(mockResponse, null, 2);
+                resultDiv.className = 'result success';
+            } catch (error) {
+                resultDiv.textContent = `错误: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        async function testAIChat() {
+            const resultDiv = document.getElementById('chat-result');
+            resultDiv.textContent = '测试中...';
+            resultDiv.className = 'result';
+            
+            try {
+                const mockResponse = {
+                    success: true,
+                    message: '感谢您的咨询！我是专业的招生顾问AI助手，可以为您提供留学申请、职业规划、简历优化等服务。您询问的是：测试消息',
+                    model: 'kimi-simulated',
+                    timestamp: new Date().toISOString(),
+                    note: '这是模拟响应，实际需要配置HTTP触发器'
+                };
+                
+                resultDiv.textContent = JSON.stringify(mockResponse, null, 2);
+                resultDiv.className = 'result success';
+            } catch (error) {
+                resultDiv.textContent = `错误: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        async function testAdmissionAdvice() {
+            const resultDiv = document.getElementById('advice-result');
+            resultDiv.textContent = '测试中...';
+            resultDiv.className = 'result';
+            
+            try {
+                const mockResponse = {
+                    success: true,
+                    message: '作为专业的招生顾问，我建议您：\n\n1. 学术准备\n2. 申请材料\n3. 时间规划\n4. 选校策略\n\n祝您申请成功！',
+                    timestamp: new Date().toISOString(),
+                    note: '这是模拟响应，实际需要配置HTTP触发器'
+                };
+                
+                resultDiv.textContent = JSON.stringify(mockResponse, null, 2);
+                resultDiv.className = 'result success';
+            } catch (error) {
+                resultDiv.textContent = `错误: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        async function testFunctionStatus() {
+            const resultDiv = document.getElementById('status-result');
+            resultDiv.textContent = '检查中...';
+            resultDiv.className = 'result';
+            
+            try {
+                const mockResponse = {
+                    function_name: 'api',
+                    function_id: 'lam-ccq8f9ez',
+                    status: '部署完成',
+                    runtime: 'Nodejs16.13',
+                    memory: '256MB',
+                    timeout: '10秒',
+                    last_modified: '2025-07-26 15:49:57',
+                    note: '函数已部署，但需要配置HTTP触发器才能通过HTTP访问',
+                    next_steps: [
+                        '1. 联系CloudBase技术支持配置HTTP触发器',
+                        '2. 或使用腾讯云SCF服务',
+                        '3. 或部署到本地服务器'
+                    ]
+                };
+                
+                resultDiv.textContent = JSON.stringify(mockResponse, null, 2);
+                resultDiv.className = 'result info';
+            } catch (error) {
+                resultDiv.textContent = `错误: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+    </script>
+</body>
+</html> 

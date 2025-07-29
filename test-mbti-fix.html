@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI API测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>MBTI API测试页面</h1>
+    
+    <div class="test-section">
+        <h2>1. 健康检查测试</h2>
+        <button onclick="testHealth()">测试健康检查</button>
+        <div id="healthResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. 获取问题测试</h2>
+        <button onclick="testQuestions()">获取MBTI问题</button>
+        <div id="questionsResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. 提交答案测试</h2>
+        <button onclick="testSubmit()">提交测试答案</button>
+        <div id="submitResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. 完整流程测试</h2>
+        <button onclick="testFullFlow()">运行完整测试</button>
+        <div id="fullFlowResult"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api-v2';
+        
+        async function testHealth() {
+            const resultDiv = document.getElementById('healthResult');
+            resultDiv.innerHTML = '<p class="info">正在测试健康检查...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <p class="success">✅ 健康检查通过</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <p class="error">❌ 健康检查失败</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <p class="error">❌ 请求失败: ${error.message}</p>
+                `;
+            }
+        }
+        
+        async function testQuestions() {
+            const resultDiv = document.getElementById('questionsResult');
+            resultDiv.innerHTML = '<p class="info">正在获取MBTI问题...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/mbti/questions`);
+                const data = await response.json();
+                
+                if (data.success && data.data) {
+                    resultDiv.innerHTML = `
+                        <p class="success">✅ 获取问题成功 (${data.data.length}个问题)</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <p class="error">❌ 获取问题失败</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <p class="error">❌ 请求失败: ${error.message}</p>
+                `;
+            }
+        }
+        
+        async function testSubmit() {
+            const resultDiv = document.getElementById('submitResult');
+            resultDiv.innerHTML = '<p class="info">正在提交测试答案...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/mbti/submit`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        answers: ['E', 'T', 'J', 'S']
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.data) {
+                    resultDiv.innerHTML = `
+                        <p class="success">✅ 提交答案成功</p>
+                        <p><strong>MBTI类型:</strong> ${data.data.type}</p>
+                        <p><strong>描述:</strong> ${data.data.description}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <p class="error">❌ 提交答案失败</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <p class="error">❌ 请求失败: ${error.message}</p>
+                `;
+            }
+        }
+        
+        async function testFullFlow() {
+            const resultDiv = document.getElementById('fullFlowResult');
+            resultDiv.innerHTML = '<p class="info">正在运行完整测试流程...</p>';
+            
+            const results = [];
+            
+            // 1. 健康检查
+            try {
+                const healthResponse = await fetch(`${API_BASE}/health`);
+                const healthData = await healthResponse.json();
+                results.push({
+                    test: '健康检查',
+                    success: healthData.success,
+                    message: healthData.success ? '通过' : '失败'
+                });
+            } catch (error) {
+                results.push({
+                    test: '健康检查',
+                    success: false,
+                    message: error.message
+                });
+            }
+            
+            // 2. 获取问题
+            try {
+                const questionsResponse = await fetch(`${API_BASE}/mbti/questions`);
+                const questionsData = await questionsResponse.json();
+                results.push({
+                    test: '获取问题',
+                    success: questionsData.success && questionsData.data,
+                    message: questionsData.success ? `${questionsData.data.length}个问题` : '失败'
+                });
+            } catch (error) {
+                results.push({
+                    test: '获取问题',
+                    success: false,
+                    message: error.message
+                });
+            }
+            
+            // 3. 提交答案
+            try {
+                const submitResponse = await fetch(`${API_BASE}/mbti/submit`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        answers: ['E', 'T', 'J', 'S']
+                    })
+                });
+                
+                const submitData = await submitResponse.json();
+                results.push({
+                    test: '提交答案',
+                    success: submitData.success && submitData.data,
+                    message: submitData.success ? submitData.data.type : '失败'
+                });
+            } catch (error) {
+                results.push({
+                    test: '提交答案',
+                    success: false,
+                    message: error.message
+                });
+            }
+            
+            // 显示结果
+            const successCount = results.filter(r => r.success).length;
+            const totalCount = results.length;
+            
+            let html = `<h3>测试结果: ${successCount}/${totalCount} 通过</h3>`;
+            
+            results.forEach(result => {
+                const status = result.success ? '✅' : '❌';
+                const color = result.success ? 'success' : 'error';
+                html += `<p class="${color}">${status} ${result.test}: ${result.message}</p>`;
+            });
+            
+            resultDiv.innerHTML = html;
+        }
+    </script>
+</body>
+</html> 
