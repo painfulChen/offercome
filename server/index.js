@@ -41,10 +41,21 @@ exports.main = async (event, context) => {
     }
 
     const result = await handlerFn({ ...event, params: route.params });
+    
+    // ---- 统一JSON包装 ----
+    if (typeof result === 'object' && result !== null) {
+      return {
+        statusCode: result.statusCode || 200,
+        headers: { 'Content-Type': 'application/json' },
+        body: result.body || JSON.stringify(result)
+      };
+    }
+    
+    // 字符串 / 数字等原样返回
     return {
-      statusCode: result.statusCode || 200,
+      statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: result.body
+      body: JSON.stringify({ data: result })
     };
   } catch (error) {
     console.error('处理请求时发生错误:', error);

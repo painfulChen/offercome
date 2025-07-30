@@ -28,22 +28,34 @@ routes.forEach(r => {
 function matchRoute(path, method = 'GET') {
   console.log(`尝试匹配路径: ${path}, 方法: ${method}`);
   
+  let pathMatched = false;
+  let allowedMethods = [];
+  
   for (const r of routes) {
-    if (r.method !== method) {
-      console.log(`方法不匹配: ${r.method} !== ${method}`);
-      continue;
-    }
-    
     const cleanPath = path.replace(/\/+$/, '');
     const m = cleanPath.match(r.regex);
-    console.log(`测试路由: ${r.path} (${r.regex.source}) -> ${m ? '匹配' : '不匹配'}`);
     
-    if (!m) continue;
-    
-    const params = {};
-    r.keys.forEach((k, idx) => (params[k] = decodeURIComponent(m[idx + 1])));
-    console.log(`匹配成功: ${r.handler}, 参数:`, params);
-    return { handler: r.handler, params };
+    if (m) {
+      pathMatched = true;
+      allowedMethods.push(r.method);
+      
+      if (r.method === method) {
+        const params = {};
+        r.keys.forEach((k, idx) => (params[k] = decodeURIComponent(m[idx + 1])));
+        console.log(`匹配成功: ${r.handler}, 参数:`, params);
+        return { handler: r.handler, params };
+      }
+    }
+  }
+  
+  // 路径匹配但方法不匹配，返回405
+  if (pathMatched) {
+    console.log(`路径匹配但方法不匹配，返回405，允许的方法: ${allowedMethods.join(', ')}`);
+    return { 
+      handler: 'methodNotAllowedHandler', 
+      params: { allowedMethods },
+      statusCode: 405 
+    };
   }
   
   console.log('没有找到匹配的路由');

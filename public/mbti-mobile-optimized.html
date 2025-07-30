@@ -584,7 +584,14 @@
                     
                 } catch (error) {
                     console.error('❌ 提交答案失败:', error);
-                    this.showError(this.getErrorMessage('submit_failed'));
+                    
+                    // 尝试解析错误响应
+                    let errorMessage = this.getErrorMessage('submit_failed');
+                    if (error.message && error.message.includes('服务器返回异常')) {
+                        errorMessage = error.message;
+                    }
+                    
+                    this.showError(errorMessage);
                 } finally {
                     if (this.isDebugMode()) console.log('🔄 清理加载状态...');
                     this.hideLoading();

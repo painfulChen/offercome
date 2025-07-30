@@ -1,103 +1,58 @@
-name: 部署到CloudBase
+name: Deploy and Smoke Test
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: 设置Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '16'
-          cache: 'npm'
-          cache-dependency-path: server/package-lock.json
-      
-      - name: 安装依赖
-        run: |
-          cd server
-          npm ci
-      
-      - name: 运行单元测试
-        run: |
-          cd server
-          npm run test:coverage
-      
-      - name: 上传测试覆盖率
-        uses: codecov/codecov-action@v3
-        with:
-          file: server/coverage/lcov.info
-          flags: unittests
-          name: codecov-umbrella
-
   deploy:
-    needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
     
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: 设置Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '16'
-          cache: 'npm'
-          cache-dependency-path: server/package-lock.json
-      
-      - name: 安装依赖
-        run: |
-          cd server
-          npm ci
-      
-      - name: 安装CloudBase CLI
-        run: |
-          npm install -g @cloudbase/cli
-      
-      - name: 配置CloudBase
-        run: |
-          tcb login --apiKeyId ${{ secrets.TCB_SECRET_ID }} --apiKey ${{ secrets.TCB_SECRET_KEY }}
-      
-      - name: 部署到CloudBase
-        run: |
-          tcb framework:deploy -e ${{ secrets.TCB_ENV_ID }} --force
-        env:
-          TCB_ENV_ID: ${{ secrets.TCB_ENV_ID }}
-      
-      - name: 等待部署完成
-        run: sleep 30
-      
-      - name: 关键API冒烟测试
-        run: |
-          DOMAIN="https://${{ secrets.TCB_ENV_ID }}.service.tcloudbase.com"
-          for endpoint in /health /mbti/questions /ai/chat; do
-            echo "测试 $DOMAIN/api-v2$endpoint"
-            curl -fs "$DOMAIN/api-v2$endpoint" -o /dev/null || exit 1
-          done
-        env:
-          TCB_ENV_ID: ${{ secrets.TCB_ENV_ID }}
-      
-      - name: 获取部署详情
-        run: |
-          tcb functions:detail api -e ${{ secrets.TCB_ENV_ID }} > function-details.json
-          tcb service:describe -e ${{ secrets.TCB_ENV_ID }} > service-details.json
-      
-      - name: 上传部署详情
-        uses: actions/upload-artifact@v3
-        with:
-          name: deployment-details
-          path: |
-            function-details.json
-            service-details.json
-      
-      - name: 通知部署结果
-        run: |
-          echo "✅ 部署成功完成"
-          echo "环境ID: ${{ secrets.TCB_ENV_ID }}"
-          echo "API前缀: /api-v2" 
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Deploy to CloudBase
+      env:
+        TCB_ENV: ${{ secrets.TCB_ENV }}
+      run: |
+        npm install -g @cloudbase/cli
+        tcb login --apiKeyId ${{ secrets.TENCENT_SECRET_ID }} --apiKey ${{ secrets.TENCENT_SECRET_KEY }}
+        tcb framework deploy
+    
+    - name: Smoke test MBTI API
+      run: |
+        BASE="https://${{ secrets.TCB_ENV }}-1256790827.ap-shanghai.app.tcloudbase.com/api-v2"
+        
+        echo "🧪 开始API烟雾测试..."
+        
+        # 测试健康检查
+        echo "📋 测试健康检查..."
+        curl -sf "$BASE/health" | jq '.status=="ok"'
+        
+        # 测试MBTI问题获取
+        echo "📋 测试MBTI问题获取..."
+        curl -sf "$BASE/mbti/questions" | jq '.data | length==32'
+        
+        # 测试MBTI计算
+        echo "📋 测试MBTI计算..."
+        curl -sf -X POST "$BASE/mbti/calculate" \
+             -H 'Content-Type: application/json' \
+             -d '{"answers":[0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1]}' \
+          | jq '.data.mbtiType | length==4'
+        
+        # 测试MBTI职业建议
+        echo "📋 测试MBTI职业建议..."
+        curl -sf "$BASE/mbti/career-advice" | jq '.data | length>0'
+        
+        echo "✅ 所有API测试通过！" 

@@ -626,4 +626,17 @@ exports.deleteRagDocumentHandler = async ({ params }) => {
       message: '文档删除成功'
     })
   };
+};
+
+exports.methodNotAllowedHandler = async ({ params }) => {
+  console.log('🚫 方法不允许:', params);
+  
+  return {
+    statusCode: 405,
+    body: JSON.stringify({
+      success: false,
+      message: '请求方法不允许',
+      allowedMethods: params.allowedMethods || []
+    })
+  };
 }; 
