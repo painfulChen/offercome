@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI API 测试 - 重构版本</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .test-section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background: #2980b9;
+        }
+        .btn.success {
+            background: #27ae60;
+        }
+        .btn.success:hover {
+            background: #229954;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 5px;
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .result.success {
+            border-left-color: #27ae60;
+            background: #d4edda;
+        }
+        .result.error {
+            border-left-color: #e74c3c;
+            background: #f8d7da;
+        }
+        .status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status.success {
+            background: #27ae60;
+            color: white;
+        }
+        .status.error {
+            background: #e74c3c;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MBTI API 测试 - 重构版本</h1>
+        
+        <div class="test-section">
+            <h2>1. 健康检查</h2>
+            <button class="btn" onclick="testHealth()">测试健康检查</button>
+            <div id="healthResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>2. MBTI问题接口</h2>
+            <button class="btn" onclick="testQuestions()">获取MBTI问题</button>
+            <div id="questionsResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>3. MBTI职业建议接口</h2>
+            <button class="btn" onclick="testCareerAdvice()">获取所有职业建议</button>
+            <button class="btn" onclick="testCareerCategories()">获取岗位类别</button>
+            <div id="careerResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>4. 参数路由测试</h2>
+            <button class="btn" onclick="testCareerAdviceByType('INTJ')">测试 INTJ 职业建议</button>
+            <button class="btn" onclick="testCareerAdviceByType('INTP')">测试 INTP 职业建议</button>
+            <button class="btn" onclick="testCareerAdviceByType('ENTJ')">测试 ENTJ 职业建议</button>
+            <button class="btn" onclick="testCareerAdviceByType('ENFP')">测试 ENFP 职业建议</button>
+            <button class="btn" onclick="testCareerAdviceByType('ISTJ')">测试 ISTJ 职业建议</button>
+            <div id="paramResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>5. 推荐职业接口测试</h2>
+            <button class="btn" onclick="testRecommendations('INTJ')">测试 INTJ 推荐职业</button>
+            <button class="btn" onclick="testRecommendations('INTP')">测试 INTP 推荐职业</button>
+            <button class="btn" onclick="testRecommendations('ENTJ')">测试 ENTJ 推荐职业</button>
+            <button class="btn" onclick="testRecommendations('ENFP')">测试 ENFP 推荐职业</button>
+            <button class="btn" onclick="testRecommendations('ISTJ')">测试 ISTJ 推荐职业</button>
+            <div id="recommendationsResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>6. 错误路由测试</h2>
+            <button class="btn" onclick="testInvalidRoute()">测试无效路由</button>
+            <button class="btn" onclick="testInvalidMBTI()">测试无效MBTI类型</button>
+            <div id="errorResult" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api-v2';
+
+        async function makeRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    method: options.method || 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    body: options.body ? JSON.stringify(options.body) : undefined
+                });
+
+                const data = await response.json();
+                return {
+                    success: response.ok,
+                    status: response.status,
+                    data: data
+                };
+            } catch (error) {
+                return {
+                    success: false,
+                    status: 0,
+                    data: { error: error.message }
+                };
+            }
+        }
+
+        function displayResult(elementId, result) {
+            const element = document.getElementById(elementId);
+            const statusClass = result.success ? 'success' : 'error';
+            const statusText = result.success ? '成功' : '失败';
+            
+            element.className = `result ${statusClass}`;
+            element.innerHTML = `
+                <span class="status ${statusClass}">${statusText} (${result.status})</span>
+                ${JSON.stringify(result.data, null, 2)}
+            `;
+        }
+
+        async function testHealth() {
+            const result = await makeRequest(`${API_BASE}/health`);
+            displayResult('healthResult', result);
+        }
+
+        async function testQuestions() {
+            const result = await makeRequest(`${API_BASE}/mbti/questions`);
+            displayResult('questionsResult', result);
+        }
+
+        async function testCareerAdvice() {
+            const result = await makeRequest(`${API_BASE}/mbti/career-advice`);
+            displayResult('careerResult', result);
+        }
+
+        async function testCareerCategories() {
+            const result = await makeRequest(`${API_BASE}/mbti/career-categories`);
+            displayResult('careerResult', result);
+        }
+
+        async function testCareerAdviceByType(mbtiType) {
+            const result = await makeRequest(`${API_BASE}/mbti/career-advice/${mbtiType}`);
+            displayResult('paramResult', result);
+        }
+
+        async function testRecommendations(mbtiType) {
+            const result = await makeRequest(`${API_BASE}/mbti/career-advice/${mbtiType}/recommendations`);
+            displayResult('recommendationsResult', result);
+        }
+
+        async function testInvalidRoute() {
+            const result = await makeRequest(`${API_BASE}/invalid/route`);
+            displayResult('errorResult', result);
+        }
+
+        async function testInvalidMBTI() {
+            const result = await makeRequest(`${API_BASE}/mbti/career-advice/INVALID/recommendations`);
+            displayResult('errorResult', result);
+        }
+
+        // 页面加载时自动测试健康检查
+        document.addEventListener('DOMContentLoaded', () => {
+            testHealth();
+        });
+    </script>
+</body>
+</html> 

@@ -1,52 +1,103 @@
-name: Deploy to CloudBase
+name: 部署到CloudBase
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
   pull_request:
     branches: [ main ]
 
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: 设置Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+          cache: 'npm'
+          cache-dependency-path: server/package-lock.json
+      
+      - name: 安装依赖
+        run: |
+          cd server
+          npm ci
+      
+      - name: 运行单元测试
+        run: |
+          cd server
+          npm run test:coverage
+      
+      - name: 上传测试覆盖率
+        uses: codecov/codecov-action@v3
+        with:
+          file: server/coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16'
-        
-    - name: Install dependencies
-      run: |
-        cd server
-        npm install
-        
-    - name: Install CloudBase CLI
-      run: npm install -g @cloudbase/cli
+      - name: 设置Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+          cache: 'npm'
+          cache-dependency-path: server/package-lock.json
       
-    - name: Deploy to CloudBase
-      env:
-        TCB_SECRETID: ${{ secrets.TCB_SECRETID }}
-        TCB_SECRETKEY: ${{ secrets.TCB_SECRETKEY }}
-        TCB_ENVID: ${{ secrets.TCB_ENVID }}
-      run: |
-        # 登录腾讯云
-        tcb login --apiKeyId $TCB_SECRETID --apiKey $TCB_SECRETKEY
-        
-        # 部署云函数
-        tcb fn deploy api
-        
-        # 部署前端
-        tcb hosting:deploy ./public -e $TCB_ENVID
-        
-        # 创建HTTP服务（如果需要）
-        tcb service:create -e $TCB_ENVID -p /api -f api || true
-        
-    - name: Notify deployment
-      run: |
-        echo "🚀 部署完成！"
-        echo "前端地址: https://${{ secrets.TCB_ENVID }}.tcloudbaseapp.com/"
-        echo "API地址: https://${{ secrets.TCB_ENVID }}-1256790827.ap-shanghai.app.tcloudbase.com/api" 
+      - name: 安装依赖
+        run: |
+          cd server
+          npm ci
+      
+      - name: 安装CloudBase CLI
+        run: |
+          npm install -g @cloudbase/cli
+      
+      - name: 配置CloudBase
+        run: |
+          tcb login --apiKeyId ${{ secrets.TCB_SECRET_ID }} --apiKey ${{ secrets.TCB_SECRET_KEY }}
+      
+      - name: 部署到CloudBase
+        run: |
+          tcb framework:deploy -e ${{ secrets.TCB_ENV_ID }} --force
+        env:
+          TCB_ENV_ID: ${{ secrets.TCB_ENV_ID }}
+      
+      - name: 等待部署完成
+        run: sleep 30
+      
+      - name: 关键API冒烟测试
+        run: |
+          DOMAIN="https://${{ secrets.TCB_ENV_ID }}.service.tcloudbase.com"
+          for endpoint in /health /mbti/questions /ai/chat; do
+            echo "测试 $DOMAIN/api-v2$endpoint"
+            curl -fs "$DOMAIN/api-v2$endpoint" -o /dev/null || exit 1
+          done
+        env:
+          TCB_ENV_ID: ${{ secrets.TCB_ENV_ID }}
+      
+      - name: 获取部署详情
+        run: |
+          tcb functions:detail api -e ${{ secrets.TCB_ENV_ID }} > function-details.json
+          tcb service:describe -e ${{ secrets.TCB_ENV_ID }} > service-details.json
+      
+      - name: 上传部署详情
+        uses: actions/upload-artifact@v3
+        with:
+          name: deployment-details
+          path: |
+            function-details.json
+            service-details.json
+      
+      - name: 通知部署结果
+        run: |
+          echo "✅ 部署成功完成"
+          echo "环境ID: ${{ secrets.TCB_ENV_ID }}"
+          echo "API前缀: /api-v2" 

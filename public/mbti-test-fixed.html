@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI人格测试 - 修复版</title>
+    <meta name="description" content="专业的MBTI人格测试，了解你的性格特点，找到最适合的职业方向">
+    <link rel="stylesheet" href="styles-new.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* MBTI测试专用样式 */
+        .mbti-page {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #fff;
+        }
+
+        .mbti-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .mbti-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .mbti-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .mbti-header p {
+            font-size: 1.1rem;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+
+        .test-progress {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD700, #FFA500);
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        .question-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .question-text {
+            font-size: 1.3rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .answer-options {
+            display: grid;
+            gap: 15px;
+        }
+
+        .answer-btn {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 10px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .answer-btn:hover {
+            background: rgba(255, 215, 0, 0.1);
+            border-color: #FFD700;
+            transform: translateY(-2px);
+        }
+
+        .answer-btn.selected {
+            background: rgba(255, 215, 0, 0.2);
+            border-color: #FFD700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .answer-btn i {
+            margin-right: 15px;
+            color: #FFD700;
+        }
+
+        .result-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            display: none;
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .mbti-type {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 10px;
+        }
+
+        .result-section {
+            margin-bottom: 25px;
+        }
+
+        .result-section h3 {
+            color: #FFD700;
+            margin-bottom: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading i {
+            font-size: 2rem;
+            color: #FFD700;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #000;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="mbti-page">
+        <div class="mbti-container">
+            <div class="mbti-header">
+                <h1>MBTI人格测试</h1>
+                <p>了解你的性格类型，找到最适合的职业方向</p>
+            </div>
+
+            <!-- 测试进度 -->
+            <div id="testProgress" class="test-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">问题 1/4</div>
+            </div>
+
+            <!-- 问题容器 -->
+            <div id="questionContainer" class="question-container">
+                <div class="question-text" id="questionText">正在加载测试问题...</div>
+                <div class="answer-options" id="answerOptions"></div>
+            </div>
+
+            <!-- 结果容器 -->
+            <div id="resultContainer" class="result-container">
+                <div class="result-header">
+                    <div class="mbti-type" id="mbtiType">ESTJ</div>
+                    <p>你的MBTI人格类型</p>
+                </div>
+
+                <div class="result-section">
+                    <h3><i class="fas fa-user"></i> 性格描述</h3>
+                    <p id="personalityDescription">总经理 - 优秀的管理者，善于组织和执行</p>
+                </div>
+
+                <div class="result-section">
+                    <h3><i class="fas fa-briefcase"></i> 职业建议</h3>
+                    <p id="careerSuggestions">根据您的MBTI类型，建议选择适合您性格特点的职业</p>
+                </div>
+
+                <div class="result-section">
+                    <h3><i class="fas fa-star"></i> 优势特点</h3>
+                    <p id="strengths">您的MBTI类型具有独特的人格特征</p>
+                </div>
+
+                <div class="result-section">
+                    <h3><i class="fas fa-lightbulb"></i> 发展建议</h3>
+                    <p id="weaknesses">每个人都有不同的发展潜力</p>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="saveResult()">
+                        <i class="fas fa-save"></i> 保存结果
+                    </button>
+                    <button class="btn btn-secondary" onclick="retakeTest()">
+                        <i class="fas fa-redo"></i> 重新测试
+                    </button>
+                </div>
+            </div>
+
+            <!-- 加载状态 -->
+            <div id="loadingContainer" class="loading" style="display: none;">
+                <i class="fas fa-spinner"></i>
+                <p>正在生成结果...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class MbtiTestApp {
+            constructor() {
+                this.questions = [];
+                this.currentQuestionIndex = 0;
+                this.answers = [];
+                this.apiBaseUrl = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api-v2';
+                
+                this.init();
+            }
+
+            async init() {
+                try {
+                    await this.loadQuestions();
+                    this.displayQuestion();
+                } catch (error) {
+                    console.error('初始化失败:', error);
+                    this.showError('获取测试问题失败，请稍后再试');
+                }
+            }
+
+            async loadQuestions() {
+                try {
+                    const response = await fetch(`${this.apiBaseUrl}/mbti/questions`);
+                    const data = await response.json();
+                    
+                    if (data.success && data.data) {
+                        this.questions = data.data;
+                    } else {
+                        throw new Error(data.message || '获取问题失败');
+                    }
+                } catch (error) {
+                    console.error('加载问题失败:', error);
+                    throw error;
+                }
+            }
+
+            displayQuestion() {
+                if (this.currentQuestionIndex >= this.questions.length) {
+                    this.showResults();
+                    return;
+                }
+
+                const question = this.questions[this.currentQuestionIndex];
+                document.getElementById('questionText').textContent = question.question;
+                
+                const optionsContainer = document.getElementById('answerOptions');
+                optionsContainer.innerHTML = '';
+                
+                question.options.forEach(option => {
+                    const button = document.createElement('button');
+                    button.className = 'answer-btn';
+                    button.innerHTML = `
+                        <i class="fas fa-arrow-right"></i>
+                        ${option.text}
+                    `;
+                    button.onclick = () => this.selectAnswer(option.id);
+                    optionsContainer.appendChild(button);
+                });
+
+                this.updateProgress();
+            }
+
+            selectAnswer(answer) {
+                this.answers.push(answer);
+                this.currentQuestionIndex++;
+                
+                if (this.currentQuestionIndex < this.questions.length) {
+                    this.displayQuestion();
+                } else {
+                    this.showResults();
+                }
+            }
+
+            updateProgress() {
+                const progress = ((this.currentQuestionIndex + 1) / this.questions.length) * 100;
+                document.getElementById('progressFill').style.width = progress + '%';
+                document.getElementById('progressText').textContent = `问题 ${this.currentQuestionIndex + 1}/${this.questions.length}`;
+            }
+
+            showLoading() {
+                document.getElementById('loadingContainer').style.display = 'block';
+                document.getElementById('questionContainer').style.display = 'none';
+            }
+
+            hideLoading() {
+                document.getElementById('loadingContainer').style.display = 'none';
+            }
+
+            async showResults() {
+                try {
+                    this.showLoading();
+                    
+                    const response = await fetch(`${this.apiBaseUrl}/mbti/calculate`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ answers: this.answers })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        const result = data.data;
+                        
+                        document.getElementById('mbtiType').textContent = result.type;
+                        document.getElementById('personalityDescription').textContent = result.description;
+                        document.getElementById('careerSuggestions').textContent = '根据您的MBTI类型，建议选择适合您性格特点的职业';
+                        document.getElementById('strengths').textContent = '您的MBTI类型具有独特的人格特征';
+                        document.getElementById('weaknesses').textContent = '每个人都有不同的发展潜力';
+                        
+                        this.hideLoading();
+                        this.showResult();
+                    } else {
+                        throw new Error(data.message || '生成结果失败');
+                    }
+                } catch (error) {
+                    console.error('显示结果失败:', error);
+                    this.hideLoading();
+                    this.showError('生成结果失败，请稍后再试');
+                }
+            }
+
+            showResult() {
+                document.getElementById('testProgress').style.display = 'none';
+                document.getElementById('questionContainer').style.display = 'none';
+                document.getElementById('resultContainer').style.display = 'block';
+            }
+
+            async saveResult() {
+                try {
+                    // 这里可以添加保存结果的逻辑
+                    this.showNotification('结果已保存！', 'success');
+                } catch (error) {
+                    console.error('保存结果失败:', error);
+                    this.showNotification('保存失败，请稍后再试', 'error');
+                }
+            }
+
+            retakeTest() {
+                this.currentQuestionIndex = 0;
+                this.answers = [];
+                this.showTest();
+                this.displayQuestion();
+            }
+
+            showTest() {
+                document.getElementById('testProgress').style.display = 'block';
+                document.getElementById('questionContainer').style.display = 'block';
+                document.getElementById('resultContainer').style.display = 'none';
+            }
+
+            showError(message) {
+                this.hideLoading();
+                alert(message);
+            }
+
+            showNotification(message, type = 'info') {
+                // 创建通知元素
+                const notification = document.createElement('div');
+                notification.className = `notification notification-${type}`;
+                notification.innerHTML = `
+                    <span class="notification-message">${message}</span>
+                    <button class="notification-close">&times;</button>
+                `;
+                
+                // 添加样式
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+                    color: white;
+                    padding: 15px 20px;
+                    border-radius: 5px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                    z-index: 1000;
+                    max-width: 300px;
+                `;
+                
+                // 添加到页面
+                document.body.appendChild(notification);
+                
+                // 自动关闭
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 3000);
+            }
+        }
+
+        // 初始化应用
+        new MbtiTestApp();
+    </script>
+</body>
+</html> 

@@ -548,7 +548,7 @@
                 this.showLoading();
                 
                 try {
-                    const response = await fetch(`${this.apiBaseUrl}/mbti/submit`, {
+                    const response = await fetch(`${this.apiBaseUrl}/mbti/calculate`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'

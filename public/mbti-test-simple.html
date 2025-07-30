@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI测试简化版</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: white; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .question { margin: 20px 0; padding: 20px; background: #333; border-radius: 10px; }
+        .option { margin: 10px 0; padding: 10px; background: #444; border-radius: 5px; cursor: pointer; }
+        .option:hover { background: #555; }
+        .selected { background: #FFD700 !important; color: black; }
+        button { padding: 10px 20px; margin: 5px; background: #FFD700; color: black; border: none; border-radius: 5px; cursor: pointer; }
+        .result { margin: 20px 0; padding: 20px; background: #333; border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MBTI测试简化版</h1>
+        
+        <div id="testSection">
+            <div class="question">
+                <h3 id="questionText">正在加载问题...</h3>
+                <div id="options"></div>
+            </div>
+            <button onclick="nextQuestion()">下一题</button>
+        </div>
+        
+        <div id="resultSection" style="display: none;">
+            <div class="result">
+                <h2>测试结果</h2>
+                <p id="resultText">正在计算...</p>
+            </div>
+            <button onclick="restart()">重新开始</button>
+        </div>
+    </div>
+
+    <script>
+        const apiBaseUrl = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com';
+        let questions = [];
+        let currentQuestion = 0;
+        let answers = [];
+        let selectedOption = null;
+
+        async function loadQuestions() {
+            try {
+                const response = await fetch(`${apiBaseUrl}/mbti/questions`);
+                const data = await response.json();
+                if (data.success) {
+                    questions = data.data;
+                    showQuestion();
+                }
+            } catch (error) {
+                console.error('加载问题失败:', error);
+            }
+        }
+
+        function showQuestion() {
+            if (currentQuestion >= questions.length) {
+                showResults();
+                return;
+            }
+
+            const question = questions[currentQuestion];
+            document.getElementById('questionText').textContent = question.text;
+            
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.textContent = option.text;
+                optionDiv.onclick = () => selectOption(index);
+                optionsDiv.appendChild(optionDiv);
+            });
+        }
+
+        function selectOption(index) {
+            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            event.target.classList.add('selected');
+            selectedOption = index;
+        }
+
+        function nextQuestion() {
+            if (selectedOption !== null) {
+                answers.push(selectedOption);
+                selectedOption = null;
+                currentQuestion++;
+                showQuestion();
+            }
+        }
+
+        async function showResults() {
+            document.getElementById('testSection').style.display = 'none';
+            document.getElementById('resultSection').style.display = 'block';
+            
+            // 计算分数
+            const scores = calculateScores();
+            const type = calculateMBTIType(scores);
+            
+            try {
+                const response = await fetch(`${apiBaseUrl}/mbti/calculate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type, scores })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('resultText').innerHTML = `
+                        <h3>您的MBTI类型: ${data.data.type}</h3>
+                        <p><strong>描述:</strong> ${data.data.description}</p>
+                        <p><strong>工作风格:</strong> ${data.data.workStyle}</p>
+                        <p><strong>团队角色:</strong> ${data.data.teamRole}</p>
+                    `;
+                } else {
+                    document.getElementById('resultText').innerHTML = `<p style="color: red;">计算失败: ${data.message}</p>`;
+                }
+            } catch (error) {
+                document.getElementById('resultText').innerHTML = `<p style="color: red;">请求失败: ${error.message}</p>`;
+            }
+        }
+
+        function calculateScores() {
+            const scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+            
+            answers.forEach((answerIndex, questionIndex) => {
+                const question = questions[questionIndex];
+                const selectedOption = question.options[answerIndex];
+                if (selectedOption && selectedOption.score) {
+                    Object.keys(selectedOption.score).forEach(dimension => {
+                        scores[dimension] += selectedOption.score[dimension];
+                    });
+                }
+            });
+            
+            return scores;
+        }
+
+        function calculateMBTIType(scores) {
+            let type = '';
+            type += scores.E > scores.I ? 'E' : 'I';
+            type += scores.S > scores.N ? 'S' : 'N';
+            type += scores.T > scores.F ? 'T' : 'F';
+            type += scores.J > scores.P ? 'J' : 'P';
+            return type;
+        }
+
+        function restart() {
+            currentQuestion = 0;
+            answers = [];
+            selectedOption = null;
+            document.getElementById('testSection').style.display = 'block';
+            document.getElementById('resultSection').style.display = 'none';
+            showQuestion();
+        }
+
+        // 页面加载时开始
+        loadQuestions();
+    </script>
+</body>
+</html> 

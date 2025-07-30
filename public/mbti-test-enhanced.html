@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI职业测试 - 互联网企业岗位匹配</title>
+    <meta name="description" content="专业的MBTI人格测试，结合互联网企业岗位特点，为您提供精准的职业建议">
+    <link rel="stylesheet" href="styles-new.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .mbti-enhanced-page {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .mbti-enhanced-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .mbti-enhanced-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .mbti-enhanced-header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: bold;
+        }
+
+        .mbti-enhanced-header p {
+            font-size: 1.2rem;
+            color: #f0f0f0;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .test-progress-enhanced {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .progress-bar-enhanced {
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-fill-enhanced {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD700, #FFA500);
+            transition: width 0.5s ease;
+            border-radius: 6px;
+        }
+
+        .progress-text-enhanced {
+            text-align: center;
+            color: #FFD700;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .question-container-enhanced {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .question-text-enhanced {
+            font-size: 1.4rem;
+            margin-bottom: 35px;
+            line-height: 1.7;
+            text-align: center;
+            color: #f0f0f0;
+        }
+
+        .answer-options-enhanced {
+            display: grid;
+            gap: 20px;
+        }
+
+        .answer-btn-enhanced {
+            display: flex;
+            align-items: center;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 15px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+
+        .answer-btn-enhanced:hover {
+            background: rgba(255, 215, 0, 0.2);
+            border-color: #FFD700;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+        }
+
+        .answer-btn-enhanced.selected {
+            background: rgba(255, 215, 0, 0.3);
+            border-color: #FFD700;
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+        }
+
+        .result-container-enhanced {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .mbti-type-enhanced {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .result-sections-enhanced {
+            display: grid;
+            gap: 30px;
+        }
+
+        .result-section-enhanced {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .result-section-enhanced h4 {
+            color: #FFD700;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .result-section-enhanced h4 i {
+            margin-right: 10px;
+        }
+
+        .career-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .career-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .career-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
+        }
+
+        .career-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 10px;
+        }
+
+        .career-category {
+            display: inline-block;
+            background: rgba(255, 215, 0, 0.2);
+            color: #FFD700;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .career-suitability {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .suitability-stars {
+            color: #FFD700;
+            margin-left: 10px;
+        }
+
+        .career-reasons {
+            margin-bottom: 15px;
+        }
+
+        .career-reasons h5 {
+            color: #FFD700;
+            margin-bottom: 8px;
+        }
+
+        .career-reasons ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .career-reasons li {
+            margin-bottom: 5px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .career-reasons li:before {
+            content: "✓";
+            color: #4CAF50;
+            position: absolute;
+            left: 0;
+        }
+
+        .career-skills {
+            margin-bottom: 15px;
+        }
+
+        .career-skills h5 {
+            color: #FFD700;
+            margin-bottom: 8px;
+        }
+
+        .skill-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .skill-tag {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+        }
+
+        .career-path {
+            margin-bottom: 15px;
+        }
+
+        .career-path h5 {
+            color: #FFD700;
+            margin-bottom: 8px;
+        }
+
+        .path-levels {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .path-level {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 12px;
+            border-radius: 8px;
+        }
+
+        .level-name {
+            color: #FFD700;
+            font-weight: bold;
+            margin-right: 10px;
+            min-width: 60px;
+        }
+
+        .level-positions {
+            color: #f0f0f0;
+            font-size: 0.9rem;
+        }
+
+        .career-companies {
+            margin-bottom: 15px;
+        }
+
+        .career-companies h5 {
+            color: #FFD700;
+            margin-bottom: 8px;
+        }
+
+        .company-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .company-tag {
+            background: rgba(255, 215, 0, 0.2);
+            color: #FFD700;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+        }
+
+        .salary-range {
+            margin-bottom: 15px;
+        }
+
+        .salary-range h5 {
+            color: #FFD700;
+            margin-bottom: 8px;
+        }
+
+        .salary-info {
+            display: flex;
+            gap: 20px;
+        }
+
+        .salary-level {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .salary-level h6 {
+            color: #FFD700;
+            margin-bottom: 5px;
+        }
+
+        .salary-amount {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .action-buttons-enhanced {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-enhanced {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-primary-enhanced {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #000;
+        }
+
+        .btn-primary-enhanced:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-outline-enhanced {
+            background: transparent;
+            color: #FFD700;
+            border: 2px solid #FFD700;
+        }
+
+        .btn-outline-enhanced:hover {
+            background: rgba(255, 215, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .loading-enhanced {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading-spinner-enhanced {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #FFD700;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .intro-section-enhanced {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .intro-content-enhanced h3 {
+            color: #FFD700;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .intro-content-enhanced p {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .dimensions-grid-enhanced {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .dimension-enhanced {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .dimension-enhanced h4 {
+            color: #FFD700;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .dimension-enhanced p {
+            color: #f0f0f0;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .start-btn-enhanced {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #000;
+            border: none;
+            padding: 20px 40px;
+            border-radius: 30px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+
+        .start-btn-enhanced:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
+        }
+
+        .start-btn-enhanced i {
+            margin-right: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .mbti-enhanced-container {
+                padding: 20px 15px;
+            }
+            
+            .mbti-enhanced-header h1 {
+                font-size: 2rem;
+            }
+            
+            .question-container-enhanced {
+                padding: 25px;
+            }
+            
+            .career-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons-enhanced {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mbti-enhanced-page">
+        <div class="mbti-enhanced-container">
+            <!-- 测试进度 -->
+            <div id="progressContainer" class="test-progress-enhanced" style="display: none;">
+                <div class="progress-bar-enhanced">
+                    <div class="progress-fill-enhanced" id="progressFill"></div>
+                </div>
+                <div class="progress-text-enhanced" id="progressText">问题 1 / 20</div>
+            </div>
+
+            <!-- 问题容器 -->
+            <div id="questionContainer" class="question-container-enhanced" style="display: none;">
+                <div class="question-text-enhanced" id="questionText"></div>
+                <div class="answer-options-enhanced" id="answerOptions"></div>
+            </div>
+
+            <!-- 结果容器 -->
+            <div id="resultContainer" class="result-container-enhanced" style="display: none;">
+                <div class="mbti-type-enhanced" id="mbtiType">INTJ</div>
+                <div class="result-sections-enhanced">
+                    <div class="result-section-enhanced">
+                        <h4><i class="fas fa-user"></i> 人格描述</h4>
+                        <p id="personalityDescription">正在生成...</p>
+                    </div>
+                    <div class="result-section-enhanced">
+                        <h4><i class="fas fa-briefcase"></i> 互联网企业岗位建议</h4>
+                        <div id="careerSuggestions">正在生成...</div>
+                    </div>
+                    <div class="result-section-enhanced">
+                        <h4><i class="fas fa-star"></i> 核心优势</h4>
+                        <p id="strengths">正在生成...</p>
+                    </div>
+                    <div class="result-section-enhanced">
+                        <h4><i class="fas fa-lightbulb"></i> 发展建议</h4>
+                        <p id="developmentAdvice">正在生成...</p>
+                    </div>
+                </div>
+                <div class="action-buttons-enhanced">
+                    <button id="saveResultBtn" class="btn-enhanced btn-primary-enhanced">
+                        <i class="fas fa-save"></i> 保存结果
+                    </button>
+                    <button id="retakeTestBtn" class="btn-enhanced btn-outline-enhanced">
+                        <i class="fas fa-redo"></i> 重新测试
+                    </button>
+                    <a href="index.html" class="btn-enhanced btn-outline-enhanced">
+                        <i class="fas fa-home"></i> 返回首页
+                    </a>
+                </div>
+            </div>
+
+            <!-- 介绍页面 -->
+            <div id="introSection" class="intro-section-enhanced">
+                <div class="intro-content-enhanced">
+                    <h3>MBTI职业测试 - 互联网企业岗位匹配</h3>
+                    <p>基于MBTI人格类型理论，结合互联网企业岗位特点，为您提供精准的职业建议和发展路径。通过科学的测试，了解您的性格优势，找到最适合的互联网企业岗位。</p>
+                    
+                    <div class="dimensions-grid-enhanced">
+                        <div class="dimension-enhanced">
+                            <h4>E - I (外向 - 内向)</h4>
+                            <p>您倾向于从外部世界还是内心世界获得能量，影响团队协作和沟通方式</p>
+                        </div>
+                        <div class="dimension-enhanced">
+                            <h4>S - N (感觉 - 直觉)</h4>
+                            <p>您更关注具体事实还是抽象概念，影响问题解决和创新思维</p>
+                        </div>
+                        <div class="dimension-enhanced">
+                            <h4>T - F (思考 - 情感)</h4>
+                            <p>您做决定时更依赖逻辑还是价值观，影响决策风格和团队管理</p>
+                        </div>
+                        <div class="dimension-enhanced">
+                            <h4>J - P (判断 - 感知)</h4>
+                            <p>您更喜欢计划还是保持灵活性，影响项目管理和工作方式</p>
+                        </div>
+                    </div>
+                    
+                    <button id="startTestBtn" class="start-btn-enhanced">
+                        <i class="fas fa-play"></i> 开始测试
+                    </button>
+                </div>
+            </div>
+
+            <!-- 加载状态 -->
+            <div id="loadingContainer" class="loading-enhanced">
+                <div class="loading-spinner-enhanced"></div>
+                <p>正在加载测试问题...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 增强版MBTI测试应用
+        class MbtiEnhancedTestApp {
+            constructor() {
+                this.apiBaseUrl = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api-v2';
+                this.questions = [];
+                this.currentQuestionIndex = 0;
+                this.answers = [];
+                this.selectedOptionIndex = 0;
+                this.init();
+            }
+
+            init() {
+                this.bindEvents();
+                document.addEventListener('keydown', (e) => this.handleKeydown(e));
+            }
+
+            bindEvents() {
+                document.getElementById('startTestBtn').addEventListener('click', () => this.startTest());
+                document.getElementById('retakeTestBtn').addEventListener('click', () => this.retakeTest());
+                document.getElementById('saveResultBtn').addEventListener('click', () => this.saveResult());
+            }
+
+            async startTest() {
+                try {
+                    this.showLoading();
+                    await this.loadQuestions();
+                    this.hideLoading();
+                    this.showQuestion();
+                } catch (error) {
+                    console.error('开始测试失败:', error);
+                    this.hideLoading();
+                    this.showError('加载测试问题失败，请稍后再试');
+                }
+            }
+
+            async loadQuestions() {
+                const response = await fetch(`${this.apiBaseUrl}/mbti/questions`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    this.questions = data.data;
+                } else {
+                    throw new Error(data.message || '获取问题失败');
+                }
+            }
+
+            showQuestion() {
+                const question = this.questions[this.currentQuestionIndex];
+                if (!question) {
+                    this.showResults();
+                    return;
+                }
+
+                document.getElementById('questionText').textContent = question.text;
+                
+                const optionsContainer = document.getElementById('answerOptions');
+                optionsContainer.innerHTML = '';
+                
+                question.options.forEach((option, index) => {
+                    const button = document.createElement('button');
+                    button.className = 'answer-btn-enhanced';
+                    button.textContent = option.text;
+                    button.addEventListener('click', () => this.selectAnswer(index));
+                    optionsContainer.appendChild(button);
+                });
+
+                this.updateProgress();
+                this.showQuestionContainer();
+            }
+
+            selectAnswer(optionIndex) {
+                this.answers[this.currentQuestionIndex] = optionIndex.toString();
+                this.currentQuestionIndex++;
+                
+                if (this.currentQuestionIndex >= this.questions.length) {
+                    this.showResults();
+                } else {
+                    this.showQuestion();
+                }
+            }
+
+            updateProgress() {
+                const progress = (this.currentQuestionIndex / this.questions.length) * 100;
+                document.getElementById('progressFill').style.width = `${progress}%`;
+                document.getElementById('progressText').textContent = `问题 ${this.currentQuestionIndex + 1} / ${this.questions.length}`;
+            }
+
+            async showResults() {
+                try {
+                    this.showLoading();
+                    
+                    const scores = this.calculateScores();
+                    const type = this.calculateMBTIType(scores);
+                    
+                    // 从数据库获取职业建议
+                    const response = await fetch(`${this.apiBaseUrl}/mbti/career-advice/${type}/recommendations`);
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        this.displayResults(data.data);
+                    } else {
+                        // 如果数据库中没有数据，使用默认建议
+                        this.displayDefaultResults(type, scores);
+                    }
+                    
+                    this.hideLoading();
+                    this.showResult();
+                } catch (error) {
+                    console.error('显示结果失败:', error);
+                    this.hideLoading();
+                    this.displayDefaultResults(this.calculateMBTIType(this.calculateScores()), this.calculateScores());
+                    this.showResult();
+                }
+            }
+
+            displayResults(data) {
+                document.getElementById('mbtiType').textContent = data.mbtiType;
+                document.getElementById('personalityDescription').textContent = data.personalityDescription;
+                
+                // 显示职业建议
+                const careerSuggestions = document.getElementById('careerSuggestions');
+                careerSuggestions.innerHTML = this.generateCareerHTML(data.recommendedCareers);
+                
+                // 显示优势
+                document.getElementById('strengths').innerHTML = data.strengths.map(strength => 
+                    `<span style="color: #4CAF50;">✓</span> ${strength}`
+                ).join('<br>');
+                
+                // 显示发展建议
+                document.getElementById('developmentAdvice').innerHTML = data.developmentAdvice.map(advice => 
+                    `<span style="color: #FFD700;">💡</span> ${advice}`
+                ).join('<br>');
+            }
+
+            displayDefaultResults(type, scores) {
+                document.getElementById('mbtiType').textContent = type;
+                document.getElementById('personalityDescription').textContent = '基于您的MBTI类型，我们为您提供个性化的职业建议';
+                document.getElementById('careerSuggestions').innerHTML = '<p>正在从数据库获取详细职业建议...</p>';
+                document.getElementById('strengths').textContent = '您的MBTI类型具有独特的人格特征和优势';
+                document.getElementById('developmentAdvice').textContent = '每个人都有不同的发展潜力，建议根据个人情况进行职业规划';
+            }
+
+            generateCareerHTML(careers) {
+                if (!careers || careers.length === 0) {
+                    return '<p>暂无职业建议数据</p>';
+                }
+
+                return `
+                    <div class="career-cards">
+                        ${careers.map(career => `
+                            <div class="career-card">
+                                <div class="career-title">${career.position}</div>
+                                <div class="career-category">${career.category}</div>
+                                
+                                <div class="career-suitability">
+                                    <span>适合程度:</span>
+                                    <span class="suitability-stars">
+                                        ${'★'.repeat(career.suitability)}${'☆'.repeat(5-career.suitability)}
+                                    </span>
+                                </div>
+                                
+                                <div class="career-reasons">
+                                    <h5>推荐理由:</h5>
+                                    <ul>
+                                        ${career.reasons.map(reason => `<li>${reason}</li>`).join('')}
+                                    </ul>
+                                </div>
+                                
+                                <div class="career-skills">
+                                    <h5>技能要求:</h5>
+                                    <div class="skill-tags">
+                                        ${career.requiredSkills.map(skill => `<span class="skill-tag">${skill}</span>`).join('')}
+                                    </div>
+                                </div>
+                                
+                                <div class="career-path">
+                                    <h5>发展路径:</h5>
+                                    <div class="path-levels">
+                                        ${career.careerPath.map(level => `
+                                            <div class="path-level">
+                                                <span class="level-name">${level.level}:</span>
+                                                <span class="level-positions">${level.positions.join(', ')}</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                                
+                                <div class="career-companies">
+                                    <h5>典型公司:</h5>
+                                    <div class="company-tags">
+                                        ${career.typicalCompanies.map(company => `<span class="company-tag">${company}</span>`).join('')}
+                                    </div>
+                                </div>
+                                
+                                <div class="salary-range">
+                                    <h5>薪资范围:</h5>
+                                    <div class="salary-info">
+                                        <div class="salary-level">
+                                            <h6>初级</h6>
+                                            <div class="salary-amount">${career.salaryRange.junior.min/1000}-${career.salaryRange.junior.max/1000}K</div>
+                                        </div>
+                                        <div class="salary-level">
+                                            <h6>高级</h6>
+                                            <div class="salary-amount">${career.salaryRange.senior.min/1000}-${career.salaryRange.senior.max/1000}K</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            calculateScores() {
+                const scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+                
+                this.answers.forEach((answer, index) => {
+                    const question = this.questions[index];
+                    if (question && question.options) {
+                        const answerIndex = parseInt(answer);
+                        const selectedOption = question.options[answerIndex];
+                        if (selectedOption && selectedOption.score) {
+                            Object.keys(selectedOption.score).forEach(dimension => {
+                                scores[dimension] += selectedOption.score[dimension];
+                            });
+                        }
+                    }
+                });
+                
+                return scores;
+            }
+
+            calculateMBTIType(scores) {
+                let type = '';
+                type += scores.E > scores.I ? 'E' : 'I';
+                type += scores.S > scores.N ? 'S' : 'N';
+                type += scores.T > scores.F ? 'T' : 'F';
+                type += scores.J > scores.P ? 'J' : 'P';
+                return type;
+            }
+
+            handleKeydown(e) {
+                const options = document.querySelectorAll('.answer-btn-enhanced');
+                switch (e.key) {
+                    case 'ArrowUp':
+                        e.preventDefault();
+                        this.selectedOptionIndex = Math.max(0, this.selectedOptionIndex - 1);
+                        this.updateSelection();
+                        break;
+                    case 'ArrowDown':
+                        e.preventDefault();
+                        this.selectedOptionIndex = Math.min(options.length - 1, this.selectedOptionIndex + 1);
+                        this.updateSelection();
+                        break;
+                    case 'Enter':
+                        e.preventDefault();
+                        if (this.selectedOptionIndex >= 0) {
+                            options[this.selectedOptionIndex].click();
+                        }
+                        break;
+                }
+            }
+
+            updateSelection() {
+                const options = document.querySelectorAll('.answer-btn-enhanced');
+                options.forEach((option, index) => {
+                    if (index === this.selectedOptionIndex) {
+                        option.classList.add('selected');
+                    } else {
+                        option.classList.remove('selected');
+                    }
+                });
+            }
+
+            showQuestionContainer() {
+                document.getElementById('introSection').style.display = 'none';
+                document.getElementById('progressContainer').style.display = 'block';
+                document.getElementById('questionContainer').style.display = 'block';
+                document.getElementById('resultContainer').style.display = 'none';
+            }
+
+            showResult() {
+                document.getElementById('introSection').style.display = 'none';
+                document.getElementById('progressContainer').style.display = 'none';
+                document.getElementById('questionContainer').style.display = 'none';
+                document.getElementById('resultContainer').style.display = 'block';
+            }
+
+            showLoading() {
+                document.getElementById('loadingContainer').style.display = 'block';
+            }
+
+            hideLoading() {
+                document.getElementById('loadingContainer').style.display = 'none';
+            }
+
+            showError(message) {
+                alert(message);
+            }
+
+            retakeTest() {
+                this.currentQuestionIndex = 0;
+                this.answers = [];
+                this.selectedOptionIndex = 0;
+                document.getElementById('introSection').style.display = 'block';
+                document.getElementById('progressContainer').style.display = 'none';
+                document.getElementById('questionContainer').style.display = 'none';
+                document.getElementById('resultContainer').style.display = 'none';
+            }
+
+            saveResult() {
+                const result = {
+                    mbtiType: document.getElementById('mbtiType').textContent,
+                    timestamp: new Date().toISOString(),
+                    answers: this.answers
+                };
+                
+                localStorage.setItem('mbtiTestResult', JSON.stringify(result));
+                alert('结果已保存到本地存储');
+            }
+        }
+
+        // 初始化应用
+        document.addEventListener('DOMContentLoaded', () => {
+            new MbtiEnhancedTestApp();
+        });
+    </script>
+</body>
+</html> 

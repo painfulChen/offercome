@@ -438,11 +438,14 @@
                 this.questions = [];
                 this.currentQuestionIndex = 0;
                 this.answers = [];
+                this.selectedOptionIndex = 0; // 新增：用于跟踪当前选中的选项
                 this.init();
             }
 
             init() {
                 this.bindEvents();
+                // 添加键盘事件监听
+                document.addEventListener('keydown', (e) => this.handleKeydown(e));
             }
 
             bindEvents() {
@@ -453,9 +456,7 @@
 
                 // 答案选择按钮
                 document.querySelectorAll('.answer-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        this.handleAnswer(e);
-                    });
+                    btn.addEventListener('click', (e) => this.handleAnswer(e));
                 });
 
                 // 保存结果按钮
@@ -482,6 +483,7 @@
                         this.questions = data.data; // 直接使用data.data，不需要flattenQuestions
                         this.currentQuestionIndex = 0;
                         this.answers = [];
+                        this.selectedOptionIndex = 0; // 重置选中状态
                         
                         this.hideLoading();
                         this.showTest();
@@ -525,7 +527,7 @@
                 }
 
                 const question = this.questions[this.currentQuestionIndex];
-                document.getElementById('questionText').textContent = question.question;
+                document.getElementById('questionText').textContent = question.text;
                 document.getElementById('progressText').textContent = 
                     `问题 ${this.currentQuestionIndex + 1} / ${this.questions.length}`;
                 
@@ -536,10 +538,10 @@
                 const optionsContainer = document.querySelector('.answer-options');
                 optionsContainer.innerHTML = '';
                 
-                question.options.forEach(option => {
+                question.options.forEach((option, index) => {
                     const btn = document.createElement('button');
                     btn.className = 'answer-btn';
-                    btn.setAttribute('data-value', option.id);
+                    btn.setAttribute('data-value', index.toString());
                     btn.innerHTML = `
                         <span class="option-text">${option.text}</span>
                         <i class="fas fa-chevron-right"></i>
@@ -547,20 +549,28 @@
                     btn.addEventListener('click', (e) => this.handleAnswer(e));
                     optionsContainer.appendChild(btn);
                 });
+
+                // 默认选中第一个选项
+                const firstOption = optionsContainer.querySelector('.answer-btn');
+                if (firstOption) {
+                    firstOption.classList.add('selected');
+                    this.selectedOptionIndex = 0;
+                }
             }
 
             handleAnswer(e) {
-                const value = e.target.closest('.answer-btn').getAttribute('data-value');
+                const btn = e.target.closest('.answer-btn');
+                const optionIndex = Array.from(btn.parentNode.children).indexOf(btn);
                 const question = this.questions[this.currentQuestionIndex];
                 
                 // 添加选中效果
                 document.querySelectorAll('.answer-btn').forEach(btn => {
                     btn.classList.remove('selected');
                 });
-                e.target.closest('.answer-btn').classList.add('selected');
+                btn.classList.add('selected');
                 
-                // 保存答案
-                this.answers.push(value);
+                // 保存答案（选项索引）
+                this.answers.push(optionIndex.toString());
                 
                 // 延迟跳转到下一题
                 setTimeout(() => {
@@ -569,16 +579,61 @@
                 }, 500);
             }
 
+            // 键盘事件处理
+            handleKeydown(e) {
+                if (this.currentQuestionIndex >= this.questions.length) return;
+                
+                const options = document.querySelectorAll('.answer-btn');
+                if (options.length === 0) return;
+                
+                switch (e.key) {
+                    case 'ArrowUp':
+                        e.preventDefault();
+                        this.selectedOptionIndex = Math.max(0, this.selectedOptionIndex - 1);
+                        this.updateSelection();
+                        break;
+                    case 'ArrowDown':
+                        e.preventDefault();
+                        this.selectedOptionIndex = Math.min(options.length - 1, this.selectedOptionIndex + 1);
+                        this.updateSelection();
+                        break;
+                    case 'Enter':
+                        e.preventDefault();
+                        if (this.selectedOptionIndex >= 0) {
+                            options[this.selectedOptionIndex].click();
+                        }
+                        break;
+                }
+            }
+
+            updateSelection() {
+                const options = document.querySelectorAll('.answer-btn');
+                options.forEach((option, index) => {
+                    if (index === this.selectedOptionIndex) {
+                        option.classList.add('selected');
+                    } else {
+                        option.classList.remove('selected');
+                    }
+                });
+            }
+
             async showResults() {
                 try {
                     this.showLoading();
                     
-                    const response = await fetch(`${this.apiBaseUrl}/mbti/submit`, {
+                    // 根据答案计算MBTI类型和分数
+                    const scores = this.calculateScores();
+                    const type = this.calculateMBTIType(scores);
+                    
+                    const response = await fetch(`${this.apiBaseUrl}/mbti/calculate`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({ answers: this.answers })
+                        body: JSON.stringify({ 
+                            type: type,
+                            scores: scores
+                        })
                     });
                     
                     const data = await response.json();
@@ -595,13 +650,54 @@
                         this.hideLoading();
                         this.showResult();
                     } else {
-                        throw new Error(data.error || '生成结果失败');
+                        throw new Error(data.message || '生成结果失败');
                     }
                 } catch (error) {
                     console.error('显示结果失败:', error);
                     this.hideLoading();
                     this.showError('生成结果失败，请稍后再试');
                 }
+            }
+
+            // 计算各维度分数
+            calculateScores() {
+                const scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+                
+                this.answers.forEach((answer, index) => {
+                    const question = this.questions[index];
+                    if (question && question.options) {
+                        // 根据答案的索引找到对应的选项
+                        const answerIndex = parseInt(answer);
+                        const selectedOption = question.options[answerIndex];
+                        if (selectedOption && selectedOption.score) {
+                            // 累加各维度分数
+                            Object.keys(selectedOption.score).forEach(dimension => {
+                                scores[dimension] += selectedOption.score[dimension];
+                            });
+                        }
+                    }
+                });
+                
+                return scores;
+            }
+
+            // 计算MBTI类型
+            calculateMBTIType(scores) {
+                let type = '';
+                
+                // E/I
+                type += scores.E > scores.I ? 'E' : 'I';
+                
+                // S/N
+                type += scores.S > scores.N ? 'S' : 'N';
+                
+                // T/F
+                type += scores.T > scores.F ? 'T' : 'F';
+                
+                // J/P
+                type += scores.J > scores.P ? 'J' : 'P';
+                
+                return type;
             }
 
             showResult() {

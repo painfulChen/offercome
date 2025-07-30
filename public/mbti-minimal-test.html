@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI最小化测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: white; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .test-btn { padding: 10px 20px; margin: 10px; background: #FFD700; color: black; border: none; border-radius: 5px; cursor: pointer; }
+        .result { margin: 10px 0; padding: 15px; background: #333; border-radius: 5px; }
+        .success { border-left: 4px solid #4CAF50; }
+        .error { border-left: 4px solid #f44336; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MBTI最小化测试</h1>
+        
+        <button class="test-btn" onclick="testAPI()">测试API</button>
+        <button class="test-btn" onclick="testFullFlow()">测试完整流程</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const apiBaseUrl = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api-v2';
+        
+        function addResult(message, isSuccess = true) {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result ${isSuccess ? 'success' : 'error'}`;
+            resultDiv.innerHTML = `<strong>${isSuccess ? '✅' : '❌'}</strong> ${message}`;
+            resultsDiv.appendChild(resultDiv);
+        }
+        
+        async function testAPI() {
+            try {
+                addResult('开始测试API...');
+                
+                const testData = {
+                    type: 'ENTJ',
+                    scores: { E: 12, I: 8, S: 6, N: 14, T: 15, F: 5, J: 13, P: 7 }
+                };
+                
+                addResult(`发送数据: ${JSON.stringify(testData)}`);
+                
+                const response = await fetch(`${apiBaseUrl}/mbti/calculate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testData)
+                });
+                
+                addResult(`响应状态: ${response.status}`);
+                
+                const data = await response.json();
+                addResult(`响应数据: ${JSON.stringify(data).substring(0, 200)}...`);
+                
+                if (data.success) {
+                    addResult(`API测试成功: ${data.data.type} - ${data.data.title}`);
+                } else {
+                    addResult(`API测试失败: ${data.message}`, false);
+                }
+            } catch (error) {
+                addResult(`API测试错误: ${error.message}`, false);
+            }
+        }
+        
+        async function testFullFlow() {
+            try {
+                addResult('开始测试完整流程...');
+                
+                // 1. 获取问题
+                const questionsResponse = await fetch(`${apiBaseUrl}/mbti/questions`);
+                const questionsData = await questionsResponse.json();
+                
+                if (!questionsData.success) {
+                    addResult('获取问题失败', false);
+                    return;
+                }
+                
+                addResult(`成功获取 ${questionsData.data.length} 个问题`);
+                
+                // 2. 模拟答案（全部选择第一个选项）
+                const answers = Array(20).fill(0);
+                
+                // 3. 计算分数
+                const scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+                
+                answers.forEach((answerIndex, questionIndex) => {
+                    const question = questionsData.data[questionIndex];
+                    const selectedOption = question.options[answerIndex];
+                    if (selectedOption && selectedOption.score) {
+                        Object.keys(selectedOption.score).forEach(dimension => {
+                            scores[dimension] += selectedOption.score[dimension];
+                        });
+                    }
+                });
+                
+                addResult(`计算得分: ${JSON.stringify(scores)}`);
+                
+                // 4. 计算类型
+                let type = '';
+                type += scores.E > scores.I ? 'E' : 'I';
+                type += scores.S > scores.N ? 'S' : 'N';
+                type += scores.T > scores.F ? 'T' : 'F';
+                type += scores.J > scores.P ? 'J' : 'P';
+                
+                addResult(`计算类型: ${type}`);
+                
+                // 5. 调用计算API
+                const calculateResponse = await fetch(`${apiBaseUrl}/mbti/calculate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type, scores })
+                });
+                
+                const calculateData = await calculateResponse.json();
+                
+                if (calculateData.success) {
+                    addResult(`完整流程测试成功: ${calculateData.data.type} - ${calculateData.data.title}`);
+                } else {
+                    addResult(`完整流程测试失败: ${calculateData.message}`, false);
+                }
+            } catch (error) {
+                addResult(`完整流程测试错误: ${error.message}`, false);
+            }
+        }
+    </script>
+</body>
+</html> 

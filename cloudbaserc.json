@@ -21,5 +21,18 @@
         "name": "offercome-api-v2",
         "path": "api-v2",
         "target": "api"
+    },
+    "framework": {
+        "name": "project",
+        "plugins": {
+            "website": {
+                "use": "@cloudbase/framework-plugin-website",
+                "inputs": {
+                    "buildCommand": "echo 'No build needed'",
+                    "outputPath": "public",
+                    "cloudPath": "/"
+                }
+            }
+        }
     }
 }

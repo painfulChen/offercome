@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI快速测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: white; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .test-btn { padding: 10px 20px; margin: 10px; background: #FFD700; color: black; border: none; border-radius: 5px; cursor: pointer; }
+        .result { margin: 10px 0; padding: 15px; background: #333; border-radius: 5px; }
+        .success { border-left: 4px solid #4CAF50; }
+        .error { border-left: 4px solid #f44336; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MBTI API 快速测试</h1>
+        
+        <button class="test-btn" onclick="testQuestions()">测试问题获取</button>
+        <button class="test-btn" onclick="testCalculate()">测试MBTI计算</button>
+        <button class="test-btn" onclick="testFullFlow()">测试完整流程</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const apiBaseUrl = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com';
+        
+        function addResult(message, isSuccess = true) {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result ${isSuccess ? 'success' : 'error'}`;
+            resultDiv.innerHTML = `<strong>${isSuccess ? '✅' : '❌'}</strong> ${message}`;
+            resultsDiv.appendChild(resultDiv);
+        }
+        
+        async function testQuestions() {
+            try {
+                const response = await fetch(`${apiBaseUrl}/mbti/questions`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    addResult(`问题获取成功: 共${data.data.length}个问题`);
+                } else {
+                    addResult(`问题获取失败: ${data.message}`, false);
+                }
+            } catch (error) {
+                addResult(`请求失败: ${error.message}`, false);
+            }
+        }
+        
+        async function testCalculate() {
+            try {
+                const testData = {
+                    type: 'ENTJ',
+                    scores: { E: 12, I: 8, S: 6, N: 14, T: 15, F: 5, J: 13, P: 7 }
+                };
+                
+                const response = await fetch(`${apiBaseUrl}/mbti/calculate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    addResult(`MBTI计算成功: ${data.data.type} - ${data.data.title}`);
+                } else {
+                    addResult(`MBTI计算失败: ${data.message}`, false);
+                }
+            } catch (error) {
+                addResult(`请求失败: ${error.message}`, false);
+            }
+        }
+        
+        async function testFullFlow() {
+            try {
+                // 1. 获取问题
+                const questionsResponse = await fetch(`${apiBaseUrl}/mbti/questions`);
+                const questionsData = await questionsResponse.json();
+                
+                if (!questionsData.success) {
+                    addResult('完整流程测试失败: 无法获取问题', false);
+                    return;
+                }
+                
+                // 2. 模拟答案
+                const answers = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; // 全部选择第一个选项
+                
+                // 3. 计算分数
+                const scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+                
+                answers.forEach((answerIndex, questionIndex) => {
+                    const question = questionsData.data[questionIndex];
+                    const selectedOption = question.options[answerIndex];
+                    if (selectedOption && selectedOption.score) {
+                        Object.keys(selectedOption.score).forEach(dimension => {
+                            scores[dimension] += selectedOption.score[dimension];
+                        });
+                    }
+                });
+                
+                // 4. 计算类型
+                let type = '';
+                type += scores.E > scores.I ? 'E' : 'I';
+                type += scores.S > scores.N ? 'S' : 'N';
+                type += scores.T > scores.F ? 'T' : 'F';
+                type += scores.J > scores.P ? 'J' : 'P';
+                
+                // 5. 调用计算API
+                const calculateResponse = await fetch(`${apiBaseUrl}/mbti/calculate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type, scores })
+                });
+                
+                const calculateData = await calculateResponse.json();
+                
+                if (calculateData.success) {
+                    addResult(`完整流程测试成功: ${calculateData.data.type} - ${calculateData.data.title}`);
+                } else {
+                    addResult(`完整流程测试失败: ${calculateData.message}`, false);
+                }
+            } catch (error) {
+                addResult(`完整流程测试失败: ${error.message}`, false);
+            }
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI职业性格测试 (20题版) - OfferCome</title>
+    <meta name="description" content="专业的MBTI职业性格测试，了解你的职业倾向和性格特点">
+    
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --primary-light: #4DA3FF;
+            --success-color: #34C759;
+            --warning-color: #FF9500;
+            --error-color: #FF3B30;
+            --background-primary: #F2F2F7;
+            --background-card: #FFFFFF;
+            --text-primary: #000000;
+            --text-secondary: #8E8E93;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+            --transition-fast: 0.15s ease;
+            --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --border-radius: 12px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .test-card {
+            background: var(--background-card);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            padding: 40px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            animation: slideInUp 0.6s ease-out;
+        }
+        
+        .test-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+        }
+        
+        .test-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .test-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .test-subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        /* 倒计时样式 */
+        .timer-container {
+            background: linear-gradient(135deg, var(--warning-color), #FF6B35);
+            color: white;
+            padding: 15px 25px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .timer-label {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .timer-display {
+            font-size: 24px;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .timer-warning {
+            background: linear-gradient(135deg, var(--error-color), #FF6B6B);
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: #E5E5EA;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+            border-radius: 4px;
+            transition: width var(--transition-normal);
+            position: relative;
+        }
+        
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .question-container {
+            margin-bottom: 30px;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .question-text {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+        
+        .options-container {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .option-card {
+            background: #F8F9FA;
+            border: 2px solid transparent;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .option-card:hover {
+            background: #E9ECEF;
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .option-card.selected {
+            background: rgba(0, 122, 255, 0.1);
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .option-card.selected::before {
+            content: '✓';
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .option-text {
+            font-size: 16px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .button-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        /* 结果展示 */
+        .result-container {
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        .result-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+        
+        .result-type {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .result-description {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        
+        .result-details {
+            background: #F8F9FA;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #E5E5EA;
+        }
+        
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .detail-value {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .career-recommendations {
+            background: #F8F9FA;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        
+        .career-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .career-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .career-reason {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .dimension-analysis {
+            background: #F8F9FA;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        
+        .dimension-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: var(--border-radius);
+        }
+        
+        .dimension-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+        
+        .dimension-description {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* 动画定义 */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        /* 响应式优化 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .test-card {
+                padding: 25px;
+            }
+            
+            .test-title {
+                font-size: 24px;
+            }
+            
+            .question-text {
+                font-size: 18px;
+            }
+            
+            .button-container {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .timer-container {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+        }
+        
+        /* 性能优化 */
+        .optimized-render {
+            will-change: transform;
+        }
+        
+        /* 交互反馈 */
+        .option-card:active {
+            transform: scale(0.98);
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        /* 错误状态 */
+        .error-message {
+            background: rgba(255, 59, 48, 0.1);
+            color: var(--error-color);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            border-left: 4px solid var(--error-color);
+        }
+        
+        /* 成功状态 */
+        .success-message {
+            background: rgba(52, 199, 89, 0.1);
+            color: var(--success-color);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            border-left: 4px solid var(--success-color);
+        }
+        
+        /* 时间警告 */
+        .time-warning {
+            background: rgba(255, 149, 0, 0.1);
+            color: var(--warning-color);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            border-left: 4px solid var(--warning-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="test-card" id="testCard">
+            <!-- 测试头部 -->
+            <div class="test-header">
+                <h1 class="test-title">
+                    <i class="fas fa-brain"></i>
+                    MBTI职业性格测试
+                </h1>
+                <p class="test-subtitle">了解你的职业倾向和性格特点，找到最适合的职业方向</p>
+                
+                <!-- 倒计时 -->
+                <div class="timer-container" id="timerContainer">
+                    <div class="timer-label">
+                        <i class="fas fa-clock"></i>
+                        剩余时间
+                    </div>
+                    <div class="timer-display" id="timerDisplay">10:00</div>
+                </div>
+                
+                <!-- 进度条 -->
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <!-- 问题容器 -->
+            <div class="question-container" id="questionContainer">
+                <div class="question-text" id="questionText">
+                    正在加载问题...
+                </div>
+                <div class="options-container" id="optionsContainer">
+                    <!-- 选项将通过JavaScript动态生成 -->
+                </div>
+            </div>
+            
+            <!-- 按钮容器 -->
+            <div class="button-container">
+                <button class="btn btn-secondary" id="prevBtn" disabled>
+                    <i class="fas fa-arrow-left"></i>
+                    上一题
+                </button>
+                <button class="btn btn-primary" id="nextBtn">
+                    下一题
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+            
+            <!-- 加载状态 -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>正在分析你的答案...</p>
+            </div>
+            
+            <!-- 错误消息 -->
+            <div class="error-message" id="errorMessage" style="display: none;"></div>
+            
+            <!-- 时间警告 -->
+            <div class="time-warning" id="timeWarning" style="display: none;">
+                <i class="fas fa-exclamation-triangle"></i>
+                时间不多了！请尽快完成测试。
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 立即执行函数，避免全局变量污染
+        (function() {
+            'use strict';
+            
+            // 状态管理
+            let currentQuestionIndex = 0;
+            let answers = [];
+            let scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+            let timeRemaining = 600; // 10分钟 = 600秒
+            let timerInterval;
+            
+            // DOM元素缓存
+            const elements = {
+                questionText: document.getElementById('questionText'),
+                optionsContainer: document.getElementById('optionsContainer'),
+                progressBar: document.getElementById('progressBar'),
+                prevBtn: document.getElementById('prevBtn'),
+                nextBtn: document.getElementById('nextBtn'),
+                loading: document.getElementById('loading'),
+                errorMessage: document.getElementById('errorMessage'),
+                testCard: document.getElementById('testCard'),
+                timerDisplay: document.getElementById('timerDisplay'),
+                timerContainer: document.getElementById('timerContainer'),
+                timeWarning: document.getElementById('timeWarning')
+            };
+            
+            // 初始化
+            function init() {
+                showQuestion(currentQuestionIndex);
+                updateProgress();
+                bindEvents();
+                startTimer();
+            }
+            
+            // 开始倒计时
+            function startTimer() {
+                timerInterval = setInterval(() => {
+                    timeRemaining--;
+                    updateTimerDisplay();
+                    
+                    if (timeRemaining <= 0) {
+                        clearInterval(timerInterval);
+                        timeUp();
+                    } else if (timeRemaining <= 60) { // 最后1分钟显示警告
+                        showTimeWarning();
+                    }
+                }, 1000);
+            }
+            
+            // 更新倒计时显示
+            function updateTimerDisplay() {
+                const minutes = Math.floor(timeRemaining / 60);
+                const seconds = timeRemaining % 60;
+                elements.timerDisplay.textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                // 根据剩余时间改变颜色
+                if (timeRemaining <= 60) {
+                    elements.timerContainer.classList.add('timer-warning');
+                } else if (timeRemaining <= 300) { // 5分钟
+                    elements.timerContainer.style.background = 'linear-gradient(135deg, var(--warning-color), #FF6B35)';
+                }
+            }
+            
+            // 显示时间警告
+            function showTimeWarning() {
+                elements.timeWarning.style.display = 'block';
+            }
+            
+            // 时间到
+            function timeUp() {
+                clearInterval(timerInterval);
+                alert('时间到！测试将重新开始。');
+                location.reload();
+            }
+            
+            // 显示问题
+            function showQuestion(index) {
+                const question = questions[index];
+                if (!question) return;
+                
+                // 更新问题文本
+                elements.questionText.textContent = `${question.id}. ${question.text}`;
+                
+                // 清空选项容器
+                elements.optionsContainer.innerHTML = '';
+                
+                // 生成选项
+                question.options.forEach((option, optionIndex) => {
+                    const optionCard = document.createElement('div');
+                    optionCard.className = 'option-card';
+                    optionCard.innerHTML = `
+                        <div class="option-text">${option.text}</div>
+                    `;
+                    
+                    // 检查是否已选择
+                    if (answers[index] === optionIndex) {
+                        optionCard.classList.add('selected');
+                    }
+                    
+                    // 绑定点击事件
+                    optionCard.addEventListener('click', () => selectOption(index, optionIndex));
+                    
+                    elements.optionsContainer.appendChild(optionCard);
+                });
+                
+                // 更新按钮状态
+                updateButtonStates();
+            }
+            
+            // 选择选项
+            function selectOption(questionIndex, optionIndex) {
+                // 移除之前的选择
+                const optionCards = elements.optionsContainer.querySelectorAll('.option-card');
+                optionCards.forEach(card => card.classList.remove('selected'));
+                
+                // 添加新的选择
+                optionCards[optionIndex].classList.add('selected');
+                
+                // 保存答案
+                answers[questionIndex] = optionIndex;
+                
+                // 更新按钮状态
+                updateButtonStates();
+            }
+            
+            // 更新按钮状态
+            function updateButtonStates() {
+                elements.prevBtn.disabled = currentQuestionIndex === 0;
+                elements.nextBtn.disabled = answers[currentQuestionIndex] === undefined;
+            }
+            
+            // 更新进度
+            function updateProgress() {
+                const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+                elements.progressBar.style.width = `${progress}%`;
+            }
+            
+            // 上一题
+            function prevQuestion() {
+                if (currentQuestionIndex > 0) {
+                    currentQuestionIndex--;
+                    showQuestion(currentQuestionIndex);
+                    updateProgress();
+                }
+            }
+            
+            // 下一题
+            function nextQuestion() {
+                if (currentQuestionIndex < questions.length - 1) {
+                    currentQuestionIndex++;
+                    showQuestion(currentQuestionIndex);
+                    updateProgress();
+                } else {
+                    submitTest();
+                }
+            }
+            
+            // 提交测试
+            async function submitTest() {
+                // 检查是否所有问题都已回答
+                if (answers.length < questions.length) {
+                    showError('请回答所有问题后再提交');
+                    return;
+                }
+                
+                // 停止倒计时
+                clearInterval(timerInterval);
+                
+                // 显示加载状态
+                elements.loading.classList.add('show');
+                elements.questionContainer.style.display = 'none';
+                elements.prevBtn.style.display = 'none';
+                elements.nextBtn.style.display = 'none';
+                elements.timerContainer.style.display = 'none';
+                
+                try {
+                    // 计算分数
+                    calculateScores();
+                    
+                    // 确定MBTI类型
+                    const mbtiType = determineMBTIType();
+                    
+                    // 调用API获取详细结果
+                    const result = await getMBTIResult(mbtiType);
+                    
+                    // 显示结果
+                    showResult(result);
+                    
+                } catch (error) {
+                    console.error('提交测试失败:', error);
+                    showError('提交失败，请重试');
+                    hideLoading();
+                }
+            }
+            
+            // 计算分数
+            function calculateScores() {
+                scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+                
+                answers.forEach((answer, questionIndex) => {
+                    const question = questions[questionIndex];
+                    const selectedOption = question.options[answer];
+                    
+                    Object.keys(selectedOption.score).forEach(key => {
+                        scores[key] += selectedOption.score[key];
+                    });
+                });
+            }
+            
+            // 确定MBTI类型
+            function determineMBTIType() {
+                const type = [
+                    scores.E > scores.I ? 'E' : 'I',
+                    scores.S > scores.N ? 'S' : 'N',
+                    scores.T > scores.F ? 'T' : 'F',
+                    scores.J > scores.P ? 'J' : 'P'
+                ].join('');
+                
+                return type;
+            }
+            
+            // 获取MBTI结果
+            async function getMBTIResult(type) {
+                const response = await fetch('/api-v2/mbti/calculate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        type: type,
+                        scores: scores
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                return await response.json();
+            }
+            
+            // 显示结果
+            function showResult(result) {
+                const data = result.data;
+                
+                elements.testCard.innerHTML = `
+                    <div class="result-container">
+                        <h2 class="result-title">测试完成！</h2>
+                        <div class="result-type">${data.type}</div>
+                        <p class="result-description">${data.description}</p>
+                        
+                        <!-- 维度分析 -->
+                        <div class="dimension-analysis">
+                            <h3 style="margin-bottom: 20px; color: var(--text-primary);">维度分析</h3>
+                            ${Object.entries(data.dimensionAnalysis).map(([key, analysis]) => `
+                                <div class="dimension-item">
+                                    <div class="dimension-name">${analysis.dimension}</div>
+                                    <div class="dimension-description">${analysis.description}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        <!-- 职业推荐 -->
+                        <div class="career-recommendations">
+                            <h3 style="margin-bottom: 20px; color: var(--text-primary);">职业推荐</h3>
+                            ${data.recommendations.careerFocus.map(career => `
+                                <div class="career-item">
+                                    <div class="career-title">${career.title}</div>
+                                    <div class="career-reason">${career.reason}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        <!-- 工作风格 -->
+                        <div class="result-details">
+                            <h3 style="margin-bottom: 15px; color: var(--text-primary);">工作风格</h3>
+                            <p style="color: var(--text-secondary); margin-bottom: 15px;">${data.workStyle}</p>
+                            <h3 style="margin-bottom: 15px; color: var(--text-primary);">团队角色</h3>
+                            <p style="color: var(--text-secondary); margin-bottom: 15px;">${data.teamRole}</p>
+                            <h3 style="margin-bottom: 15px; color: var(--text-primary);">工作环境建议</h3>
+                            <p style="color: var(--text-secondary); margin-bottom: 15px;">${data.recommendations.workEnvironment}</p>
+                            <h3 style="margin-bottom: 15px; color: var(--text-primary);">团队合作建议</h3>
+                            <p style="color: var(--text-secondary);">${data.recommendations.teamCollaboration}</p>
+                        </div>
+                        
+                        <!-- 发展建议 -->
+                        ${data.recommendations.developmentAreas.length > 0 ? `
+                            <div class="career-recommendations">
+                                <h3 style="margin-bottom: 20px; color: var(--text-primary);">发展建议</h3>
+                                ${data.recommendations.developmentAreas.map(area => `
+                                    <div class="career-item">
+                                        <div class="career-reason">${area}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                        
+                        <div class="button-container">
+                            <button class="btn btn-secondary" onclick="location.reload()">
+                                <i class="fas fa-redo"></i>
+                                重新测试
+                            </button>
+                            <a href="index-optimized.html" class="btn btn-primary">
+                                <i class="fas fa-home"></i>
+                                返回首页
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // 显示错误
+            function showError(message) {
+                elements.errorMessage.textContent = message;
+                elements.errorMessage.style.display = 'block';
+                
+                setTimeout(() => {
+                    elements.errorMessage.style.display = 'none';
+                }, 5000);
+            }
+            
+            // 隐藏加载状态
+            function hideLoading() {
+                elements.loading.classList.remove('show');
+                elements.questionContainer.style.display = 'block';
+                elements.prevBtn.style.display = 'inline-flex';
+                elements.nextBtn.style.display = 'inline-flex';
+                elements.timerContainer.style.display = 'flex';
+            }
+            
+            // 绑定事件
+            function bindEvents() {
+                elements.prevBtn.addEventListener('click', prevQuestion);
+                elements.nextBtn.addEventListener('click', nextQuestion);
+                
+                // 键盘导航
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowLeft' && !elements.prevBtn.disabled) {
+                        prevQuestion();
+                    } else if (e.key === 'ArrowRight' && !elements.nextBtn.disabled) {
+                        nextQuestion();
+                    }
+                });
+            }
+            
+            // 启动应用
+            init();
+            
+        })();
+    </script>
+</body>
+</html> 

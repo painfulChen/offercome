@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI测试调试版</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: white; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .debug-panel { background: #333; padding: 20px; margin: 20px 0; border-radius: 10px; }
+        .debug-panel h3 { color: #FFD700; }
+        .debug-content { background: #000; padding: 10px; border-radius: 5px; font-family: monospace; font-size: 12px; max-height: 300px; overflow-y: auto; }
+        .test-btn { padding: 10px 20px; margin: 10px; background: #FFD700; color: black; border: none; border-radius: 5px; cursor: pointer; }
+        .question { margin: 20px 0; padding: 20px; background: #333; border-radius: 10px; }
+        .option { margin: 10px 0; padding: 10px; background: #444; border-radius: 5px; cursor: pointer; }
+        .option:hover { background: #555; }
+        .selected { background: #FFD700 !important; color: black; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MBTI测试调试版</h1>
+        
+        <div class="debug-panel">
+            <h3>调试信息</h3>
+            <div id="debugContent" class="debug-content"></div>
+        </div>
+        
+        <div id="testSection">
+            <div class="question">
+                <h3 id="questionText">点击开始测试</h3>
+                <div id="options"></div>
+            </div>
+            <button class="test-btn" onclick="startTest()">开始测试</button>
+            <button class="test-btn" onclick="testCalculate()">测试计算</button>
+        </div>
+        
+        <div id="resultSection" style="display: none;">
+            <h2>测试结果</h2>
+            <div id="resultText"></div>
+        </div>
+    </div>
+
+    <script>
+        const apiBaseUrl = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com';
+        let questions = [];
+        let currentQuestion = 0;
+        let answers = [];
+        let selectedOption = null;
+
+        function log(message) {
+            console.log(message);
+            const debugContent = document.getElementById('debugContent');
+            debugContent.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${message}</div>`;
+            debugContent.scrollTop = debugContent.scrollHeight;
+        }
+
+        async function startTest() {
+            try {
+                log('开始加载问题...');
+                
+                const response = await fetch(`${apiBaseUrl}/mbti/questions`);
+                const data = await response.json();
+                
+                log(`API响应状态: ${response.status}`);
+                log(`API响应数据: ${JSON.stringify(data).substring(0, 200)}...`);
+                
+                if (data.success) {
+                    questions = data.data;
+                    currentQuestion = 0;
+                    answers = [];
+                    selectedOption = null;
+                    
+                    log(`成功加载 ${questions.length} 个问题`);
+                    showQuestion();
+                } else {
+                    throw new Error(data.message || '获取问题失败');
+                }
+            } catch (error) {
+                log(`错误: ${error.message}`);
+            }
+        }
+
+        function showQuestion() {
+            if (currentQuestion >= questions.length) {
+                showResults();
+                return;
+            }
+
+            const question = questions[currentQuestion];
+            document.getElementById('questionText').textContent = question.text;
+            
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.textContent = option.text;
+                optionDiv.onclick = () => selectOption(index);
+                optionsDiv.appendChild(optionDiv);
+            });
+            
+            log(`显示问题 ${currentQuestion + 1}: ${question.text.substring(0, 50)}...`);
+        }
+
+        function selectOption(index) {
+            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            event.target.classList.add('selected');
+            selectedOption = index;
+            
+            log(`选择选项 ${index}: ${questions[currentQuestion].options[index].text.substring(0, 30)}...`);
+            
+            // 自动进入下一题
+            setTimeout(() => {
+                nextQuestion();
+            }, 500);
+        }
+
+        function nextQuestion() {
+            if (selectedOption !== null) {
+                answers.push(selectedOption);
+                log(`保存答案: 问题${currentQuestion + 1} -> 选项${selectedOption}`);
+                selectedOption = null;
+                currentQuestion++;
+                showQuestion();
+            }
+        }
+
+        async function showResults() {
+            log('开始计算结果...');
+            
+            try {
+                const scores = calculateScores();
+                const type = calculateMBTIType(scores);
+                
+                log(`计算得分: ${JSON.stringify(scores)}`);
+                log(`MBTI类型: ${type}`);
+                
+                const requestData = { type, scores };
+                log(`发送数据: ${JSON.stringify(requestData)}`);
+                
+                const response = await fetch(`${apiBaseUrl}/mbti/calculate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestData)
+                });
+                
+                log(`响应状态: ${response.status}`);
+                log(`响应头: ${JSON.stringify(Object.fromEntries(response.headers.entries()))}`);
+                
+                const data = await response.json();
+                log(`响应数据: ${JSON.stringify(data).substring(0, 300)}...`);
+                
+                if (data.success) {
+                    const result = data.data;
+                    document.getElementById('resultText').innerHTML = `
+                        <h3>您的MBTI类型: ${result.type}</h3>
+                        <p><strong>描述:</strong> ${result.description}</p>
+                        <p><strong>工作风格:</strong> ${result.workStyle}</p>
+                        <p><strong>团队角色:</strong> ${result.teamRole}</p>
+                    `;
+                    
+                    log('结果计算成功');
+                } else {
+                    throw new Error(data.message || '计算失败');
+                }
+            } catch (error) {
+                log(`计算错误: ${error.message}`);
+                document.getElementById('resultText').innerHTML = `<p style="color: red;">计算失败: ${error.message}</p>`;
+            }
+            
+            document.getElementById('testSection').style.display = 'none';
+            document.getElementById('resultSection').style.display = 'block';
+        }
+
+        function calculateScores() {
+            const scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+            
+            answers.forEach((answerIndex, questionIndex) => {
+                const question = questions[questionIndex];
+                const selectedOption = question.options[answerIndex];
+                if (selectedOption && selectedOption.score) {
+                    Object.keys(selectedOption.score).forEach(dimension => {
+                        scores[dimension] += selectedOption.score[dimension];
+                    });
+                }
+            });
+            
+            return scores;
+        }
+
+        function calculateMBTIType(scores) {
+            let type = '';
+            type += scores.E > scores.I ? 'E' : 'I';
+            type += scores.S > scores.N ? 'S' : 'N';
+            type += scores.T > scores.F ? 'T' : 'F';
+            type += scores.J > scores.P ? 'J' : 'P';
+            return type;
+        }
+
+        async function testCalculate() {
+            try {
+                log('测试MBTI计算API...');
+                
+                const testData = {
+                    type: 'ENTJ',
+                    scores: { E: 12, I: 8, S: 6, N: 14, T: 15, F: 5, J: 13, P: 7 }
+                };
+                
+                log(`发送测试数据: ${JSON.stringify(testData)}`);
+                
+                const response = await fetch(`${apiBaseUrl}/mbti/calculate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testData)
+                });
+                
+                log(`测试响应状态: ${response.status}`);
+                
+                const data = await response.json();
+                log(`测试响应数据: ${JSON.stringify(data).substring(0, 200)}...`);
+                
+                if (data.success) {
+                    log(`测试成功: ${data.data.type} - ${data.data.title}`);
+                } else {
+                    log(`测试失败: ${data.message}`);
+                }
+            } catch (error) {
+                log(`测试错误: ${error.message}`);
+            }
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI快速测试</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #1a1a1a; 
+            color: white; 
+        }
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+        }
+        .test-btn { 
+            padding: 10px 20px; 
+            margin: 10px; 
+            background: #FFD700; 
+            color: black; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+        }
+        .result { 
+            margin: 10px 0; 
+            padding: 15px; 
+            background: #333; 
+            border-radius: 5px; 
+        }
+        .success { border-left: 4px solid #4CAF50; }
+        .error { border-left: 4px solid #f44336; }
+        .question { 
+            margin: 10px 0; 
+            padding: 15px; 
+            background: #333; 
+            border-radius: 5px; 
+        }
+        .option { 
+            margin: 5px 0; 
+            padding: 10px; 
+            background: #444; 
+            border-radius: 3px; 
+            cursor: pointer; 
+        }
+        .option:hover { background: #555; }
+        .selected { background: #FFD700 !important; color: black; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MBTI快速测试</h1>
+        
+        <button class="test-btn" onclick="testAPI()">测试API连接</button>
+        <button class="test-btn" onclick="startQuickTest()">开始快速测试</button>
+        
+        <div id="results"></div>
+        <div id="testArea" style="display: none;">
+            <div id="questionDisplay"></div>
+            <div id="optionsDisplay"></div>
+            <button class="test-btn" onclick="nextQuestion()">下一题</button>
+        </div>
+    </div>
+
+    <script>
+        const apiBaseUrl = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api-v2';
+        let questions = [];
+        let currentQuestion = 0;
+        let answers = [];
+        
+        function addResult(message, isSuccess = true) {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result ${isSuccess ? 'success' : 'error'}`;
+            resultDiv.innerHTML = `<strong>${isSuccess ? '✅' : '❌'}</strong> ${message}`;
+            resultsDiv.appendChild(resultDiv);
+        }
+        
+        async function testAPI() {
+            try {
+                addResult('开始测试API...');
+                
+                const response = await fetch(`${apiBaseUrl}/mbti/questions`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    addResult(`API测试成功: 获取到 ${data.data.length} 个问题`);
+                } else {
+                    addResult(`API测试失败: ${data.message}`, false);
+                }
+            } catch (error) {
+                addResult(`API测试错误: ${error.message}`, false);
+            }
+        }
+        
+        async function startQuickTest() {
+            try {
+                addResult('开始加载问题...');
+                
+                const response = await fetch(`${apiBaseUrl}/mbti/questions`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    questions = data.data;
+                    currentQuestion = 0;
+                    answers = [];
+                    
+                    addResult(`成功加载 ${questions.length} 个问题`);
+                    
+                    document.getElementById('testArea').style.display = 'block';
+                    showQuestion();
+                } else {
+                    addResult(`加载失败: ${data.message}`, false);
+                }
+            } catch (error) {
+                addResult(`错误: ${error.message}`, false);
+            }
+        }
+        
+        function showQuestion() {
+            if (currentQuestion >= questions.length) {
+                showResults();
+                return;
+            }
+            
+            const question = questions[currentQuestion];
+            document.getElementById('questionDisplay').innerHTML = `
+                <div class="question">
+                    <h3>问题 ${currentQuestion + 1} / ${questions.length}</h3>
+                    <p>${question.text}</p>
+                </div>
+            `;
+            
+            const optionsDiv = document.getElementById('optionsDisplay');
+            optionsDiv.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.textContent = option.text;
+                optionDiv.onclick = () => selectOption(index);
+                optionsDiv.appendChild(optionDiv);
+            });
+        }
+        
+        function selectOption(index) {
+            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            event.target.classList.add('selected');
+            answers.push(index);
+            
+            addResult(`选择选项 ${index}: ${questions[currentQuestion].options[index].text.substring(0, 30)}...`);
+        }
+        
+        function nextQuestion() {
+            if (answers.length <= currentQuestion) {
+                alert('请先选择一个选项');
+                return;
+            }
+            
+            currentQuestion++;
+            showQuestion();
+        }
+        
+        async function showResults() {
+            try {
+                addResult('开始计算结果...');
+                
+                const scores = calculateScores();
+                const type = calculateMBTIType(scores);
+                
+                addResult(`计算得分: ${JSON.stringify(scores)}`);
+                addResult(`MBTI类型: ${type}`);
+                
+                const response = await fetch(`${apiBaseUrl}/mbti/calculate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type, scores })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const result = data.data;
+                    addResult(`✅ 测试完成! 您的MBTI类型: ${result.type}`);
+                    addResult(`描述: ${result.description}`);
+                    addResult(`工作风格: ${result.workStyle}`);
+                } else {
+                    addResult(`计算失败: ${data.message}`, false);
+                }
+            } catch (error) {
+                addResult(`计算错误: ${error.message}`, false);
+            }
+            
+            document.getElementById('testArea').style.display = 'none';
+        }
+        
+        function calculateScores() {
+            const scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+            
+            answers.forEach((answerIndex, questionIndex) => {
+                const question = questions[questionIndex];
+                const selectedOption = question.options[answerIndex];
+                if (selectedOption && selectedOption.score) {
+                    Object.keys(selectedOption.score).forEach(dimension => {
+                        scores[dimension] += selectedOption.score[dimension];
+                    });
+                }
+            });
+            
+            return scores;
+        }
+        
+        function calculateMBTIType(scores) {
+            let type = '';
+            type += scores.E > scores.I ? 'E' : 'I';
+            type += scores.S > scores.N ? 'S' : 'N';
+            type += scores.T > scores.F ? 'T' : 'F';
+            type += scores.J > scores.P ? 'J' : 'P';
+            return type;
+        }
+    </script>
+</body>
+</html> 

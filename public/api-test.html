@@ -3,46 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API测试页面</title>
+    <title>MBTI API 测试</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             max-width: 800px;
-            margin: 50px auto;
+            margin: 0 auto;
             padding: 20px;
             background: #f5f5f5;
         }
-        .container {
+        .test-section {
             background: white;
-            padding: 30px;
+            padding: 20px;
+            margin: 20px 0;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        .test-section {
-            margin: 20px 0;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        .success {
-            background: #d4edda;
-            color: #155724;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
-        }
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
+        .test-section h2 {
+            color: #333;
+            margin-bottom: 15px;
         }
         .btn {
             background: #007bff;
             color: white;
-            padding: 10px 20px;
             border: none;
+            padding: 10px 20px;
             border-radius: 5px;
             cursor: pointer;
             margin: 5px;
@@ -51,184 +36,175 @@
             background: #0056b3;
         }
         .result {
-            background: #f8f9fa;
-            padding: 15px;
+            margin-top: 15px;
+            padding: 10px;
             border-radius: 5px;
-            margin: 10px 0;
-            font-family: monospace;
-            font-size: 12px;
-            max-height: 200px;
-            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🔧 API接口测试</h1>
-        <p>测试RAG系统的各个API接口是否正常工作</p>
+    <h1>MBTI API 测试页面</h1>
+    
+    <div class="test-section">
+        <h2>1. 测试职业建议接口</h2>
+        <button class="btn" onclick="testCareerAdvice()">获取所有职业建议</button>
+        <button class="btn" onclick="testCareerCategories()">获取岗位类别</button>
+        <div id="careerResult" class="result"></div>
+    </div>
 
-        <div class="test-section">
-            <h3>🏥 健康检查</h3>
-            <button class="btn" id="healthBtn">测试健康检查</button>
-            <div id="healthResult"></div>
-        </div>
+    <div class="test-section">
+        <h2>2. 测试特定MBTI类型</h2>
+        <button class="btn" onclick="testMBTIType('INTJ')">测试 INTJ</button>
+        <button class="btn" onclick="testMBTIType('INTP')">测试 INTP</button>
+        <button class="btn" onclick="testMBTIType('ENTJ')">测试 ENTJ</button>
+        <button class="btn" onclick="testMBTIType('ENFP')">测试 ENFP</button>
+        <button class="btn" onclick="testMBTIType('ISTJ')">测试 ISTJ</button>
+        <div id="mbtiResult" class="result"></div>
+    </div>
 
-        <div class="test-section">
-            <h3>📊 统计信息</h3>
-            <button class="btn" id="statsBtn">获取统计信息</button>
-            <div id="statsResult"></div>
-        </div>
+    <div class="test-section">
+        <h2>3. 测试推荐职业接口</h2>
+        <button class="btn" onclick="testRecommendations('INTJ')">INTJ 推荐</button>
+        <button class="btn" onclick="testRecommendations('INTP')">INTP 推荐</button>
+        <button class="btn" onclick="testRecommendations('ENTJ')">ENTJ 推荐</button>
+        <button class="btn" onclick="testRecommendations('ENFP')">ENFP 推荐</button>
+        <button class="btn" onclick="testRecommendations('ISTJ')">ISTJ 推荐</button>
+        <div id="recommendationsResult" class="result"></div>
+    </div>
 
-        <div class="test-section">
-            <h3>📋 文档列表</h3>
-            <button class="btn" id="docsBtn">获取文档列表</button>
-            <div id="docsResult"></div>
-        </div>
-
-        <div class="test-section">
-            <h3>📁 文件上传</h3>
-            <input type="file" id="testFile" accept=".txt,.pdf,.doc,.docx">
-            <button class="btn" id="uploadBtn">测试上传</button>
-            <div id="uploadResult"></div>
-        </div>
-
-        <div class="test-section">
-            <h3>🔍 搜索测试</h3>
-            <input type="text" id="searchQuery" placeholder="输入搜索关键词" style="padding: 8px; margin: 5px; width: 200px;">
-            <button class="btn" id="searchBtn">搜索</button>
-            <div id="searchResult"></div>
-        </div>
+    <div class="test-section">
+        <h2>4. 测试问题接口</h2>
+        <button class="btn" onclick="testQuestions()">获取测试问题</button>
+        <button class="btn" onclick="testQuestionsStats()">获取问题统计</button>
+        <div id="questionsResult" class="result"></div>
     </div>
 
     <script>
-        // 健康检查测试
-        document.getElementById('healthBtn').addEventListener('click', async function() {
-            const resultDiv = document.getElementById('healthResult');
-            resultDiv.innerHTML = '<div>正在测试...</div>';
+        const API_BASE = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api-v2';
+
+        async function testCareerAdvice() {
+            const resultDiv = document.getElementById('careerResult');
+            resultDiv.innerHTML = '<div class="info">正在获取职业建议...</div>';
             
             try {
-                const response = await fetch('/api/rag/health');
+                const response = await fetch(`${API_BASE}/mbti/career-advice`);
                 const data = await response.json();
                 
-                if (data.status === 'ok') {
-                    resultDiv.innerHTML = '<div class="success">✅ 健康检查通过</div>';
-                    resultDiv.innerHTML += `<div class="result">${JSON.stringify(data, null, 2)}</div>`;
+                if (data.success) {
+                    resultDiv.innerHTML = `<div class="success">✅ 获取成功！共 ${data.data.length} 个MBTI类型</div>`;
                 } else {
-                    resultDiv.innerHTML = '<div class="error">❌ 健康检查失败</div>';
+                    resultDiv.innerHTML = `<div class="error">❌ 获取失败: ${data.message}</div>`;
                 }
             } catch (error) {
-                resultDiv.innerHTML = `<div class="error">❌ 健康检查失败: ${error.message}</div>`;
+                resultDiv.innerHTML = `<div class="error">❌ 请求失败: ${error.message}</div>`;
             }
-        });
+        }
 
-        // 统计信息测试
-        document.getElementById('statsBtn').addEventListener('click', async function() {
-            const resultDiv = document.getElementById('statsResult');
-            resultDiv.innerHTML = '<div>正在获取...</div>';
+        async function testCareerCategories() {
+            const resultDiv = document.getElementById('careerResult');
+            resultDiv.innerHTML = '<div class="info">正在获取岗位类别...</div>';
             
             try {
-                const response = await fetch('/api/rag/stats');
+                const response = await fetch(`${API_BASE}/mbti/career-categories`);
                 const data = await response.json();
                 
-                resultDiv.innerHTML = '<div class="success">✅ 统计信息获取成功</div>';
-                resultDiv.innerHTML += `<div class="result">${JSON.stringify(data, null, 2)}</div>`;
-            } catch (error) {
-                resultDiv.innerHTML = `<div class="error">❌ 获取统计信息失败: ${error.message}</div>`;
-            }
-        });
-
-        // 文档列表测试
-        document.getElementById('docsBtn').addEventListener('click', async function() {
-            const resultDiv = document.getElementById('docsResult');
-            resultDiv.innerHTML = '<div>正在获取...</div>';
-            
-            try {
-                const response = await fetch('/api/rag/documents');
-                const data = await response.json();
-                
-                if (data.status === 'ok') {
-                    resultDiv.innerHTML = '<div class="success">✅ 文档列表获取成功</div>';
-                    resultDiv.innerHTML += `<div class="result">${JSON.stringify(data, null, 2)}</div>`;
+                if (data.success) {
+                    resultDiv.innerHTML = `<div class="success">✅ 获取成功！岗位类别: ${data.data.join(', ')}</div>`;
                 } else {
-                    resultDiv.innerHTML = '<div class="error">❌ 文档列表获取失败</div>';
+                    resultDiv.innerHTML = `<div class="error">❌ 获取失败: ${data.message}</div>`;
                 }
             } catch (error) {
-                resultDiv.innerHTML = `<div class="error">❌ 获取文档列表失败: ${error.message}</div>`;
+                resultDiv.innerHTML = `<div class="error">❌ 请求失败: ${error.message}</div>`;
             }
-        });
+        }
 
-        // 文件上传测试
-        document.getElementById('uploadBtn').addEventListener('click', async function() {
-            const fileInput = document.getElementById('testFile');
-            const resultDiv = document.getElementById('uploadResult');
-            
-            if (!fileInput.files[0]) {
-                resultDiv.innerHTML = '<div class="error">❌ 请先选择文件</div>';
-                return;
-            }
-            
-            resultDiv.innerHTML = '<div>正在上传...</div>';
+        async function testMBTIType(mbtiType) {
+            const resultDiv = document.getElementById('mbtiResult');
+            resultDiv.innerHTML = `<div class="info">正在获取 ${mbtiType} 职业建议...</div>`;
             
             try {
-                const formData = new FormData();
-                formData.append('file', fileInput.files[0]);
-                formData.append('category', 'test');
-                formData.append('tags', 'test,api');
-                
-                const response = await fetch('/api/rag/upload/local', {
-                    method: 'POST',
-                    body: formData
-                });
-                
+                const response = await fetch(`${API_BASE}/mbti/career-advice/${mbtiType}`);
                 const data = await response.json();
                 
-                if (data.status === 'ok') {
-                    resultDiv.innerHTML = '<div class="success">✅ 文件上传成功</div>';
-                    resultDiv.innerHTML += `<div class="result">${JSON.stringify(data, null, 2)}</div>`;
+                if (data.success) {
+                    resultDiv.innerHTML = `<div class="success">✅ ${mbtiType} 获取成功！\n人格描述: ${data.data.personalityDescription}\n职业建议数量: ${data.data.internetCareers.length}</div>`;
                 } else {
-                    resultDiv.innerHTML = `<div class="error">❌ 文件上传失败: ${data.message || data.error}</div>`;
+                    resultDiv.innerHTML = `<div class="error">❌ 获取失败: ${data.message}</div>`;
                 }
             } catch (error) {
-                resultDiv.innerHTML = `<div class="error">❌ 文件上传失败: ${error.message}</div>`;
+                resultDiv.innerHTML = `<div class="error">❌ 请求失败: ${error.message}</div>`;
             }
-        });
+        }
 
-        // 搜索测试
-        document.getElementById('searchBtn').addEventListener('click', async function() {
-            const query = document.getElementById('searchQuery').value;
-            const resultDiv = document.getElementById('searchResult');
-            
-            if (!query.trim()) {
-                resultDiv.innerHTML = '<div class="error">❌ 请输入搜索关键词</div>';
-                return;
-            }
-            
-            resultDiv.innerHTML = '<div>正在搜索...</div>';
+        async function testRecommendations(mbtiType) {
+            const resultDiv = document.getElementById('recommendationsResult');
+            resultDiv.innerHTML = `<div class="info">正在获取 ${mbtiType} 推荐职业...</div>`;
             
             try {
-                const response = await fetch('/api/rag/search', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        query: query,
-                        limit: 5
-                    })
-                });
-                
+                const response = await fetch(`${API_BASE}/mbti/career-advice/${mbtiType}/recommendations`);
                 const data = await response.json();
                 
-                if (data.status === 'ok') {
-                    resultDiv.innerHTML = '<div class="success">✅ 搜索成功</div>';
-                    resultDiv.innerHTML += `<div class="result">${JSON.stringify(data, null, 2)}</div>`;
+                if (data.success) {
+                    resultDiv.innerHTML = `<div class="success">✅ ${mbtiType} 推荐职业获取成功！\n推荐职业数量: ${data.data.recommendedCareers.length}</div>`;
                 } else {
-                    resultDiv.innerHTML = `<div class="error">❌ 搜索失败: ${data.message || data.error}</div>`;
+                    resultDiv.innerHTML = `<div class="error">❌ 获取失败: ${data.message}</div>`;
                 }
             } catch (error) {
-                resultDiv.innerHTML = `<div class="error">❌ 搜索失败: ${error.message}</div>`;
+                resultDiv.innerHTML = `<div class="error">❌ 请求失败: ${error.message}</div>`;
             }
-        });
+        }
+
+        async function testQuestions() {
+            const resultDiv = document.getElementById('questionsResult');
+            resultDiv.innerHTML = '<div class="info">正在获取测试问题...</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/mbti/questions`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `<div class="success">✅ 获取成功！共 ${data.total} 个测试问题</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ 获取失败: ${data.message}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ 请求失败: ${error.message}</div>`;
+            }
+        }
+
+        async function testQuestionsStats() {
+            const resultDiv = document.getElementById('questionsResult');
+            resultDiv.innerHTML = '<div class="info">正在获取问题统计...</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/mbti/questions/stats`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `<div class="success">✅ 获取成功！\n总问题数: ${data.data.totalQuestions}\n维度统计: ${data.data.dimensionStats.length} 个维度</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ 获取失败: ${data.message}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ 请求失败: ${error.message}</div>`;
+            }
+        }
     </script>
 </body>
 </html> 
