@@ -6,6 +6,7 @@
     <meta name="theme-color" content="#4F46E5">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="api-base" content="https://offercome2025-9g14jitp22f4ddfc.service.tcloudbase.com/api-v2">
     <title>MBTI人格测试 - 移动端优化版</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -430,7 +431,9 @@
     <script>
         class MbtiMobileApp {
             constructor() {
-                this.apiBaseUrl = 'https://offercome2025-9g14jitp22f4ddfc.service.tcloudbase.com/api-v2';
+                // 从meta标签或环境变量获取API地址
+                const apiMeta = document.querySelector('meta[name="api-base"]');
+                this.apiBaseUrl = apiMeta ? apiMeta.getAttribute('content') : 'https://offercome2025-9g14jitp22f4ddfc.service.tcloudbase.com/api-v2';
                 this.questions = [];
                 this.currentQuestionIndex = 0;
                 this.answers = [];
@@ -542,23 +545,24 @@
             }
             
             async submitAnswers() {
-                console.log('🔄 开始提交答案...');
-                console.log('📊 答案数量:', this.answers.length);
-                console.log('📋 答案内容:', this.answers);
+                // 条件调试日志
+                if (this.isDebugMode()) {
+                    console.log('🔄 开始提交答案...');
+                    console.log('📊 答案数量:', this.answers.length);
+                }
                 
                 if (this.isLoading) {
-                    console.log('⚠️ 正在处理中，忽略重复请求');
+                    if (this.isDebugMode()) console.log('⚠️ 正在处理中，忽略重复请求');
                     return;
                 }
                 
                 this.isLoading = true;
-                console.log('✅ 设置加载状态');
+                if (this.isDebugMode()) console.log('✅ 设置加载状态');
                 
                 this.showLoading();
-                console.log('✅ 显示加载页面');
                 
                 try {
-                    console.log('🔄 开始生成模拟结果...');
+                    if (this.isDebugMode()) console.log('🔄 开始生成模拟结果...');
                     
                     // 由于API暂时有问题，使用模拟数据
                     const mockResult = {
@@ -568,25 +572,46 @@
                         description: 'INTJ建筑师型人格 - 富有想象力和战略性的思考者，一切都要经过深思熟虑'
                     };
                     
-                    console.log('📊 模拟结果:', mockResult);
+                    if (this.isDebugMode()) console.log('📊 模拟结果:', mockResult);
                     
                     // 延迟模拟API调用
-                    console.log('⏳ 等待1秒...');
-                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    if (this.isDebugMode()) console.log('⏳ 等待1秒...');
+                    await this.delay(1000);
                     
-                    console.log('✅ 调用showResult...');
+                    if (this.isDebugMode()) console.log('✅ 调用showResult...');
                     this.showResult(mockResult);
-                    console.log('✅ 结果显示完成');
+                    if (this.isDebugMode()) console.log('✅ 结果显示完成');
                     
                 } catch (error) {
                     console.error('❌ 提交答案失败:', error);
-                    this.showError('提交失败，请重试');
+                    this.showError(this.getErrorMessage('submit_failed'));
                 } finally {
-                    console.log('🔄 清理加载状态...');
+                    if (this.isDebugMode()) console.log('🔄 清理加载状态...');
                     this.hideLoading();
                     this.isLoading = false;
-                    console.log('✅ 清理完成');
+                    if (this.isDebugMode()) console.log('✅ 清理完成');
                 }
+            }
+            
+            // 调试模式检查
+            isDebugMode() {
+                return window.location.search.includes('debug=true') || 
+                       window.location.hostname === 'localhost';
+            }
+            
+            // 延迟函数
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+            
+            // 获取错误消息
+            getErrorMessage(key) {
+                const messages = {
+                    'submit_failed': '提交失败，请重试',
+                    'network_error': '网络连接失败，请检查网络',
+                    'load_failed': '加载失败，请刷新页面重试'
+                };
+                return messages[key] || '操作失败，请重试';
             }
             
             showLoading() {
