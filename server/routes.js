@@ -6,6 +6,7 @@ module.exports = [
   // MBTI相关
   { path: '/mbti/questions', method: 'GET', handler: 'getMBTIQuestionsHandler' },
   { path: '/mbti/calculate', method: 'POST', handler: 'calculateMBTIHandler' },
+  { path: '/mbti/test', method: 'POST', handler: 'testMBTIHandler' },
   { path: '/mbti/career-advice', method: 'GET', handler: 'getMBTICareerAdviceHandler' },
   { path: '/mbti/career-categories', method: 'GET', handler: 'getMBTICareerCategoriesHandler' },
   { path: '/mbti/career-advice/:mbtiType', method: 'GET', handler: 'getMBTICareerAdviceByTypeHandler' },

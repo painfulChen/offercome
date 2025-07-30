@@ -1,15 +1,33 @@
 // server/handlers/index.js
 
+// 导入MySQL数据库配置
+const db = require('../config/database-cloud');
+const mbtiHandlers = require('./mbti');
+
 // MBTI相关handlers
 exports.getMBTIQuestionsHandler = async () => {
-  return {
-    statusCode: 200,
-    body: JSON.stringify({
-      success: true,
-      data: [
+  try {
+    console.log('🔄 开始获取MBTI问题...');
+    
+    // 从MySQL数据库获取所有问题
+    console.log('🔍 查询MySQL数据库中的MBTI问题...');
+    const questions = await db.query(`
+      SELECT * FROM mbti_questions 
+      WHERE is_active = TRUE 
+      ORDER BY dimension, question_number
+    `);
+    
+    console.log(`📊 从数据库获取到 ${questions.length} 个MBTI问题`);
+    
+    if (questions.length === 0) {
+      console.log('⚠️ 数据库中没有找到MBTI问题，返回模拟数据');
+      // 返回模拟数据作为备用
+      const mockQuestions = [
         {
           id: 1,
           text: "在社交场合中，你更倾向于：",
+          dimension: "EI",
+          category: "社交偏好",
           options: [
             { text: "与很多人交谈，认识新朋友", score: { E: 1, I: 0 } },
             { text: "与少数几个熟悉的人深入交谈", score: { E: 0, I: 1 } }
@@ -18,177 +36,296 @@ exports.getMBTIQuestionsHandler = async () => {
         {
           id: 2,
           text: "在团队工作中，你更喜欢：",
+          dimension: "EI",
+          category: "社交偏好",
           options: [
             { text: "积极参与讨论，分享想法", score: { E: 1, I: 0 } },
             { text: "先思考后发言，确保想法成熟", score: { E: 0, I: 1 } }
           ]
-        }
-      ],
-      message: 'MBTI问题获取成功'
-    })
-  };
-};
-
-exports.calculateMBTIHandler = async ({ body }) => {
-  return {
-    statusCode: 200,
-    body: JSON.stringify({
-      success: true,
-      data: { mbtiType: 'INTJ', scores: { E: 0, I: 1, S: 0, N: 1, T: 1, F: 0, J: 1, P: 0 } },
-      message: 'MBTI计算成功'
-    })
-  };
-};
-
-exports.getMBTICareerAdviceHandler = async () => {
-  return {
-    statusCode: 200,
-    body: JSON.stringify({
-      success: true,
-      data: [
+        },
         {
-          mbtiType: 'INTJ',
-          personalityDescription: '建筑师型人格 - 富有想象力和战略性的思考者，一切都要经过深思熟虑',
-          coreTraits: ['战略思维', '独立自主', '追求完美', '逻辑分析', '创新思维'],
-          internetCareers: [
-            {
-              position: '技术架构师',
-              category: '技术开发',
-              suitability: 5,
-              reasons: ['INTJ的战略思维和系统化思考能力非常适合设计复杂的技术架构'],
-              requiredSkills: ['系统设计', '技术选型', '架构模式', '性能优化'],
-              careerPath: [
-                { level: '初级', positions: ['初级开发工程师'] },
-                { level: '中级', positions: ['高级开发工程师'] },
-                { level: '高级', positions: ['技术架构师'] }
-              ],
-              typicalCompanies: ['阿里巴巴', '腾讯', '字节跳动'],
-              salaryRange: { junior: { min: 15000, max: 25000 }, senior: { min: 40000, max: 80000 } }
-            }
-          ],
-          strengths: ['强大的战略思维和系统化思考能力', '独立自主，能够深度思考复杂问题'],
-          challenges: ['可能过于完美主义，影响效率', '独立性强，团队协作需要改进'],
-          developmentAdvice: ['培养团队协作能力，学会倾听他人意见', '在追求完美的同时注意效率平衡']
-        }
-      ],
-      message: '获取MBTI职业建议成功'
-    })
-  };
-};
-
-exports.getMBTICareerCategoriesHandler = async () => {
-  return {
-    statusCode: 200,
-    body: JSON.stringify({
-      success: true,
-      data: ['技术开发', '产品设计', '运营营销', '数据分析', '项目管理', '用户体验', '商务拓展', '内容创作'],
-      message: '获取岗位类别成功'
-    })
-  };
-};
-
-exports.getMBTICareerAdviceByTypeHandler = async ({ params }) => {
-  const { mbtiType } = params;
-  const careerData = {
-    'INTJ': {
-      mbtiType: 'INTJ',
-      personalityDescription: '建筑师型人格 - 富有想象力和战略性的思考者，一切都要经过深思熟虑',
-      coreTraits: ['战略思维', '独立自主', '追求完美', '逻辑分析', '创新思维'],
-      internetCareers: [
+          id: 3,
+          text: "当您需要充电时，您会选择：",
+          dimension: "EI",
+          category: "社交偏好",
+          options: [
+            { text: "和朋友一起出去活动", score: { E: 1, I: 0 } },
+            { text: "独自待在家里或安静的地方", score: { E: 0, I: 1 } }
+          ]
+        },
         {
-          position: '技术架构师',
-          category: '技术开发',
-          suitability: 5,
-          reasons: ['INTJ的战略思维和系统化思考能力非常适合设计复杂的技术架构'],
-          requiredSkills: ['系统设计', '技术选型', '架构模式', '性能优化'],
-          careerPath: [
-            { level: '初级', positions: ['初级开发工程师'] },
-            { level: '中级', positions: ['高级开发工程师'] },
-            { level: '高级', positions: ['技术架构师'] }
-          ],
-          typicalCompanies: ['阿里巴巴', '腾讯', '字节跳动'],
-          salaryRange: { junior: { min: 15000, max: 25000 }, senior: { min: 40000, max: 80000 } }
+          id: 4,
+          text: "您更喜欢的决策方式是：",
+          dimension: "TF",
+          category: "决策方式",
+          options: [
+            { text: "基于逻辑和客观分析", score: { T: 1, F: 0 } },
+            { text: "基于价值观和人际关系", score: { T: 0, F: 1 } }
+          ]
+        },
+        {
+          id: 5,
+          text: "您更倾向于：",
+          dimension: "SN",
+          category: "信息处理",
+          options: [
+            { text: "关注具体的事实和细节", score: { S: 1, N: 0 } },
+            { text: "关注可能性和未来趋势", score: { S: 0, N: 1 } }
+          ]
         }
-      ],
-      strengths: ['强大的战略思维和系统化思考能力', '独立自主，能够深度思考复杂问题'],
-      challenges: ['可能过于完美主义，影响效率', '独立性强，团队协作需要改进'],
-      developmentAdvice: ['培养团队协作能力，学会倾听他人意见', '在追求完美的同时注意效率平衡']
+      ];
+      
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          success: true,
+          data: mockQuestions,
+          message: 'MBTI问题获取成功（模拟数据）'
+        })
+      };
     }
-  };
-
-  if (careerData[mbtiType]) {
+    
+    // 转换为前端需要的格式
+    const formattedQuestions = questions.map(q => ({
+      id: q.id,
+      text: q.question_text,
+      dimension: q.dimension,
+      category: getCategoryByDimension(q.dimension),
+      options: generateOptionsByDimension(q.dimension, q.id)
+    }));
+    
+    console.log('✅ MBTI问题格式化完成');
+    
     return {
       statusCode: 200,
       body: JSON.stringify({
         success: true,
-        data: careerData[mbtiType],
+        data: formattedQuestions,
+        message: 'MBTI问题获取成功'
+      })
+    };
+  } catch (error) {
+    console.error('❌ 获取MBTI问题失败:', error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        success: false,
+        message: '获取MBTI问题失败',
+        error: error.message
+      })
+    };
+  }
+};
+
+// 辅助函数：根据维度获取类别
+function getCategoryByDimension(dimension) {
+  const categoryMap = {
+    'EI': '社交偏好',
+    'SN': '信息处理',
+    'TF': '决策方式',
+    'JP': '生活方式'
+  };
+  return categoryMap[dimension] || '其他';
+}
+
+// 辅助函数：根据维度生成选项
+function generateOptionsByDimension(dimension, questionId) {
+  const optionsMap = {
+    'EI': [
+      { text: '倾向于外向', score: { E: 1, I: 0 } },
+      { text: '倾向于内向', score: { E: 0, I: 1 } }
+    ],
+    'SN': [
+      { text: '倾向于感觉', score: { S: 1, N: 0 } },
+      { text: '倾向于直觉', score: { S: 0, N: 1 } }
+    ],
+    'TF': [
+      { text: '倾向于思考', score: { T: 1, F: 0 } },
+      { text: '倾向于情感', score: { T: 0, F: 1 } }
+    ],
+    'JP': [
+      { text: '倾向于判断', score: { J: 1, P: 0 } },
+      { text: '倾向于感知', score: { J: 0, P: 1 } }
+    ]
+  };
+  
+  return optionsMap[dimension] || [
+    { text: '选项A', score: {} },
+    { text: '选项B', score: {} }
+  ];
+}
+
+exports.calculateMBTIHandler = mbtiHandlers.calculateMBTIHandler;
+
+exports.testMBTIHandler = async ({ body }) => {
+  console.log('🧪 测试MBTI处理器...');
+  
+  const response = {
+    success: true,
+    data: { 
+      test: 'success',
+      message: '测试处理器正常工作'
+    },
+    message: '测试成功'
+  };
+  
+  console.log('📤 返回测试响应:', JSON.stringify(response));
+  
+  return {
+    statusCode: 200,
+    body: JSON.stringify(response)
+  };
+};
+
+exports.getMBTICareerAdviceHandler = async () => {
+  try {
+    console.log('🔄 获取MBTI职业建议...');
+    
+    // 从MySQL获取职业建议数据
+    const careerAdvice = await db.query(`
+      SELECT * FROM mbti_career_advice 
+      WHERE is_active = TRUE 
+      ORDER BY mbti_type
+    `);
+    
+    // 解析JSON字段
+    const processedData = careerAdvice.map(advice => ({
+      ...advice,
+      core_traits: JSON.parse(advice.core_traits || '[]'),
+      recommended_careers: JSON.parse(advice.recommended_careers || '[]')
+    }));
+    
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        success: true,
+        data: processedData,
+        message: '获取MBTI职业建议成功'
+      })
+    };
+  } catch (error) {
+    console.error('❌ 获取MBTI职业建议失败:', error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        success: false,
+        message: '获取MBTI职业建议失败',
+        error: error.message
+      })
+    };
+  }
+};
+
+exports.getMBTICareerCategoriesHandler = async () => {
+  try {
+    console.log('🔄 获取MBTI职业类别...');
+    
+    const categories = await db.query(`
+      SELECT DISTINCT category FROM mbti_career_advice 
+      WHERE is_active = TRUE 
+      ORDER BY category
+    `);
+    
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        success: true,
+        data: categories.map(c => c.category),
+        message: '获取岗位类别成功'
+      })
+    };
+  } catch (error) {
+    console.error('❌ 获取MBTI职业类别失败:', error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        success: false,
+        message: '获取MBTI职业类别失败',
+        error: error.message
+      })
+    };
+  }
+};
+
+exports.getMBTICareerAdviceByTypeHandler = async ({ params }) => {
+  try {
+    const { mbtiType } = params;
+    console.log(`🔄 获取 ${mbtiType} 职业建议...`);
+    
+    const careerAdvice = await db.query(`
+      SELECT * FROM mbti_career_advice 
+      WHERE mbti_type = ? AND is_active = TRUE
+    `, [mbtiType]);
+    
+    if (careerAdvice.length === 0) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({
+          success: false,
+          message: `未找到 ${mbtiType} 类型的职业建议`
+        })
+      };
+    }
+    
+    // 解析JSON字段
+    const advice = careerAdvice[0];
+    const processedData = {
+      ...advice,
+      core_traits: JSON.parse(advice.core_traits || '[]'),
+      recommended_careers: JSON.parse(advice.recommended_careers || '[]')
+    };
+    
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        success: true,
+        data: processedData,
         message: '获取职业建议成功'
       })
     };
-  } else {
+  } catch (error) {
+    console.error('❌ 获取MBTI职业建议失败:', error);
     return {
-      statusCode: 404,
+      statusCode: 500,
       body: JSON.stringify({
         success: false,
-        message: `未找到MBTI类型 ${mbtiType} 的职业建议`
+        message: '获取MBTI职业建议失败',
+        error: error.message
       })
     };
   }
 };
 
 exports.getMBTIRecommendationsHandler = async ({ params }) => {
-  const { mbtiType } = params;
-  const careerData = {
-    'INTJ': {
-      mbtiType: 'INTJ',
-      personalityDescription: '建筑师型人格 - 富有想象力和战略性的思考者，一切都要经过深思熟虑',
-      coreTraits: ['战略思维', '独立自主', '追求完美', '逻辑分析', '创新思维'],
-      internetCareers: [
-        {
-          position: '技术架构师',
-          category: '技术开发',
-          suitability: 5,
-          reasons: ['INTJ的战略思维和系统化思考能力非常适合设计复杂的技术架构'],
-          requiredSkills: ['系统设计', '技术选型', '架构模式', '性能优化'],
-          careerPath: [
-            { level: '初级', positions: ['初级开发工程师'] },
-            { level: '中级', positions: ['高级开发工程师'] },
-            { level: '高级', positions: ['技术架构师'] }
-          ],
-          typicalCompanies: ['阿里巴巴', '腾讯', '字节跳动'],
-          salaryRange: { junior: { min: 15000, max: 25000 }, senior: { min: 40000, max: 80000 } }
-        }
-      ],
-      strengths: ['强大的战略思维和系统化思考能力', '独立自主，能够深度思考复杂问题'],
-      challenges: ['可能过于完美主义，影响效率', '独立性强，团队协作需要改进'],
-      developmentAdvice: ['培养团队协作能力，学会倾听他人意见', '在追求完美的同时注意效率平衡']
-    }
-  };
-
-  const recData = careerData[mbtiType];
-  if (recData) {
+  try {
+    const { mbtiType } = params;
+    console.log(`🔄 获取 ${mbtiType} 推荐职业...`);
+    
+    const recommendations = await db.query(`
+      SELECT * FROM mbti_career_recommendations 
+      WHERE mbti_type = ? AND is_active = TRUE
+      ORDER BY suitability_score DESC
+    `, [mbtiType]);
+    
     return {
       statusCode: 200,
       body: JSON.stringify({
         success: true,
         data: {
-          mbtiType: recData.mbtiType,
-          personalityDescription: recData.personalityDescription,
-          coreTraits: recData.coreTraits,
-          recommendedCareers: recData.internetCareers.sort((a, b) => b.suitability - a.suitability),
-          strengths: recData.strengths,
-          challenges: recData.challenges,
-          developmentAdvice: recData.developmentAdvice
+          mbtiType,
+          recommendations: recommendations
         },
         message: '获取推荐职业成功'
       })
     };
-  } else {
+  } catch (error) {
+    console.error('❌ 获取MBTI推荐职业失败:', error);
     return {
-      statusCode: 404,
+      statusCode: 500,
       body: JSON.stringify({
         success: false,
-        message: `未找到MBTI类型 ${mbtiType} 的职业建议`
+        message: '获取MBTI推荐职业失败',
+        error: error.message
       })
     };
   }

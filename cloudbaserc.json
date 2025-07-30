@@ -14,7 +14,15 @@
                 "cloudbase-function.js",
                 "tests/**",
                 "logs/**"
-            ]
+            ],
+            "envVariables": {
+                "DB_HOST": "sh-cdb-l8rfujds.sql.tencentcdb.com",
+                "DB_PORT": "21736",
+                "DB_USER": "root",
+                "DB_PASSWORD": "Offercome2024!",
+                "DB_NAME": "offercome",
+                "NODE_ENV": "production"
+            }
         }
     ],
     "service": {

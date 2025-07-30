@@ -26,7 +26,8 @@
     "ioredis": "^5.6.1",
     "mongoose": "^8.16.5",
     "moonshot-node": "^0.0.5",
-    "multer": "^2.0.2"
+    "multer": "^2.0.2",
+    "mysql2": "^3.14.3"
   },
   "devDependencies": {
     "jest": "^29.7.0",
