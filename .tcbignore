@@ -1,9 +1,16 @@
+# 依赖和构建产物
 node_modules
+*.log
+.env*
+
+# 备份和临时文件
 server/**/*.bak.js
 server/index-old.js
 server/index-backup*.js
 server/index-complete.js
 server/index-new.js
+
+# 开发工具和脚本
 server/auto-fix-service.js
 server/logging-service.js
 server/migrate-data.js
@@ -12,9 +19,21 @@ server/init-success-cases.sql
 server/database-schema.sql
 server/cost-tracker.js
 server/test-document*.txt
+
+# 目录
 server/uploads/
 server/logs/
 server/temp/
 server/tests/
-*.log
-.env* 
+
+# 文档和测试
+*.md
+*.map
+tests/
+**/*.test.js
+**/*.spec.js
+
+# 大文件
+*.zip
+*.tar.gz
+*.sql 

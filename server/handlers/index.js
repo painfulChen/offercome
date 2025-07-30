@@ -188,12 +188,35 @@ exports.getMBTICareerAdviceHandler = async () => {
       ORDER BY mbti_type
     `);
     
-    // 解析JSON字段
-    const processedData = careerAdvice.map(advice => ({
-      ...advice,
-      core_traits: JSON.parse(advice.core_traits || '[]'),
-      recommended_careers: JSON.parse(advice.recommended_careers || '[]')
-    }));
+    // 解析JSON字段，添加错误处理
+    const processedData = careerAdvice.map(advice => {
+      let coreTraits = [];
+      let recommendedCareers = [];
+      
+      try {
+        coreTraits = JSON.parse(advice.core_traits || '[]');
+      } catch (error) {
+        console.warn('⚠️ core_traits JSON解析失败:', error.message);
+        // 如果解析失败，尝试将字符串按逗号分割
+        if (advice.core_traits && typeof advice.core_traits === 'string') {
+          coreTraits = advice.core_traits.split(',').map(s => s.trim()).filter(s => s);
+        }
+      }
+      
+      try {
+        recommendedCareers = JSON.parse(advice.recommended_careers || '[]');
+      } catch (error) {
+        console.warn('⚠️ recommended_careers JSON解析失败:', error.message);
+        // 如果解析失败，返回空数组
+        recommendedCareers = [];
+      }
+      
+      return {
+        ...advice,
+        core_traits: coreTraits,
+        recommended_careers: recommendedCareers
+      };
+    });
     
     return {
       statusCode: 200,
@@ -267,12 +290,33 @@ exports.getMBTICareerAdviceByTypeHandler = async ({ params }) => {
       };
     }
     
-    // 解析JSON字段
+    // 解析JSON字段，添加错误处理
     const advice = careerAdvice[0];
+    let coreTraits = [];
+    let recommendedCareers = [];
+    
+    try {
+      coreTraits = JSON.parse(advice.core_traits || '[]');
+    } catch (error) {
+      console.warn('⚠️ core_traits JSON解析失败:', error.message);
+      // 如果解析失败，尝试将字符串按逗号分割
+      if (advice.core_traits && typeof advice.core_traits === 'string') {
+        coreTraits = advice.core_traits.split(',').map(s => s.trim()).filter(s => s);
+      }
+    }
+    
+    try {
+      recommendedCareers = JSON.parse(advice.recommended_careers || '[]');
+    } catch (error) {
+      console.warn('⚠️ recommended_careers JSON解析失败:', error.message);
+      // 如果解析失败，返回空数组
+      recommendedCareers = [];
+    }
+    
     const processedData = {
       ...advice,
-      core_traits: JSON.parse(advice.core_traits || '[]'),
-      recommended_careers: JSON.parse(advice.recommended_careers || '[]')
+      core_traits: coreTraits,
+      recommended_careers: recommendedCareers
     };
     
     return {
