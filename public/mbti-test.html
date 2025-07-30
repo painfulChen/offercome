@@ -434,11 +434,12 @@
         // MBTI测试应用
         class MbtiTestApp {
             constructor() {
-                this.apiBaseUrl = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api-v2';
+                this.apiBaseUrl = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api16';
                 this.questions = [];
                 this.currentQuestionIndex = 0;
                 this.answers = [];
                 this.selectedOptionIndex = 0; // 新增：用于跟踪当前选中的选项
+                this.isProcessing = false; // 防止重复点击
                 this.init();
             }
 
@@ -559,24 +560,50 @@
             }
 
             handleAnswer(e) {
+                // 防止重复点击
+                if (this.isProcessing) {
+                    console.log('⚠️ 正在处理中，忽略重复点击');
+                    return;
+                }
+                
+                this.isProcessing = true;
                 const btn = e.target.closest('.answer-btn');
                 const optionIndex = Array.from(btn.parentNode.children).indexOf(btn);
                 const question = this.questions[this.currentQuestionIndex];
                 
+                console.log('📝 选择答案:', optionIndex, '问题:', this.currentQuestionIndex + 1);
+                
                 // 添加选中效果
-                document.querySelectorAll('.answer-btn').forEach(btn => {
-                    btn.classList.remove('selected');
+                const allBtns = document.querySelectorAll('.answer-btn');
+                allBtns.forEach(b => {
+                    b.classList.remove('selected');
+                    b.classList.add('processing'); // 添加处理中状态
+                    b.style.opacity = '0.7';
+                    b.style.pointerEvents = 'none';
                 });
                 btn.classList.add('selected');
+                btn.style.transform = 'scale(1.05)';
+                
+                // 显示答案反馈
+                this.showAnswerFeedback();
                 
                 // 保存答案（选项索引）
                 this.answers.push(optionIndex.toString());
                 
-                // 延迟跳转到下一题
+                // 延迟跳转到下一题，给用户视觉反馈
                 setTimeout(() => {
+                    // 移除处理中状态
+                    allBtns.forEach(b => {
+                        b.classList.remove('processing');
+                        b.style.opacity = '';
+                        b.style.pointerEvents = '';
+                        b.style.transform = '';
+                    });
+                    
                     this.currentQuestionIndex++;
+                    this.isProcessing = false;
                     this.displayQuestion();
-                }, 500);
+                }, 800); // 增加延迟时间
             }
 
             // 键盘事件处理
@@ -621,9 +648,18 @@
                 try {
                     this.showLoading();
                     
-                    // 根据答案计算MBTI类型和分数
-                    const scores = this.calculateScores();
-                    const type = this.calculateMBTIType(scores);
+                    console.log('🔄 开始提交答案...');
+                    console.log('📊 答案数组:', this.answers);
+                    console.log('📊 答案长度:', this.answers.length);
+                    console.log('📊 问题总数:', this.questions.length);
+                    
+                    // 验证答案数量
+                    if (this.answers.length !== this.questions.length) {
+                        throw new Error(`答案数量错误，需要${this.questions.length}个答案，当前只有${this.answers.length}个`);
+                    }
+                    
+                    // 转换答案格式为数字数组
+                    const answersArray = this.answers.map(answer => parseInt(answer));
                     
                     const response = await fetch(`${this.apiBaseUrl}/mbti/calculate`, {
                         method: 'POST',
@@ -631,17 +667,19 @@
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({ 
-                            type: type,
-                            scores: scores
+                            answers: answersArray
                         })
                     });
                     
+                    console.log('📡 响应状态:', response.status);
+                    
                     const data = await response.json();
+                    console.log('📊 响应数据:', data);
                     
                     if (data.success) {
                         const result = data.data;
                         
-                        document.getElementById('mbtiType').textContent = result.type;
+                        document.getElementById('mbtiType').textContent = result.mbtiType || result.type;
                         document.getElementById('personalityDescription').textContent = result.description;
                         document.getElementById('careerSuggestions').textContent = '根据您的MBTI类型，建议选择适合您性格特点的职业';
                         document.getElementById('strengths').textContent = '您的MBTI类型具有独特的人格特征';
@@ -719,6 +757,7 @@
             retakeTest() {
                 this.currentQuestionIndex = 0;
                 this.answers = [];
+                this.isProcessing = false; // 重置防抖状态
                 this.showTest();
                 this.displayQuestion();
             }
@@ -727,6 +766,58 @@
                 this.hideLoading();
                 document.getElementById('introSection').style.display = 'block';
                 alert(message);
+            }
+
+            showAnswerFeedback() {
+                // 移除现有的反馈元素
+                const existingFeedback = document.getElementById('answer-feedback');
+                if (existingFeedback) {
+                    existingFeedback.remove();
+                }
+                
+                // 创建答案反馈元素
+                const feedback = document.createElement('div');
+                feedback.id = 'answer-feedback';
+                feedback.innerHTML = '答案已记录 ✓';
+                feedback.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: rgba(255, 215, 0, 0.9);
+                    color: #000;
+                    padding: 20px 40px;
+                    border-radius: 10px;
+                    font-size: 18px;
+                    font-weight: 600;
+                    z-index: 1000;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                    animation: fadeInOut 0.8s ease-in-out;
+                `;
+                
+                // 添加动画样式
+                if (!document.getElementById('feedback-animation-style')) {
+                    const style = document.createElement('style');
+                    style.id = 'feedback-animation-style';
+                    style.textContent = `
+                        @keyframes fadeInOut {
+                            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+                            50% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                            100% { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+                
+                // 添加到页面
+                document.body.appendChild(feedback);
+                
+                // 自动移除
+                setTimeout(() => {
+                    if (feedback.parentNode) {
+                        feedback.parentNode.removeChild(feedback);
+                    }
+                }, 800);
             }
 
             showNotification(message, type = 'info') {
