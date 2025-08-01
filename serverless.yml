@@ -1,0 +1,38 @@
+component: scf
+name: offercome-api
+app: offercome
+stage: ${opt:stage, 'dev'}
+
+inputs:
+  name: ${name}-${stage}
+  src: ./
+  runtime: Nodejs16.13
+  region: ap-shanghai
+  handler: functions/index.main_handler
+  events:
+    - apigw:
+        parameters:
+          protocols:
+            - http
+            - https
+          environment: release
+          endpoints:
+            - path: /api/{proxy+}
+              method: ANY
+              function:
+                isIntegratedResponse: true
+                functionQualifier: $LATEST
+  env:
+    variables:
+      NODE_ENV: ${stage}
+      DB_HOST: ${env:DB_HOST, 'localhost'}
+      DB_PORT: ${env:DB_PORT, '3306'}
+      DB_USER: ${env:DB_USER, 'root'}
+      DB_PASSWORD: ${env:DB_PASSWORD, ''}
+      DB_NAME: ${env:DB_NAME, 'cloudbase_ai'}
+      JWT_SECRET: ${env:JWT_SECRET, 'your-jwt-secret-key'}
+      OPENAI_API_KEY: ${env:OPENAI_API_KEY, 'your-openai-api-key'}
+  memorySize: 256
+  timeout: 30
+  logsetId: ${env:LOGSET_ID, ''}
+  topicId: ${env:TOPIC_ID, ''} 

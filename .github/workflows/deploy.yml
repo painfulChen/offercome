@@ -1,58 +1,73 @@
-name: Deploy and Smoke Test
-
+name: SCF Deploy
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches: [ main, develop ]
 
 jobs:
-  deploy:
+  deploy-dev:
     runs-on: ubuntu-latest
-    
+    if: github.ref == 'refs/heads/develop'
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16'
-        cache: 'npm'
-    
-    - name: Install dependencies
-      run: npm ci
-    
-    - name: Deploy to CloudBase
-      env:
-        TCB_ENV: ${{ secrets.TCB_ENV }}
-      run: |
-        npm install -g @cloudbase/cli
-        tcb login --apiKeyId ${{ secrets.TENCENT_SECRET_ID }} --apiKey ${{ secrets.TENCENT_SECRET_KEY }}
-        tcb framework deploy
-    
-    - name: Smoke test MBTI API
-      run: |
-        BASE="https://${{ secrets.TCB_ENV }}-1256790827.ap-shanghai.app.tcloudbase.com/api-v2"
+      - name: Checkout code
+        uses: actions/checkout@v4
         
-        echo "🧪 开始API烟雾测试..."
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: |
+          npm install
+          cd server && npm install
+          
+      - name: Install SCF CLI
+        run: npm install -g serverless-cloud-framework
         
-        # 测试健康检查
-        echo "📋 测试健康检查..."
-        curl -sf "$BASE/health" | jq '.status=="ok"'
+      - name: Deploy to dev
+        env:
+          TENCENT_SECRET_ID: ${{ secrets.SECRET_ID_DEV }}
+          TENCENT_SECRET_KEY: ${{ secrets.SECRET_KEY_DEV }}
+        run: |
+          cp env.dev .env
+          scf deploy --stage dev
+          
+      - name: Test API health
+        run: |
+          sleep 30
+          curl -f https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/dev/api/health || exit 1
+
+  deploy-test:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
         
-        # 测试MBTI问题获取
-        echo "📋 测试MBTI问题获取..."
-        curl -sf "$BASE/mbti/questions" | jq '.data | length==32'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: |
+          npm install
+          cd server && npm install
+          
+      - name: Install SCF CLI
+        run: npm install -g serverless-cloud-framework
         
-        # 测试MBTI计算
-        echo "📋 测试MBTI计算..."
-        curl -sf -X POST "$BASE/mbti/calculate" \
-             -H 'Content-Type: application/json' \
-             -d '{"answers":[0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1]}' \
-          | jq '.data.mbtiType | length==4'
-        
-        # 测试MBTI职业建议
-        echo "📋 测试MBTI职业建议..."
-        curl -sf "$BASE/mbti/career-advice" | jq '.data | length>0'
-        
-        echo "✅ 所有API测试通过！" 
+      - name: Deploy to test
+        env:
+          TENCENT_SECRET_ID: ${{ secrets.SECRET_ID_TEST }}
+          TENCENT_SECRET_KEY: ${{ secrets.SECRET_KEY_TEST }}
+        run: |
+          cp env.test .env
+          scf deploy --stage test
+          
+      - name: Test API health
+        run: |
+          sleep 30
+          curl -f https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/test/api/health || exit 1 
