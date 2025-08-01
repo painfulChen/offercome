@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RAG系统登录</title>
+    <title>OfferCome 用户登录</title>
     <style>
         * {
             margin: 0;
@@ -44,6 +44,21 @@
         .login-header p {
             color: #7f8c8d;
             font-size: 1.1em;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .register-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
         }
 
         .form-group {
@@ -171,14 +186,14 @@
 <body>
     <div class="login-container">
         <div class="login-header">
-            <h1>🚀 RAG系统</h1>
-            <p>智能文档检索与管理系统</p>
+            <h1>🎯 OfferCome</h1>
+            <p>智能职业规划与案例管理平台</p>
         </div>
 
         <div class="demo-info">
             <h3>📋 演示账号</h3>
-            <p><strong>用户名:</strong> admin</p>
-            <p><strong>密码:</strong> admin123</p>
+            <p><strong>邮箱:</strong> new@example.com</p>
+            <p><strong>密码:</strong> 123456</p>
         </div>
 
         <div class="error-message" id="errorMessage"></div>
@@ -186,8 +201,8 @@
 
         <form id="loginForm">
             <div class="form-group">
-                <label for="username">用户名</label>
-                <input type="text" id="username" name="username" placeholder="请输入用户名" required>
+                <label for="email">邮箱</label>
+                <input type="email" id="email" name="email" placeholder="请输入邮箱" required>
             </div>
 
             <div class="form-group">
@@ -201,12 +216,17 @@
             </button>
         </form>
 
+        <div class="register-link">
+            <a href="register.html">还没有账号？立即注册</a>
+        </div>
+
         <div class="footer">
             <p>© 2024 RAG系统 - 智能文档管理平台</p>
             <p><a href="/public/rag-admin-enhanced.html">直接访问管理界面</a></p>
         </div>
     </div>
 
+    <script src="js/api-client.js"></script>
     <script>
         const loginForm = document.getElementById('loginForm');
         const loginBtn = document.getElementById('loginBtn');
@@ -251,11 +271,11 @@
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value.trim();
 
-            if (!username || !password) {
-                showMessage('请输入用户名和密码', 'error');
+            if (!email || !password) {
+                showMessage('请输入邮箱和密码', 'error');
                 return;
             }
 
@@ -263,36 +283,25 @@
             setLoading(true);
 
             try {
-                const response = await fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        username: username,
-                        password: password
-                    })
+                // 使用新的API客户端
+                const response = await apiClient.login({
+                    email: email,
+                    password: password
                 });
 
-                const data = await response.json();
-
-                if (data.success) {
-                    // 保存token到localStorage
-                    localStorage.setItem('rag_token', data.data.token);
-                    localStorage.setItem('rag_user', JSON.stringify(data.data.user));
-                    
+                if (response.success) {
                     showMessage('登录成功！正在跳转...', 'success');
                     
-                    // 延迟跳转到管理界面
+                    // 延迟跳转到案例管理界面
                     setTimeout(() => {
-                        window.location.href = '/public/rag-admin-enhanced.html';
+                        window.location.href = 'case-management.html';
                     }, 1500);
                 } else {
-                    showMessage(data.error || '登录失败', 'error');
+                    showMessage(response.message || '登录失败', 'error');
                 }
             } catch (error) {
                 console.error('登录错误:', error);
-                showMessage('网络错误，请稍后重试', 'error');
+                showMessage(error.message || '网络错误，请稍后重试', 'error');
             } finally {
                 setLoading(false);
             }

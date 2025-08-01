@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OfferCome 用户注册</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .register-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+            backdrop-filter: blur(10px);
+        }
+
+        .register-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .register-header h1 {
+            color: #2c3e50;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .register-header p {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 500;
+            font-size: 0.95em;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .register-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .register-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .register-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            background-color: #e74c3c;
+            color: white;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 0.9em;
+        }
+
+        .success-message {
+            background-color: #27ae60;
+            color: white;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 0.9em;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .password-strength {
+            margin-top: 5px;
+            font-size: 0.8em;
+        }
+
+        .strength-weak {
+            color: #e74c3c;
+        }
+
+        .strength-medium {
+            color: #f39c12;
+        }
+
+        .strength-strong {
+            color: #27ae60;
+        }
+
+        @media (max-width: 480px) {
+            .register-container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-header">
+            <h1>🎯 OfferCome</h1>
+            <p>创建您的账户，开始职业规划之旅</p>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="username">用户名 *</label>
+                <input type="text" id="username" name="username" placeholder="请输入用户名" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">邮箱 *</label>
+                <input type="email" id="email" name="email" placeholder="请输入邮箱地址" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">手机号</label>
+                <input type="tel" id="phone" name="phone" placeholder="请输入手机号（可选）">
+            </div>
+
+            <div class="form-group">
+                <label for="password">密码 *</label>
+                <input type="password" id="password" name="password" placeholder="请输入密码" required>
+                <div class="password-strength" id="passwordStrength"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">确认密码 *</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="请再次输入密码" required>
+            </div>
+
+            <button type="submit" class="register-btn" id="registerBtn">
+                <span id="registerText">立即注册</span>
+                <span id="registerLoading" class="loading" style="display: none;"></span>
+            </button>
+        </form>
+
+        <div class="login-link">
+            <a href="login.html">已有账号？立即登录</a>
+        </div>
+
+        <div class="footer">
+            <p>© 2024 OfferCome - 智能职业规划平台</p>
+        </div>
+    </div>
+
+    <script src="js/api-client.js"></script>
+    <script>
+        const registerForm = document.getElementById('registerForm');
+        const registerBtn = document.getElementById('registerBtn');
+        const registerText = document.getElementById('registerText');
+        const registerLoading = document.getElementById('registerLoading');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+
+        // 显示消息
+        function showMessage(message, type) {
+            hideMessages();
+            if (type === 'error') {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+            } else if (type === 'success') {
+                successMessage.textContent = message;
+                successMessage.style.display = 'block';
+            }
+        }
+
+        // 隐藏消息
+        function hideMessages() {
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+        }
+
+        // 设置加载状态
+        function setLoading(loading) {
+            if (loading) {
+                registerBtn.disabled = true;
+                registerText.style.display = 'none';
+                registerLoading.style.display = 'inline-block';
+            } else {
+                registerBtn.disabled = false;
+                registerText.style.display = 'inline';
+                registerLoading.style.display = 'none';
+            }
+        }
+
+        // 密码强度检测
+        function checkPasswordStrength(password) {
+            const strengthIndicator = document.getElementById('passwordStrength');
+            
+            if (!password) {
+                strengthIndicator.textContent = '';
+                return;
+            }
+
+            let strength = 0;
+            const checks = [
+                password.length >= 6,
+                /[a-z]/.test(password),
+                /[A-Z]/.test(password),
+                /[0-9]/.test(password),
+                /[^a-zA-Z0-9]/.test(password)
+            ];
+
+            strength = checks.filter(check => check).length;
+
+            if (strength < 2) {
+                strengthIndicator.textContent = '密码强度：弱';
+                strengthIndicator.className = 'password-strength strength-weak';
+            } else if (strength < 4) {
+                strengthIndicator.textContent = '密码强度：中等';
+                strengthIndicator.className = 'password-strength strength-medium';
+            } else {
+                strengthIndicator.textContent = '密码强度：强';
+                strengthIndicator.className = 'password-strength strength-strong';
+            }
+        }
+
+        // 监听密码输入
+        document.getElementById('password').addEventListener('input', function(e) {
+            checkPasswordStrength(e.target.value);
+        });
+
+        // 表单验证
+        function validateForm() {
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (!username) {
+                showMessage('请输入用户名', 'error');
+                return false;
+            }
+
+            if (username.length < 2) {
+                showMessage('用户名至少需要2个字符', 'error');
+                return false;
+            }
+
+            if (!email) {
+                showMessage('请输入邮箱地址', 'error');
+                return false;
+            }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showMessage('请输入有效的邮箱地址', 'error');
+                return false;
+            }
+
+            if (!password) {
+                showMessage('请输入密码', 'error');
+                return false;
+            }
+
+            if (password.length < 6) {
+                showMessage('密码至少需要6个字符', 'error');
+                return false;
+            }
+
+            if (password !== confirmPassword) {
+                showMessage('两次输入的密码不一致', 'error');
+                return false;
+            }
+
+            return true;
+        }
+
+        // 注册处理
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!validateForm()) {
+                return;
+            }
+
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const password = document.getElementById('password').value;
+
+            hideMessages();
+            setLoading(true);
+
+            try {
+                const response = await apiClient.register({
+                    username: username,
+                    email: email,
+                    phone: phone || undefined,
+                    password: password
+                });
+
+                if (response.success) {
+                    showMessage('注册成功！正在跳转到案例管理页面...', 'success');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'case-management.html';
+                    }, 2000);
+                } else {
+                    showMessage(response.message || '注册失败', 'error');
+                }
+            } catch (error) {
+                console.error('注册错误:', error);
+                showMessage(error.message || '网络错误，请稍后重试', 'error');
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        // 检查是否已登录
+        if (apiClient.isLoggedIn()) {
+            window.location.href = 'case-management.html';
+        }
+    </script>
+</body>
+</html>
