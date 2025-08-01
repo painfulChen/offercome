@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>小人插图测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .illustration {
+            margin: 20px 0;
+            text-align: center;
+            display: block;
+        }
+        
+        .illustration svg {
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+            animation: float 3s ease-in-out infinite;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        h1 {
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+        
+        p {
+            color: #6b7280;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>小人插图测试</h1>
+        <p>如果你能看到下面的小人，说明插图功能正常</p>
+        
+        <!-- 小人插图 -->
+        <div class="illustration">
+            <svg width="120" height="120" viewBox="0 0 120 120">
+                <!-- 头部 -->
+                <circle cx="60" cy="30" r="15" fill="#667eea" stroke="#4c51bf" stroke-width="2"/>
+                <!-- 身体 -->
+                <rect x="50" y="45" width="20" height="40" fill="#667eea" stroke="#4c51bf" stroke-width="2" rx="5"/>
+                <!-- 手臂 -->
+                <line x1="45" y1="55" x2="35" y2="65" stroke="#667eea" stroke-width="3" stroke-linecap="round"/>
+                <line x1="75" y1="55" x2="85" y2="65" stroke="#667eea" stroke-width="3" stroke-linecap="round"/>
+                <!-- 腿部 -->
+                <line x1="55" y1="85" x2="50" y2="95" stroke="#667eea" stroke-width="3" stroke-linecap="round"/>
+                <line x1="65" y1="85" x2="70" y2="95" stroke="#667eea" stroke-width="3" stroke-linecap="round"/>
+                <!-- 眼睛 -->
+                <circle cx="55" cy="25" r="2" fill="#ffffff"/>
+                <circle cx="65" cy="25" r="2" fill="#ffffff"/>
+                <!-- 嘴巴 -->
+                <path d="M 55 35 Q 60 38 65 35" stroke="#ffffff" stroke-width="2" fill="none"/>
+            </svg>
+        </div>
+        
+        <p>小人应该会上下浮动，如果你看到了，说明动画也正常工作！</p>
+    </div>
+</body>
+</html> 

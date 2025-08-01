@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>移动端布局测试</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #fff;
+        }
+
+        .test-container {
+            max-width: 100vw;
+            width: 100vw;
+            padding: 15px 10px;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+
+        .test-page {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 20px 15px;
+            margin-bottom: 15px;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            overflow: visible;
+            min-height: auto;
+        }
+
+        .test-header {
+            text-align: center;
+            margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .title {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            line-height: 1.2;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .test-content {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            width: 100%;
+            box-sizing: border-box;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            overflow: visible;
+            white-space: normal;
+        }
+
+        .test-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px 12px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            overflow: visible;
+            white-space: normal;
+        }
+
+        .test-item h4 {
+            font-size: 1rem;
+            margin-bottom: 8px;
+            line-height: 1.2;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .test-item p {
+            margin-bottom: 8px;
+            line-height: 1.4;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }
+
+        .test-item em {
+            font-size: 0.8rem;
+            line-height: 1.4;
+            display: block;
+            margin-top: 8px;
+            padding: 10px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 6px;
+            border-left: 2px solid #FFD700;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            overflow: visible;
+            white-space: normal;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        .test-page * {
+            word-break: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            overflow: visible;
+        }
+
+        .test-page, .test-container, .test-content {
+            max-width: none !important;
+            width: 100% !important;
+            overflow: visible !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-page">
+            <div class="test-header">
+                <h2 class="title">🎉 测试完成！</h2>
+                <div style="font-size: 2rem; color: #FFD700; margin-bottom: 10px;">ESTJ</div>
+            </div>
+            <div class="test-content">
+                <p>你是ESTJ型人格，具有独特的思维方式和行为模式。你往往被误解为"过于强势"或"不近人情"，但实际上，你的领导风格能够激发团队的最大潜能。</p>
+                
+                <div class="test-item">
+                    <h4>🎯 最适合的职业方向</h4>
+                    <div class="test-item">
+                        <h4>互联网</h4>
+                        <p><strong>推荐岗位：</strong>产品总监、技术总监、运营总监</p>
+                        <p><strong>匹配原因：</strong>ESTJ的领导能力和战略眼光在互联网企业高层管理中发挥重要作用。他们能够推动团队实现 ambitious 目标。</p>
+                        <em>💡 反直觉洞察：虽然你可能觉得自己不够"外向"或"专业"，但你的ESTJ特质恰恰是这些岗位最需要的核心竞争力。</em>
+                    </div>
+                </div>
+
+                <div class="test-item" style="border-left-color: #ef4444;">
+                    <h4 style="color: #ef4444;">⚠️ 需要谨慎考虑的方向</h4>
+                    <div class="test-item">
+                        <h4 style="color: #ef4444;">服务</h4>
+                        <p><strong>避免岗位：</strong>客服代表、前台接待、导游</p>
+                        <p><strong>原因：</strong>ESTJ更适合领导和管理，不适合需要持续人际互动的服务岗位。他们更适合制定策略和推动执行。</p>
+                        <em>💡 反直觉洞察：这并不意味着你"不够好"，而是这些岗位的工作方式与你的天赋特质存在根本性冲突。选择适合自己的赛道，比盲目努力更重要。</em>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

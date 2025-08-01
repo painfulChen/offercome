@@ -9,20 +9,29 @@
             "runtime": "Nodejs16.13",
             "memorySize": 256,
             "timeout": 30,
-            "entry": "index.main",
+            "entry": "cloudbase-function.main",
             "ignore": [
                 "cloudbase-function.js",
                 "tests/**",
                 "logs/**"
             ],
             "envVariables": {
-                "DB_HOST": "sh-cdb-l8rfujds.sql.tencentcdb.com",
-                "DB_PORT": "21736",
+                "DB_HOST": "localhost",
+                "DB_PORT": "3306",
                 "DB_USER": "root",
-                "DB_PASSWORD": "Offercome2024!",
-                "DB_NAME": "offercome",
-                "NODE_ENV": "production"
+                "DB_PASSWORD": "",
+                "DB_NAME": "cloudbase_ai",
+                "NODE_ENV": "production",
+                "JWT_SECRET": "your-jwt-secret-key",
+                "OPENAI_API_KEY": "your-openai-api-key"
             }
+        },
+        {
+            "name": "test-function",
+            "runtime": "Nodejs16.13",
+            "memorySize": 128,
+            "timeout": 10,
+            "entry": "test-function.main"
         }
     ],
     "service": {

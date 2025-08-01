@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#4F46E5">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="api-base" content="https://offercome2025-9g14jitp22f4ddfc.service.tcloudbase.com/api-v2">
+    <meta name="api-base" content="https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api16">
     <title>MBTI人格测试 - 移动端优化版</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -433,7 +433,7 @@
             constructor() {
                 // 从meta标签或环境变量获取API地址
                 const apiMeta = document.querySelector('meta[name="api-base"]');
-                this.apiBaseUrl = apiMeta ? apiMeta.getAttribute('content') : 'https://offercome2025-9g14jitp22f4ddfc.service.tcloudbase.com/api-v2';
+                this.apiBaseUrl = apiMeta ? apiMeta.getAttribute('content') : 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api16';
                 this.questions = [];
                 this.currentQuestionIndex = 0;
                 this.answers = [];
@@ -503,7 +503,7 @@
                 }
                 
                 const question = this.questions[this.currentQuestionIndex];
-                document.getElementById('questionText').textContent = question.question;
+                document.getElementById('questionText').textContent = question.text;
                 
                 // 更新进度
                 const progress = ((this.currentQuestionIndex + 1) / this.questions.length) * 100;
@@ -513,10 +513,10 @@
                 const optionsContainer = document.getElementById('answerOptions');
                 optionsContainer.innerHTML = '';
                 
-                question.options.forEach(option => {
+                question.options.forEach((option, index) => {
                     const btn = document.createElement('button');
                     btn.className = 'answer-btn';
-                    btn.setAttribute('data-value', option.id);
+                    btn.setAttribute('data-value', index); // 使用索引作为值：0 或 1
                     btn.innerHTML = `
                         <span class="option-text">${option.text}</span>
                         <i class="fas fa-chevron-right"></i>
@@ -528,13 +528,13 @@
             
             handleAnswer(event) {
                 const btn = event.currentTarget;
-                const value = btn.getAttribute('data-value');
+                const value = parseInt(btn.getAttribute('data-value')); // 转换为数字
                 
                 // 添加选中效果
                 document.querySelectorAll('.answer-btn').forEach(b => b.classList.remove('selected'));
                 btn.classList.add('selected');
                 
-                // 保存答案
+                // 保存答案（确保是数字）
                 this.answers.push(value);
                 
                 // 延迟跳转到下一题
@@ -562,25 +562,58 @@
                 this.showLoading();
                 
                 try {
-                    if (this.isDebugMode()) console.log('🔄 开始生成模拟结果...');
+                    if (this.isDebugMode()) console.log('🔄 开始调用真实API...');
                     
-                    // 由于API暂时有问题，使用模拟数据
-                    const mockResult = {
-                        mbtiType: 'INTJ',
-                        scores: { E: 4, I: 6, S: 3, N: 7, T: 8, F: 2, J: 6, P: 4 },
-                        type: 'INTJ',
-                        description: 'INTJ建筑师型人格 - 富有想象力和战略性的思考者，一切都要经过深思熟虑'
+                    // 调试：显示答案数据
+                    console.log('📊 答案数组:', this.answers);
+                    console.log('📊 答案类型:', typeof this.answers);
+                    console.log('📊 是否数组:', Array.isArray(this.answers));
+                    console.log('📊 答案长度:', this.answers.length);
+                    console.log('📊 前5个答案:', this.answers.slice(0, 5));
+                    
+                    // 确保答案是数字数组
+                    const processedAnswers = this.answers.map(ans => {
+                        const num = parseInt(ans);
+                        if (isNaN(num)) {
+                            console.error('❌ 答案格式错误:', ans, typeof ans);
+                            throw new Error(`答案格式错误: ${ans}`);
+                        }
+                        return num;
+                    });
+                    
+                    console.log('📊 处理后的答案:', processedAnswers);
+                    
+                    const requestBody = {
+                        answers: processedAnswers
                     };
                     
-                    if (this.isDebugMode()) console.log('📊 模拟结果:', mockResult);
+                    console.log('📊 请求体:', JSON.stringify(requestBody, null, 2));
                     
-                    // 延迟模拟API调用
-                    if (this.isDebugMode()) console.log('⏳ 等待1秒...');
-                    await this.delay(1000);
+                    // 调用真实的MBTI计算API
+                    const response = await fetch(`${this.apiBaseUrl}/mbti/calculate`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(requestBody)
+                    });
                     
-                    if (this.isDebugMode()) console.log('✅ 调用showResult...');
-                    this.showResult(mockResult);
-                    if (this.isDebugMode()) console.log('✅ 结果显示完成');
+                    if (this.isDebugMode()) console.log('📡 API响应状态:', response.status);
+                    
+                    if (!response.ok) {
+                        throw new Error(`服务器返回异常: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    if (this.isDebugMode()) console.log('📊 API返回数据:', data);
+                    
+                    if (data.success) {
+                        if (this.isDebugMode()) console.log('✅ 调用showResult...');
+                        this.showResult(data.data);
+                        if (this.isDebugMode()) console.log('✅ 结果显示完成');
+                    } else {
+                        throw new Error(data.message || '计算结果失败');
+                    }
                     
                 } catch (error) {
                     console.error('❌ 提交答案失败:', error);
@@ -600,10 +633,11 @@
                 }
             }
             
-            // 调试模式检查
+            // 调试模式检查 - 临时总是启用
             isDebugMode() {
-                return window.location.search.includes('debug=true') || 
-                       window.location.hostname === 'localhost';
+                return true; // 临时总是启用调试
+                // return window.location.search.includes('debug=true') || 
+                //        window.location.hostname === 'localhost';
             }
             
             // 延迟函数

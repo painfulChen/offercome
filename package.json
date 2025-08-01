@@ -1,46 +1,60 @@
 {
-  "name": "offercome",
+  "name": "cloudbase-ai-persistent",
   "version": "1.0.0",
-  "description": "OfferCome智能求职辅导平台 - CloudBase统一部署",
+  "description": "CloudBase AI开发框架 - 数据持久化版本",
   "main": "server/index.js",
   "scripts": {
-    "dev": "node server/index.js",
     "start": "node server/index.js",
-    "deploy": "tcb fn deploy api -e offercome2025-9g14jitp22f4ddfc --force",
-    "deploy-frontend": "tcb hosting deploy public/ -e offercome2025-9g14jitp22f4ddfc",
-    "deploy-all": "npm run deploy && npm run deploy-frontend",
-    "test": "node tests/run-tests.js",
+    "dev": "nodemon server/index.js",
     "build": "echo '构建完成'",
-    "clean": "rm -rf node_modules package-lock.json",
-    "backup": "tar -czf backup-$(date +%Y%m%d-%H%M%S).tar.gz server/ public/ miniprogram/",
-    "migrate": "./migrate-to-cloudbase.sh"
+    "build:static": "echo '静态资源构建完成'",
+    "test": "jest",
+    "init-db": "node server/scripts/init-database-persistent.js",
+    "backup": "node server/scripts/backup-restore.js backup",
+    "backup-table": "node server/scripts/backup-restore.js backup",
+    "restore": "node server/scripts/backup-restore.js restore",
+    "list-backups": "node server/scripts/backup-restore.js list",
+    "cleanup-backups": "node server/scripts/backup-restore.js cleanup",
+    "deploy": "./deploy-persistent.sh",
+    "auto-deploy": "./auto-deploy.sh",
+    "health-check": "node -e \"const healthCheck = require('./server/handlers/health-check'); console.log('健康检查模块加载成功');\"",
+    "db-test": "node -e \"const { createPool } = require('./server/config/database-persistent'); createPool().then(() => console.log('✅ 数据库连接成功')).catch(err => console.error('❌ 数据库连接失败:', err.message));\"",
+    "migrate": "node server/scripts/migrate-data.js",
+    "migrate-json": "node server/scripts/migrate-data.js migrate-json",
+    "migrate-mongo": "node server/scripts/migrate-data.js migrate-mongo",
+    "performance-report": "node server/scripts/performance-monitor.js report",
+    "performance-monitor": "node server/scripts/performance-monitor.js monitor",
+    "performance-test": "node server/scripts/performance-monitor.js test"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "mongoose": "^7.0.0",
-    "ioredis": "^5.3.0",
-    "jsonwebtoken": "^9.0.2",
-    "bcryptjs": "^3.0.2",
-    "multer": "^1.4.5-lts.1",
-    "cors": "^2.8.5",
-    "helmet": "^7.0.0",
-    "dotenv": "^16.3.1",
     "axios": "^1.11.0",
-    "winston": "^3.8.2"
+    "bcryptjs": "^2.4.3",
+    "compression": "^1.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.18.2",
+    "helmet": "^7.2.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.1",
+    "mysql2": "^3.14.3",
+    "openai": "^4.20.0",
+    "redis": "^4.6.7"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.1",
+    "supertest": "^7.1.4"
   },
-  "keywords": [
-    "求职",
-    "AI",
-    "简历优化",
-    "面试辅导",
-    "CloudBase"
-  ],
-  "author": "OfferCome Team",
-  "license": "MIT",
   "engines": {
     "node": ">=16.0.0"
-  }
+  },
+  "keywords": [
+    "cloudbase",
+    "ai",
+    "persistent",
+    "mysql",
+    "wechat-miniprogram"
+  ],
+  "author": "CloudBase AI Team",
+  "license": "MIT"
 }

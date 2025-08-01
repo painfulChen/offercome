@@ -5,63 +5,164 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MBTI API 测试</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .result { margin: 10px 0; padding: 10px; border-radius: 5px; }
-        .success { background: #d4edda; color: #155724; }
-        .error { background: #f8d7da; color: #721c24; }
-        .info { background: #d1ecf1; color: #0c5460; }
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
     </style>
 </head>
 <body>
-    <h1>MBTI API 测试</h1>
-    <button onclick="testAPI()">测试MBTI API</button>
-    <div id="result"></div>
+    <div class="container">
+        <h1>MBTI API 测试页面</h1>
+        
+        <div>
+            <button onclick="testQuestions()">1. 测试获取问题</button>
+            <button onclick="testCalculate()">2. 测试计算MBTI</button>
+            <button onclick="testFullFlow()">3. 测试完整流程</button>
+        </div>
+        
+        <div id="result"></div>
+    </div>
 
     <script>
-        const API_BASE = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api-v2';
+        const API_BASE = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api16';
         
-        async function testAPI() {
+        function showResult(message, type = 'info') {
             const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = '<div class="info">正在测试API...</div>';
-            
+            resultDiv.className = `result ${type}`;
+            resultDiv.textContent = message;
+        }
+        
+        async function testQuestions() {
             try {
-                // 测试提交答案
+                showResult('🔄 正在获取问题...', 'info');
+                
+                const response = await fetch(`${API_BASE}/mbti/questions`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult(`✅ 成功获取问题\n问题数量: ${data.data.length}\n第一个问题: ${data.data[0].text}`, 'success');
+                } else {
+                    showResult(`❌ 获取问题失败: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ 请求失败: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testCalculate() {
+            try {
+                showResult('🔄 正在测试MBTI计算...', 'info');
+                
+                // 生成32个测试答案
+                const testAnswers = Array.from({length: 32}, (_, i) => i % 2);
+                
                 const response = await fetch(`${API_BASE}/mbti/calculate`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        answers: ['E', 'T', 'J', 'S']
+                        answers: testAnswers
                     })
                 });
                 
                 const data = await response.json();
                 
                 if (data.success) {
-                    resultDiv.innerHTML = `
-                        <div class="success">
-                            <h3>✅ API测试成功</h3>
-                            <p><strong>MBTI类型:</strong> ${data.data.type}</p>
-                            <p><strong>描述:</strong> ${data.data.description}</p>
-                            <p><strong>答案:</strong> ${data.data.answers.join(', ')}</p>
-                        </div>
-                    `;
+                    showResult(`✅ MBTI计算成功\n类型: ${data.data.mbtiType}\n描述: ${data.data.description}`, 'success');
                 } else {
-                    resultDiv.innerHTML = `
-                        <div class="error">
-                            <h3>❌ API测试失败</h3>
-                            <p>${data.message}</p>
-                        </div>
-                    `;
+                    showResult(`❌ MBTI计算失败: ${data.message}`, 'error');
                 }
             } catch (error) {
-                resultDiv.innerHTML = `
-                    <div class="error">
-                        <h3>❌ 请求失败</h3>
-                        <p>${error.message}</p>
-                    </div>
-                `;
+                showResult(`❌ 请求失败: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testFullFlow() {
+            try {
+                showResult('🔄 开始完整流程测试...', 'info');
+                
+                // 1. 获取问题
+                const questionsResponse = await fetch(`${API_BASE}/mbti/questions`);
+                const questionsData = await questionsResponse.json();
+                
+                if (!questionsData.success) {
+                    showResult(`❌ 获取问题失败: ${questionsData.message}`, 'error');
+                    return;
+                }
+                
+                showResult(`✅ 获取问题成功，共${questionsData.data.length}个问题`, 'success');
+                
+                // 2. 生成答案
+                const answers = Array.from({length: questionsData.data.length}, (_, i) => i % 2);
+                
+                showResult(`📝 生成测试答案: ${answers.length}个`, 'info');
+                
+                // 3. 计算MBTI
+                const calculateResponse = await fetch(`${API_BASE}/mbti/calculate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        answers: answers
+                    })
+                });
+                
+                const calculateData = await calculateResponse.json();
+                
+                if (calculateData.success) {
+                    showResult(`🎉 完整流程测试成功！\nMBTI类型: ${calculateData.data.mbtiType}\n描述: ${calculateData.data.description}`, 'success');
+                } else {
+                    showResult(`❌ MBTI计算失败: ${calculateData.message}`, 'error');
+                }
+                
+            } catch (error) {
+                showResult(`❌ 完整流程测试失败: ${error.message}`, 'error');
             }
         }
     </script>

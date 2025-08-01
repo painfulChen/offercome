@@ -1,72 +1,178 @@
-// CloudBase函数 - 重构版本，使用新的路由匹配系统
-const { matchRoute } = require('./router');
-const handlers = require('./handlers');
-const routes = require('./routes');
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const compression = require('compression');
+const morgan = require('morgan');
+require('dotenv').config();
 
-exports.main = async (event, context) => {
-  console.log('收到请求:', event);
-  
-  const rawPath = (event.path || '').replace(/^\/api-v2/, '') || '/';
-  const { httpMethod: method = 'GET', body } = event;
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-  console.log('处理路径:', rawPath, '方法:', method);
+// 中间件配置
+app.use(helmet());
+app.use(compression());
+app.use(cors());
+app.use(morgan('combined'));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
 
-  const route = matchRoute(rawPath, method);
-  if (!route) {
-    console.log('路由未匹配:', rawPath, method);
-    return {
-      statusCode: 404,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        success: false,
-        message: `路径 ${rawPath} 不存在`,
-        availablePaths: routes.map(r => `/api-v2${r.path}`)
-      })
-    };
-  }
+// 数据库连接
+const { createPool } = require('./config/database-persistent');
 
+// 健康检查路由
+app.get('/api/health', async (req, res) => {
   try {
-    console.log('匹配路由:', route.handler, '参数:', route.params);
-    const handlerFn = handlers[route.handler];
-    if (!handlerFn) {
-      console.error('Handler未找到:', route.handler);
-      return {
-        statusCode: 500,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          success: false,
-          message: `Handler ${route.handler} 未找到`
-        })
-      };
-    }
+    const pool = await createPool();
+    const [result] = await pool.execute('SELECT 1 as status');
+    
+    res.json({
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      database: result[0].status === 1 ? 'connected' : 'error',
+      uptime: process.uptime(),
+      memory: process.memoryUsage()
+    });
+  } catch (error) {
+    res.status(503).json({
+      status: 'unhealthy',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
 
-    const result = await handlerFn({ ...event, params: route.params });
-    
-    // ---- 统一JSON包装 ----
-    if (typeof result === 'object' && result !== null) {
-      return {
-        statusCode: result.statusCode || 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: result.body || JSON.stringify(result)
-      };
+// 用户认证路由
+const authRoutes = require('./routes/auth');
+app.use('/api/auth', authRoutes);
+
+// AI服务路由
+const aiRoutes = require('./routes/ai');
+app.use('/api/ai', aiRoutes);
+
+// 案例管理路由
+const caseRoutes = require('./routes/cases');
+app.use('/api/cases', caseRoutes);
+
+// 辅导会话路由
+const coachingRoutes = require('./routes/coaching');
+app.use('/api/coaching', coachingRoutes);
+
+// 用户管理路由
+const userRoutes = require('./routes/users');
+app.use('/api/users', userRoutes);
+
+// 数据备份路由
+const backupRoutes = require('./routes/backup');
+app.use('/api/backup', backupRoutes);
+
+// 性能监控路由
+const monitorRoutes = require('./routes/monitor');
+app.use('/api/monitor', monitorRoutes);
+
+// 根路径
+app.get('/', (req, res) => {
+  res.json({
+    message: 'CloudBase AI API Service',
+    version: '1.0.0',
+    status: 'running',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// 404处理
+app.use('*', (req, res) => {
+  res.status(404).json({
+    error: 'Route not found',
+    path: req.originalUrl,
+    method: req.method
+  });
+});
+
+// 错误处理中间件
+app.use((error, req, res, next) => {
+  console.error('API Error:', error);
+  res.status(500).json({
+    error: 'Internal server error',
+    message: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+  });
+});
+
+// 启动服务器
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`🚀 API服务器运行在端口 ${PORT}`);
+    console.log(`📊 健康检查: http://localhost:${PORT}/api/health`);
+  });
+}
+
+// CloudBase云函数导出
+const main = async (event, context) => {
+  const { httpMethod, path, headers, body, queryString } = event;
+  
+  // 构建Express请求对象
+  const req = {
+    method: httpMethod,
+    url: path,
+    headers: headers || {},
+    body: body ? JSON.parse(body) : {},
+    query: queryString || {}
+  };
+  
+  // 构建Express响应对象
+  let responseBody = '';
+  let responseStatus = 200;
+  let responseHeaders = {};
+  
+  const res = {
+    status: (code) => {
+      responseStatus = code;
+      return res;
+    },
+    json: (data) => {
+      responseBody = JSON.stringify(data);
+      responseHeaders['Content-Type'] = 'application/json';
+      return res;
+    },
+    send: (data) => {
+      responseBody = data;
+      return res;
+    },
+    setHeader: (name, value) => {
+      responseHeaders[name] = value;
+      return res;
     }
+  };
+  
+  // 处理请求
+  try {
+    // 模拟Express中间件链
+    await new Promise((resolve, reject) => {
+      const next = (error) => {
+        if (error) reject(error);
+        else resolve();
+      };
+      
+      // 执行路由匹配
+      app._router.handle(req, res, next);
+    });
     
-    // 字符串 / 数字等原样返回
     return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ data: result })
+      statusCode: responseStatus,
+      headers: responseHeaders,
+      body: responseBody
     };
   } catch (error) {
-    console.error('处理请求时发生错误:', error);
+    console.error('CloudBase函数错误:', error);
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        success: false,
-        message: '服务器内部错误',
-        error: error.message
+        error: 'Internal server error',
+        message: error.message
       })
     };
   }
-}; 
+};
+
+// 导出main函数
+module.exports = { main }; 

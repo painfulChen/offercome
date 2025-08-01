@@ -3,345 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>简单测试 - OfferCome</title>
+    <title>简单测试</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        }
-        
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 2rem;
-        }
-        
-        .test-section {
-            margin-bottom: 2rem;
-            padding: 1rem;
-            border: 2px solid #e1e5e9;
-            border-radius: 10px;
-        }
-        
-        .test-section h3 {
-            color: #667eea;
-            margin-bottom: 1rem;
-        }
-        
-        button {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            background: #667eea;
-            color: white;
-            cursor: pointer;
-            margin: 0.5rem;
-            font-size: 1rem;
-        }
-        
-        button:hover {
-            background: #5a6fd8;
-        }
-        
-        .result {
-            margin-top: 1rem;
-            padding: 1rem;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-            white-space: pre-wrap;
-            font-family: monospace;
-        }
-        
-        .success {
-            border-left-color: #28a745;
-            background: #d4edda;
-        }
-        
-        .error {
-            border-left-color: #dc3545;
-            background: #f8d7da;
-        }
-        
-        .links {
-            margin-top: 2rem;
-            text-align: center;
-        }
-        
-        .links a {
-            display: inline-block;
-            padding: 0.75rem 1.5rem;
-            margin: 0.5rem;
-            background: #667eea;
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-        
-        .links a:hover {
-            background: #5a6fd8;
-            transform: translateY(-2px);
-        }
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .result { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .error { color: red; }
+        .success { color: green; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🔧 系统功能测试</h1>
-        
-        <!-- 页面功能测试 -->
-        <div class="test-section">
-            <h3>📄 页面功能测试</h3>
-            <button onclick="testPageFunctions()">测试页面功能</button>
-            <div id="pageResult" class="result"></div>
-        </div>
-        
-        <!-- JavaScript功能测试 -->
-        <div class="test-section">
-            <h3>⚡ JavaScript功能测试</h3>
-            <button onclick="testJavaScript()">测试JavaScript</button>
-            <div id="jsResult" class="result"></div>
-        </div>
-        
-        <!-- 本地存储测试 -->
-        <div class="test-section">
-            <h3>💾 本地存储测试</h3>
-            <button onclick="testLocalStorage()">测试本地存储</button>
-            <div id="storageResult" class="result"></div>
-        </div>
-        
-        <!-- 事件监听测试 -->
-        <div class="test-section">
-            <h3>🎯 事件监听测试</h3>
-            <button onclick="testEventListeners()">测试事件监听</button>
-            <div id="eventResult" class="result"></div>
-        </div>
-        
-        <!-- 页面链接 -->
-        <div class="links">
-            <h3>📱 页面导航</h3>
-            <a href="index.html" target="_blank">主页面</a>
-            <a href="test-frontend.html" target="_blank">功能测试页面</a>
-            <a href="admin-dashboard-simple.html" target="_blank">管理后台</a>
-        </div>
-    </div>
+    <h1>MBTI 简单测试</h1>
+    <button onclick="testAPI()">测试 API</button>
+    <div id="result"></div>
 
     <script>
-        // 显示结果
-        function showResult(elementId, message, isSuccess = true) {
-            const element = document.getElementById(elementId);
-            element.textContent = message;
-            element.className = `result ${isSuccess ? 'success' : 'error'}`;
-        }
+        const API_BASE = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api16';
         
-        // 测试页面功能
-        function testPageFunctions() {
-            let result = '页面功能测试结果:\n\n';
-            
-            // 测试DOM元素
-            const container = document.querySelector('.container');
-            if (container) {
-                result += '✅ 容器元素存在\n';
-            } else {
-                result += '❌ 容器元素不存在\n';
-            }
-            
-            // 测试按钮
-            const buttons = document.querySelectorAll('button');
-            result += `✅ 找到 ${buttons.length} 个按钮\n`;
-            
-            // 测试结果区域
-            const results = document.querySelectorAll('.result');
-            result += `✅ 找到 ${results.length} 个结果区域\n`;
-            
-            // 测试样式
-            const computedStyle = window.getComputedStyle(document.body);
-            if (computedStyle.background) {
-                result += '✅ 样式加载正常\n';
-            } else {
-                result += '❌ 样式加载异常\n';
-            }
-            
-            showResult('pageResult', result);
-        }
-        
-        // 测试JavaScript功能
-        function testJavaScript() {
-            let result = 'JavaScript功能测试结果:\n\n';
-            
-            // 测试基本语法
-            try {
-                const testArray = [1, 2, 3, 4, 5];
-                const sum = testArray.reduce((a, b) => a + b, 0);
-                result += `✅ 数组操作正常 (sum: ${sum})\n`;
-            } catch (error) {
-                result += `❌ 数组操作异常: ${error.message}\n`;
-            }
-            
-            // 测试异步函数
-            try {
-                const testPromise = Promise.resolve('test');
-                result += '✅ Promise支持正常\n';
-            } catch (error) {
-                result += `❌ Promise支持异常: ${error.message}\n`;
-            }
-            
-            // 测试JSON
-            try {
-                const testObj = { name: 'test', value: 123 };
-                const jsonStr = JSON.stringify(testObj);
-                const parsedObj = JSON.parse(jsonStr);
-                result += '✅ JSON操作正常\n';
-            } catch (error) {
-                result += `❌ JSON操作异常: ${error.message}\n`;
-            }
-            
-            // 测试Date
-            try {
-                const now = new Date();
-                result += `✅ 日期对象正常 (${now.toISOString()})\n`;
-            } catch (error) {
-                result += `❌ 日期对象异常: ${error.message}\n`;
-            }
-            
-            showResult('jsResult', result);
-        }
-        
-        // 测试本地存储
-        function testLocalStorage() {
-            let result = '本地存储测试结果:\n\n';
+        async function testAPI() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '正在测试...';
             
             try {
-                // 测试写入
-                localStorage.setItem('test_key', 'test_value');
-                result += '✅ 写入本地存储成功\n';
-                
-                // 测试读取
-                const value = localStorage.getItem('test_key');
-                if (value === 'test_value') {
-                    result += '✅ 读取本地存储成功\n';
-                } else {
-                    result += '❌ 读取本地存储失败\n';
+                // 创建32个测试答案
+                const answers = [];
+                for (let i = 0; i < 32; i++) {
+                    answers.push(i % 2); // 0,1,0,1,...
                 }
                 
-                // 测试删除
-                localStorage.removeItem('test_key');
-                const deletedValue = localStorage.getItem('test_key');
-                if (deletedValue === null) {
-                    result += '✅ 删除本地存储成功\n';
-                } else {
-                    result += '❌ 删除本地存储失败\n';
-                }
+                console.log('发送的答案:', answers);
+                console.log('答案类型:', typeof answers);
+                console.log('是否数组:', Array.isArray(answers));
                 
-                // 测试清除
-                localStorage.setItem('test_key2', 'test_value2');
-                localStorage.clear();
-                const clearedValue = localStorage.getItem('test_key2');
-                if (clearedValue === null) {
-                    result += '✅ 清除本地存储成功\n';
-                } else {
-                    result += '❌ 清除本地存储失败\n';
-                }
+                const requestBody = {
+                    answers: answers
+                };
                 
-            } catch (error) {
-                result += `❌ 本地存储异常: ${error.message}\n`;
-            }
-            
-            showResult('storageResult', result);
-        }
-        
-        // 测试事件监听
-        function testEventListeners() {
-            let result = '事件监听测试结果:\n\n';
-            
-            try {
-                // 测试点击事件
-                let clickTest = false;
-                const testButton = document.createElement('button');
-                testButton.textContent = '测试按钮';
-                testButton.addEventListener('click', () => {
-                    clickTest = true;
+                console.log('请求体:', JSON.stringify(requestBody, null, 2));
+                
+                const response = await fetch(`${API_BASE}/mbti/calculate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
                 });
                 
-                // 模拟点击
-                testButton.click();
-                if (clickTest) {
-                    result += '✅ 点击事件监听正常\n';
+                console.log('响应状态:', response.status);
+                
+                const data = await response.json();
+                console.log('响应数据:', data);
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ 测试成功!</div>
+                        <div>MBTI类型: ${data.data.mbtiType}</div>
+                        <div>描述: ${data.data.description}</div>
+                        <details>
+                            <summary>完整响应</summary>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </details>
+                    `;
                 } else {
-                    result += '❌ 点击事件监听异常\n';
-                }
-                
-                // 测试键盘事件
-                let keyTest = false;
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Escape') {
-                        keyTest = true;
-                    }
-                });
-                
-                // 模拟键盘事件
-                const keyEvent = new KeyboardEvent('keydown', { key: 'Escape' });
-                document.dispatchEvent(keyEvent);
-                
-                if (keyTest) {
-                    result += '✅ 键盘事件监听正常\n';
-                } else {
-                    result += '❌ 键盘事件监听异常\n';
-                }
-                
-                // 测试表单事件
-                let formTest = false;
-                const testForm = document.createElement('form');
-                testForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    formTest = true;
-                });
-                
-                // 模拟表单提交
-                testForm.dispatchEvent(new Event('submit'));
-                
-                if (formTest) {
-                    result += '✅ 表单事件监听正常\n';
-                } else {
-                    result += '❌ 表单事件监听异常\n';
+                    resultDiv.innerHTML = `
+                        <div class="error">❌ 测试失败: ${data.message}</div>
+                        <details>
+                            <summary>错误详情</summary>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </details>
+                    `;
                 }
                 
             } catch (error) {
-                result += `❌ 事件监听异常: ${error.message}\n`;
+                console.error('测试失败:', error);
+                resultDiv.innerHTML = `<div class="error">❌ 网络错误: ${error.message}</div>`;
             }
-            
-            showResult('eventResult', result);
         }
-        
-        // 页面加载时自动测试
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('页面加载完成，开始自动测试...');
-            
-            // 延迟执行测试，确保页面完全加载
-            setTimeout(() => {
-                testPageFunctions();
-                testJavaScript();
-                testLocalStorage();
-                testEventListeners();
-            }, 1000);
-        });
     </script>
 </body>
 </html> 

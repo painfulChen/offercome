@@ -90,29 +90,181 @@
             gap: 15px;
         }
 
+        /* 测试页面按钮样式 */
         .answer-btn {
-            display: flex;
-            align-items: center;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(255, 215, 0, 0.3);
-            border-radius: 10px;
-            color: #fff;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
+            border: none;
+            padding: 18px 15px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 1rem;
+            width: 100%;
+            box-sizing: border-box;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
         }
 
         .answer-btn:hover {
-            background: rgba(255, 215, 0, 0.1);
-            border-color: #FFD700;
             transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
         }
 
         .answer-btn.selected {
-            background: rgba(255, 215, 0, 0.2);
-            border-color: #FFD700;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .answer-btn.selected:hover {
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+        }
+
+        .option-text {
+            font-size: 1rem;
+            line-height: 1.5;
+            word-break: break-word;
+            font-weight: 500;
+        }
+
+        /* 开始测试按钮 */
+        .start-btn {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        /* 提交按钮 */
+        .submit-btn {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .submit-btn:disabled {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 返回按钮 */
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            color: #FFD700;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 215, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* 进度条 */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD700, #FFA500);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        /* 问题计数器 */
+        .question-counter {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #FFD700;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* 加载动画 */
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading-spinner {
+            border: 3px solid rgba(255, 215, 0, 0.3);
+            border-top: 3px solid #FFD700;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 成功提示 */
+        .success-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
         .option-label {
@@ -129,63 +281,620 @@
             flex-shrink: 0;
         }
 
-        .option-text {
-            flex: 1;
-        }
-
-        .result-container {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .mbti-type {
-            font-size: 3rem;
-            font-weight: bold;
-            background: linear-gradient(45deg, #FFD700, #FFA500);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 20px;
-        }
-
-        .result-sections {
-            display: grid;
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .result-section {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: 20px;
-            text-align: left;
-        }
-
-        .result-section h4 {
+        .answer-btn i {
             color: #FFD700;
-            margin-bottom: 10px;
             font-size: 1.2rem;
         }
 
-        .result-section p {
-            line-height: 1.6;
-            color: #ccc;
+        /* 结果页面样式 */
+        .result-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
         }
 
-        .action-buttons {
+        /* 结果页面布局优化 */
+        .result-page {
             display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 30px;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 30px 20px;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            overflow: visible;
+            min-height: auto;
+            border: 1px solid rgba(255, 215, 0, 0.15);
         }
 
+        .result-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .page-illustration {
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            order: -1; /* 确保图标在最上方 */
+        }
+
+        .page-illustration svg {
+            width: 80px;
+            height: 80px;
+        }
+
+        .page-title {
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            color: #FFD700;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .page-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 15px;
+        }
+
+        .page-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .page-dot.active {
+            background: #FFD700;
+            transform: scale(1.2);
+        }
+
+        .title {
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+            line-height: 1.3;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            color: #fff;
+        }
+
+        .mbti-type {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            word-wrap: break-word;
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        .mbti-description {
+            font-size: 1rem;
+            line-height: 1.7;
+            padding: 20px;
+            margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            overflow: visible;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            text-align: left;
+            border-left: 4px solid #FFD700;
+        }
+
+        .career-content, .strengths-content, .improvements-content {
+            font-size: 1rem;
+            line-height: 1.7;
+            width: 100%;
+            box-sizing: border-box;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            overflow: visible;
+            text-align: left;
+        }
+
+        .career-industry {
+            padding: 18px 15px;
+            margin-bottom: 18px;
+            border-radius: 10px;
+            width: 100%;
+            box-sizing: border-box;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            overflow: visible;
+            text-align: left;
+            border-left: 4px solid #10b981;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .career-industry h4 {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            line-height: 1.3;
+            word-wrap: break-word;
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .career-industry p {
+            margin-bottom: 10px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            color: #e5e5e5;
+        }
+
+        .career-industry strong {
+            color: #FFD700;
+            font-weight: 600;
+        }
+
+        .strengths-content li, .improvements-content li {
+            padding: 15px 18px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            overflow: visible;
+            text-align: left;
+            background: rgba(59, 130, 246, 0.15);
+            border-left: 3px solid #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #e5e5e5;
+        }
+
+        .strengths-content li:before {
+            content: "💪 ";
+            margin-right: 8px;
+            font-size: 1.1rem;
+        }
+
+        .improvements-content li:before {
+            content: "🎯 ";
+            margin-right: 8px;
+            font-size: 1.1rem;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            width: 100%;
+        }
+
+        .nav-btn {
+            padding: 14px 20px;
+            font-size: 0.95rem;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .nav-btn.primary {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
+        }
+
+        .nav-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+        }
+
+        /* 反直觉洞察部分优化 */
+        .career-industry em {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            display: block;
+            margin-top: 10px;
+            padding: 12px;
+            background: rgba(255, 215, 0, 0.15);
+            border-radius: 8px;
+            border-left: 3px solid #FFD700;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            overflow: visible;
+            font-style: normal;
+            color: #FFD700;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        /* 特殊样式优化 - 不适合的职业 */
+        .career-industry[style*="border-left-color: #ef4444"] {
+            border-left-width: 4px;
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .career-industry[style*="border-left-color: #ef4444"] h4 {
+            color: #ef4444 !important;
+            font-size: 1.1rem;
+        }
+
+        .career-industry[style*="border-left-color: #ef4444"] p {
+            color: #e5e5e5;
+        }
+
+        /* 确保内容不被截断 */
+        .result-page {
+            min-height: auto;
+            overflow: visible;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        /* 增加底部间距 */
+        .result-container {
+            padding-bottom: 30px;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        /* 强制换行和防止溢出 */
+        * {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        /* 确保所有文本容器都有足够的宽度 */
+        .result-page > * {
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+        }
+
+        /* 移动端优化样式 */
+        @media (max-width: 768px) {
+            /* 基础容器优化 */
+            .mbti-container {
+                padding: 15px 10px;
+                max-width: 100vw;
+                width: 100vw;
+                box-sizing: border-box;
+                overflow-x: hidden;
+            }
+
+            .mbti-header h1 {
+                font-size: 1.8rem;
+                margin-bottom: 10px;
+                word-break: break-word;
+            }
+
+            .mbti-header p {
+                font-size: 0.9rem;
+                line-height: 1.4;
+                margin-bottom: 20px;
+                word-break: break-word;
+            }
+
+            .question-container {
+                padding: 20px 15px;
+                margin-bottom: 20px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .question-text {
+                font-size: 1.1rem;
+                line-height: 1.5;
+                margin-bottom: 20px;
+                text-align: left;
+                word-break: break-word;
+            }
+
+            .answer-btn {
+                padding: 15px 12px;
+                margin-bottom: 10px;
+                border-radius: 10px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .option-text {
+                font-size: 0.95rem;
+                line-height: 1.4;
+                word-break: break-word;
+            }
+
+            /* 结果页面完全重写 */
+            .result-container {
+                padding: 10px;
+                max-width: 100vw;
+                width: 100vw;
+                box-sizing: border-box;
+                overflow-x: hidden;
+            }
+
+            .result-page {
+                padding: 20px 15px;
+                margin-bottom: 15px;
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
+                overflow: visible;
+                min-height: auto;
+            }
+
+            .result-header {
+                margin-bottom: 20px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .page-illustration {
+                margin-bottom: 10px;
+                display: flex;
+                justify-content: center;
+            }
+
+            .page-illustration svg {
+                width: 60px;
+                height: 60px;
+            }
+
+            .page-title {
+                font-size: 0.8rem;
+                margin-bottom: 5px;
+                word-break: break-word;
+            }
+
+            .page-indicator {
+                gap: 5px;
+                margin-bottom: 10px;
+            }
+
+            .page-dot {
+                width: 5px;
+                height: 5px;
+            }
+
+            .title {
+                font-size: 1.4rem;
+                margin-bottom: 10px;
+                line-height: 1.2;
+                word-break: break-word;
+                overflow-wrap: break-word;
+            }
+
+            .mbti-type {
+                font-size: 2rem;
+                margin-bottom: 10px;
+                word-break: break-word;
+                overflow-wrap: break-word;
+            }
+
+            .mbti-description {
+                font-size: 0.9rem;
+                line-height: 1.5;
+                padding: 15px;
+                margin-bottom: 15px;
+                width: 100%;
+                box-sizing: border-box;
+                word-break: break-word;
+                overflow-wrap: break-word;
+                overflow: visible;
+                white-space: normal;
+            }
+
+            .career-content, .strengths-content, .improvements-content {
+                font-size: 0.9rem;
+                line-height: 1.5;
+                width: 100%;
+                box-sizing: border-box;
+                word-break: break-word;
+                overflow-wrap: break-word;
+                overflow: visible;
+                white-space: normal;
+            }
+
+            .career-industry {
+                padding: 15px 12px;
+                margin-bottom: 15px;
+                border-radius: 8px;
+                width: 100%;
+                box-sizing: border-box;
+                word-break: break-word;
+                overflow-wrap: break-word;
+                overflow: visible;
+                white-space: normal;
+            }
+
+            .career-industry h4 {
+                font-size: 1rem;
+                margin-bottom: 8px;
+                line-height: 1.2;
+                word-break: break-word;
+                overflow-wrap: break-word;
+            }
+
+            .career-industry p {
+                margin-bottom: 8px;
+                line-height: 1.4;
+                word-break: break-word;
+                overflow-wrap: break-word;
+                white-space: normal;
+            }
+
+            .career-industry strong {
+                font-weight: 600;
+            }
+
+            .strengths-content li, .improvements-content li {
+                padding: 12px 15px;
+                margin-bottom: 10px;
+                border-radius: 6px;
+                line-height: 1.4;
+                font-size: 0.85rem;
+                word-break: break-word;
+                overflow-wrap: break-word;
+                overflow: visible;
+                white-space: normal;
+            }
+
+            .strengths-content li:before, .improvements-content li:before {
+                margin-right: 6px;
+                font-size: 1rem;
+            }
+
+            .navigation {
+                margin-top: 20px;
+                flex-direction: column;
+                gap: 10px;
+                width: 100%;
+            }
+
+            .nav-btn {
+                padding: 12px 18px;
+                font-size: 0.9rem;
+                border-radius: 15px;
+                width: 100%;
+                text-align: center;
+                box-sizing: border-box;
+            }
+
+            /* 反直觉洞察部分优化 */
+            .career-industry em {
+                font-size: 0.8rem;
+                line-height: 1.4;
+                display: block;
+                margin-top: 8px;
+                padding: 10px;
+                background: rgba(255, 215, 0, 0.1);
+                border-radius: 6px;
+                border-left: 2px solid #FFD700;
+                word-break: break-word;
+                overflow-wrap: break-word;
+                overflow: visible;
+                white-space: normal;
+            }
+
+            /* 特殊样式优化 */
+            .career-industry[style*="border-left-color: #ef4444"] {
+                border-left-width: 3px;
+            }
+
+            .career-industry[style*="border-left-color: #ef4444"] h4 {
+                color: #ef4444 !important;
+                font-size: 1rem;
+            }
+
+            /* 强制所有元素使用正确的盒模型 */
+            * {
+                box-sizing: border-box;
+            }
+
+            /* 确保所有文本都能完整显示 */
+            .result-page * {
+                word-break: break-word;
+                overflow-wrap: break-word;
+                white-space: normal;
+                overflow: visible;
+            }
+
+            /* 移除任何可能限制宽度的样式 */
+            .result-page, .result-container, .career-content, .strengths-content, .improvements-content {
+                max-width: none !important;
+                width: 100% !important;
+                overflow: visible !important;
+            }
+        }
+
+        /* 超小屏幕进一步优化 */
+        @media (max-width: 480px) {
+            .mbti-container {
+                padding: 10px 5px;
+            }
+
+            .question-container {
+                padding: 15px 10px;
+            }
+
+            .question-text {
+                font-size: 1rem;
+            }
+
+            .answer-btn {
+                padding: 12px 10px;
+            }
+
+            .option-text {
+                font-size: 0.9rem;
+            }
+
+            .result-page {
+                padding: 15px 10px;
+            }
+
+            .title {
+                font-size: 1.2rem;
+            }
+
+            .mbti-type {
+                font-size: 1.8rem;
+            }
+
+            .mbti-description {
+                font-size: 0.85rem;
+                padding: 12px;
+            }
+
+            .career-content, .strengths-content, .improvements-content {
+                font-size: 0.85rem;
+            }
+
+            .career-industry {
+                padding: 12px 10px;
+            }
+
+            .career-industry h4 {
+                font-size: 0.95rem;
+            }
+
+            .strengths-content li, .improvements-content li {
+                padding: 10px 12px;
+                font-size: 0.8rem;
+            }
+
+            .nav-btn {
+                padding: 10px 15px;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* 介绍页面样式 */
         .intro-section {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 15px;
             padding: 30px;
             text-align: center;
+            margin-bottom: 30px;
         }
 
         .intro-content h3 {
@@ -241,63 +950,132 @@
             box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
         }
 
-        .back-btn {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            color: #FFD700;
-            padding: 10px 20px;
-            border-radius: 25px;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .back-btn:hover {
-            background: rgba(255, 215, 0, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-        }
-
-        .loading-spinner {
-            border: 3px solid rgba(255, 215, 0, 0.3);
-            border-top: 3px solid #FFD700;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
+        /* 移动端介绍页面优化 */
         @media (max-width: 768px) {
-            .mbti-container {
+            .intro-section {
                 padding: 20px 15px;
+                margin-bottom: 20px;
             }
-            
-            .mbti-header h1 {
-                font-size: 2rem;
+
+            .intro-content h3 {
+                font-size: 1.3rem;
+                margin-bottom: 15px;
             }
-            
-            .question-text {
-                font-size: 1.1rem;
+
+            .intro-content p {
+                font-size: 0.95rem;
+                line-height: 1.5;
+                margin-bottom: 25px;
             }
-            
-            .answer-btn {
+
+            .dimensions-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                margin-bottom: 25px;
+            }
+
+            .dimension {
                 padding: 15px;
             }
-            
-            .action-buttons {
-                flex-direction: column;
+
+            .dimension h4 {
+                font-size: 1rem;
+                margin-bottom: 8px;
+            }
+
+            .dimension p {
+                font-size: 0.85rem;
+            }
+
+            .start-btn {
+                padding: 12px 30px;
+                font-size: 1rem;
+            }
+        }
+
+        /* 用户信息收集表单样式 */
+        .user-info-form {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .user-info-form h4 {
+            color: #FFD700;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.95rem;
+            color: #ccc;
+            margin-bottom: 5px;
+            text-align: left;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #FFD700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        .form-group small {
+            display: block;
+            font-size: 0.8rem;
+            color: #ccc;
+            margin-top: 5px;
+            text-align: left;
+        }
+
+        /* 移动端表单优化 */
+        @media (max-width: 768px) {
+            .user-info-form {
+                padding: 15px;
+                margin-top: 20px;
+            }
+
+            .user-info-form h4 {
+                font-size: 1.1rem;
+                margin-bottom: 15px;
+            }
+
+            .form-group {
+                margin-bottom: 12px;
+            }
+
+            .form-group label {
+                font-size: 0.9rem;
+            }
+
+            .form-group input,
+            .form-group select {
+                padding: 10px 12px;
+                font-size: 0.95rem;
+            }
+
+            .form-group small {
+                font-size: 0.75rem;
             }
         }
     </style>
@@ -346,31 +1124,151 @@
             </div>
         </div>
 
-        <!-- 结果容器 -->
+        <!-- 结果展示 -->
         <div id="resultContainer" class="result-container" style="display: none;">
-            <div class="mbti-type" id="mbtiType">INTJ</div>
-            <div class="result-sections">
-                <div class="result-section">
-                    <h4>人格描述</h4>
-                    <p id="personalityDescription">正在生成...</p>
+            <!-- 第一页：MBTI类型 -->
+            <div id="result-page-1" class="result-page">
+                <div class="result-header">
+                    <div class="page-illustration">
+                        <svg width="100" height="100" viewBox="0 0 100 100">
+                            <!-- 庆祝的小人 -->
+                            <circle cx="50" cy="25" r="12" fill="#667eea" stroke="#4c51bf" stroke-width="2"/>
+                            <rect x="42" y="37" width="16" height="30" fill="#667eea" stroke="#4c51bf" stroke-width="2" rx="3"/>
+                            <line x1="38" y1="45" x2="30" y2="55" stroke="#667eea" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="62" y1="45" x2="70" y2="55" stroke="#667eea" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="45" y1="67" x2="40" y2="75" stroke="#667eea" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="55" y1="67" x2="60" y2="75" stroke="#667eea" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="45" cy="20" r="2" fill="#ffffff"/>
+                            <circle cx="55" cy="20" r="2" fill="#ffffff"/>
+                            <path d="M 45 30 Q 50 33 55 30" stroke="#ffffff" stroke-width="2" fill="none"/>
+                            <!-- 庆祝的手势 -->
+                            <line x1="30" y1="40" x2="25" y2="35" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+                            <line x1="70" y1="40" x2="75" y2="35" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="page-title">第 1 页，共 4 页</div>
+                    <div class="page-indicator">
+                        <div class="page-dot active"></div>
+                        <div class="page-dot"></div>
+                        <div class="page-dot"></div>
+                        <div class="page-dot"></div>
+                    </div>
+                    <h2 class="title">🎉 测试完成！</h2>
+                    <div class="mbti-type" id="mbti-type"></div>
+                    <div class="mbti-description" id="mbti-description"></div>
                 </div>
-                <div class="result-section">
-                    <h4>职业建议</h4>
-                    <p id="careerSuggestions">正在生成...</p>
-                </div>
-                <div class="result-section">
-                    <h4>优势分析</h4>
-                    <p id="strengths">正在生成...</p>
-                </div>
-                <div class="result-section">
-                    <h4>改进建议</h4>
-                    <p id="weaknesses">正在生成...</p>
+                <div class="navigation">
+                    <button class="nav-btn" onclick="showResultPage(2)">查看职业建议 →</button>
                 </div>
             </div>
-            <div class="action-buttons">
-                <button id="saveResultBtn" class="btn btn-primary">保存结果</button>
-                <button id="retakeTestBtn" class="btn btn-outline">重新测试</button>
-                <a href="index.html" class="btn btn-outline">返回首页</a>
+            
+            <!-- 第二页：职业建议 -->
+            <div id="result-page-2" class="result-page" style="display: none;">
+                <div class="result-header">
+                    <div class="page-illustration">
+                        <svg width="100" height="100" viewBox="0 0 100 100">
+                            <!-- 工作的小人 -->
+                            <circle cx="50" cy="25" r="12" fill="#10b981" stroke="#059669" stroke-width="2"/>
+                            <rect x="42" y="37" width="16" height="30" fill="#10b981" stroke="#059669" stroke-width="2" rx="3"/>
+                            <line x1="38" y1="45" x2="30" y2="55" stroke="#10b981" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="62" y1="45" x2="70" y2="55" stroke="#10b981" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="45" y1="67" x2="40" y2="75" stroke="#10b981" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="55" y1="67" x2="60" y2="75" stroke="#10b981" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="45" cy="20" r="2" fill="#ffffff"/>
+                            <circle cx="55" cy="20" r="2" fill="#ffffff"/>
+                            <path d="M 45 30 Q 50 33 55 30" stroke="#ffffff" stroke-width="2" fill="none"/>
+                            <!-- 公文包 -->
+                            <rect x="35" y="50" width="30" height="20" fill="#f59e0b" stroke="#d97706" stroke-width="1" rx="2"/>
+                            <line x1="40" y1="50" x2="40" y2="45" stroke="#f59e0b" stroke-width="2"/>
+                            <line x1="60" y1="50" x2="60" y2="45" stroke="#f59e0b" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div class="page-title">第 2 页，共 4 页</div>
+                    <div class="page-indicator">
+                        <div class="page-dot"></div>
+                        <div class="page-dot active"></div>
+                        <div class="page-dot"></div>
+                        <div class="page-dot"></div>
+                    </div>
+                    <h2 class="title">💼 职业建议</h2>
+                    <div class="career-content" id="career-content"></div>
+                </div>
+                <div class="navigation">
+                    <button class="nav-btn" onclick="showResultPage(1)">← 返回</button>
+                    <button class="nav-btn" onclick="showResultPage(3)">查看优势分析 →</button>
+                </div>
+            </div>
+            
+            <!-- 第三页：优势分析 -->
+            <div id="result-page-3" class="result-page" style="display: none;">
+                <div class="result-header">
+                    <div class="page-illustration">
+                        <svg width="100" height="100" viewBox="0 0 100 100">
+                            <!-- 强壮的小人 -->
+                            <circle cx="50" cy="25" r="12" fill="#3b82f6" stroke="#1d4ed8" stroke-width="2"/>
+                            <rect x="42" y="37" width="16" height="30" fill="#3b82f6" stroke="#1d4ed8" stroke-width="2" rx="3"/>
+                            <line x1="38" y1="45" x2="30" y2="55" stroke="#3b82f6" stroke-width="3" stroke-linecap="round"/>
+                            <line x1="62" y1="45" x2="70" y2="55" stroke="#3b82f6" stroke-width="3" stroke-linecap="round"/>
+                            <line x1="45" y1="67" x2="40" y2="75" stroke="#3b82f6" stroke-width="3" stroke-linecap="round"/>
+                            <line x1="55" y1="67" x2="60" y2="75" stroke="#3b82f6" stroke-width="3" stroke-linecap="round"/>
+                            <circle cx="45" cy="20" r="2" fill="#ffffff"/>
+                            <circle cx="55" cy="20" r="2" fill="#ffffff"/>
+                            <path d="M 45 30 Q 50 33 55 30" stroke="#ffffff" stroke-width="2" fill="none"/>
+                            <!-- 肌肉效果 -->
+                            <circle cx="35" cy="45" r="3" fill="#1e40af"/>
+                            <circle cx="65" cy="45" r="3" fill="#1e40af"/>
+                        </svg>
+                    </div>
+                    <div class="page-title">第 3 页，共 4 页</div>
+                    <div class="page-indicator">
+                        <div class="page-dot"></div>
+                        <div class="page-dot"></div>
+                        <div class="page-dot active"></div>
+                        <div class="page-dot"></div>
+                    </div>
+                    <h2 class="title">💪 你的核心优势</h2>
+                    <div class="strengths-content" id="strengths-content"></div>
+                </div>
+                <div class="navigation">
+                    <button class="nav-btn" onclick="showResultPage(2)">← 返回</button>
+                    <button class="nav-btn" onclick="showResultPage(4)">查看发展建议 →</button>
+                </div>
+            </div>
+            
+            <!-- 第四页：发展建议 -->
+            <div id="result-page-4" class="result-page" style="display: none;">
+                <div class="result-header">
+                    <div class="page-illustration">
+                        <svg width="100" height="100" viewBox="0 0 100 100">
+                            <!-- 成长的小人 -->
+                            <circle cx="50" cy="25" r="12" fill="#8b5cf6" stroke="#7c3aed" stroke-width="2"/>
+                            <rect x="42" y="37" width="16" height="30" fill="#8b5cf6" stroke="#7c3aed" stroke-width="2" rx="3"/>
+                            <line x1="38" y1="45" x2="30" y2="55" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="62" y1="45" x2="70" y2="55" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="45" y1="67" x2="40" y2="75" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="55" y1="67" x2="60" y2="75" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="45" cy="20" r="2" fill="#ffffff"/>
+                            <circle cx="55" cy="20" r="2" fill="#ffffff"/>
+                            <path d="M 45 30 Q 50 33 55 30" stroke="#ffffff" stroke-width="2" fill="none"/>
+                            <!-- 成长箭头 -->
+                            <path d="M 50 60 L 50 80 M 45 75 L 50 80 L 55 75" stroke="#fbbf24" stroke-width="3" fill="none"/>
+                            <circle cx="50" cy="65" r="2" fill="#fbbf24"/>
+                        </svg>
+                    </div>
+                    <div class="page-title">第 4 页，共 4 页</div>
+                    <div class="page-indicator">
+                        <div class="page-dot"></div>
+                        <div class="page-dot"></div>
+                        <div class="page-dot"></div>
+                        <div class="page-dot active"></div>
+                    </div>
+                    <h2 class="title">📈 发展建议</h2>
+                    <div class="improvements-content" id="improvements-content"></div>
+                </div>
+                <div class="navigation">
+                    <button class="nav-btn" onclick="showResultPage(3)">← 返回</button>
+                    <button class="nav-btn restart-btn" onclick="retakeTest()">重新测试</button>
+                </div>
             </div>
         </div>
 
@@ -398,6 +1296,53 @@
                         <p>你更喜欢计划还是保持灵活性</p>
                     </div>
                 </div>
+
+                <!-- 用户信息收集表单 -->
+                <div class="user-info-form">
+                    <h4>📝 请填写基本信息（用于提供更精准的职业建议）</h4>
+                    
+                    <div class="form-group">
+                        <label for="userMajor">专业/学科</label>
+                        <select id="userMajor" required>
+                            <option value="">请选择专业/学科</option>
+                            <option value="计算机科学/软件工程">计算机科学/软件工程</option>
+                            <option value="金融学/经济学">金融学/经济学</option>
+                            <option value="心理学">心理学</option>
+                            <option value="法学">法学</option>
+                            <option value="工商管理/市场营销">工商管理/市场营销</option>
+                            <option value="电子信息/自动化">电子信息/自动化</option>
+                            <option value="机械/土木/材料">机械/土木/材料</option>
+                            <option value="医学/药学">医学/药学</option>
+                            <option value="教育学">教育学</option>
+                            <option value="外语/翻译">外语/翻译</option>
+                            <option value="新闻/传播">新闻/传播</option>
+                            <option value="艺术/设计">艺术/设计</option>
+                            <option value="其他">其他</option>
+                        </select>
+                        <input type="text" id="userMajorOther" placeholder="请补充您的专业/学科" style="display:none;margin-top:10px;" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="userSchool">学校类型</label>
+                        <select id="userSchool" required>
+                            <option value="">请选择学校类型</option>
+                            <option value="985">985高校</option>
+                            <option value="211">211高校</option>
+                            <option value="双非一本">双非一本</option>
+                            <option value="双非二本">双非二本</option>
+                            <option value="海外qs50">海外QS50</option>
+                            <option value="海外qs100">海外QS100</option>
+                            <option value="海外普硕">海外普通硕士</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="userEmail">邮箱地址</label>
+                        <input type="email" id="userEmail" placeholder="your.email@example.com" required>
+                        <small>我们将为您推送详细的测评报告和职业发展建议</small>
+                    </div>
+                </div>
                 
                 <button id="startTestBtn" class="start-btn">
                     <i class="fas fa-play"></i> 开始测试
@@ -409,6 +1354,11 @@
         <div id="loadingContainer" class="loading" style="display: none;">
             <div class="loading-spinner"></div>
             <p>正在加载测试问题...</p>
+        </div>
+        
+        <!-- 答案反馈 -->
+        <div id="answerFeedback" style="display: none; position: fixed; top: 20%; left: 50%; transform: translate(-50%, -50%); background: rgba(255, 215, 0, 0.9); color: #000; padding: 15px 30px; border-radius: 10px; font-size: 16px; font-weight: 600; z-index: 1000;">
+            答案已记录 ✓
         </div>
     </div>
 
@@ -434,11 +1384,13 @@
         // MBTI测试应用
         class MbtiTestApp {
             constructor() {
-                this.apiBaseUrl = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api-v2';
+                this.apiBaseUrl = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api16';
                 this.questions = [];
                 this.currentQuestionIndex = 0;
                 this.answers = [];
                 this.selectedOptionIndex = 0; // 新增：用于跟踪当前选中的选项
+                this.isProcessing = false; // 防止重复点击
+                this.userInfo = {}; // 用户信息
                 this.init();
             }
 
@@ -472,6 +1424,24 @@
 
             async startTest() {
                 try {
+                    // 验证表单数据
+                    if (!this.validateUserInfo()) {
+                        return;
+                    }
+
+                    // 收集用户信息
+                    const majorSelect = document.getElementById('userMajor');
+                    const majorOther = document.getElementById('userMajorOther');
+                    let major = majorSelect.value;
+                    if (major === '其他') {
+                        major = majorOther.value.trim();
+                    }
+                    this.userInfo = {
+                        major,
+                        school: document.getElementById('userSchool').value,
+                        email: document.getElementById('userEmail').value.trim()
+                    };
+
                     // 显示加载状态
                     this.showLoading();
                     
@@ -496,6 +1466,49 @@
                     this.hideLoading();
                     this.showError('获取测试问题失败，请稍后再试');
                 }
+            }
+
+            validateUserInfo() {
+                const majorSelect = document.getElementById('userMajor');
+                const majorOther = document.getElementById('userMajorOther');
+                const school = document.getElementById('userSchool').value;
+                const email = document.getElementById('userEmail').value.trim();
+
+                let major = majorSelect.value;
+                if (!major) {
+                    alert('请选择您的专业/学科');
+                    majorSelect.focus();
+                    return false;
+                }
+                if (major === '其他') {
+                    if (!majorOther.value.trim()) {
+                        alert('请补充您的专业/学科');
+                        majorOther.focus();
+                        return false;
+                    }
+                }
+
+                if (!school) {
+                    alert('请选择您的学校类型');
+                    document.getElementById('userSchool').focus();
+                    return false;
+                }
+
+                if (!email) {
+                    alert('请填写您的邮箱地址');
+                    document.getElementById('userEmail').focus();
+                    return false;
+                }
+
+                // 验证邮箱格式
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    alert('请输入有效的邮箱地址');
+                    document.getElementById('userEmail').focus();
+                    return false;
+                }
+
+                return true;
             }
 
             flattenQuestions(groupedQuestions) {
@@ -550,18 +1563,24 @@
                     optionsContainer.appendChild(btn);
                 });
 
-                // 默认选中第一个选项
-                const firstOption = optionsContainer.querySelector('.answer-btn');
-                if (firstOption) {
-                    firstOption.classList.add('selected');
-                    this.selectedOptionIndex = 0;
-                }
+                // 不默认选中任何选项
+                this.selectedOptionIndex = -1;
             }
 
             handleAnswer(e) {
+                // 防止重复点击
+                if (this.isProcessing) {
+                    console.log('⚠️ 正在处理中，忽略重复点击');
+                    return;
+                }
+                
+                this.isProcessing = true;
+                
                 const btn = e.target.closest('.answer-btn');
                 const optionIndex = Array.from(btn.parentNode.children).indexOf(btn);
                 const question = this.questions[this.currentQuestionIndex];
+                
+                console.log('📝 选择答案:', optionIndex, '问题:', this.currentQuestionIndex + 1);
                 
                 // 添加选中效果
                 document.querySelectorAll('.answer-btn').forEach(btn => {
@@ -572,11 +1591,19 @@
                 // 保存答案（选项索引）
                 this.answers.push(optionIndex.toString());
                 
-                // 延迟跳转到下一题
+                // 显示答案反馈
+                const feedback = document.getElementById('answerFeedback');
+                feedback.style.display = 'block';
+                
+                // 延迟跳转到下一题，给用户视觉反馈
                 setTimeout(() => {
+                    // 隐藏反馈
+                    feedback.style.display = 'none';
+                    
                     this.currentQuestionIndex++;
+                    this.isProcessing = false;
                     this.displayQuestion();
-                }, 500);
+                }, 800);
             }
 
             // 键盘事件处理
@@ -618,21 +1645,35 @@
             }
 
             async showResults() {
+                // 防止重复提交
+                if (this.isProcessing) {
+                    console.log('⚠️ 正在提交中，忽略重复提交');
+                    return;
+                }
+                
+                this.isProcessing = true;
+                
                 try {
                     this.showLoading();
                     
-                    // 根据答案计算MBTI类型和分数
-                    const scores = this.calculateScores();
-                    const type = this.calculateMBTIType(scores);
+                    // 验证答案数量
+                    if (this.answers.length !== this.questions.length) {
+                        throw new Error(`答案数量错误，需要${this.questions.length}个答案，当前只有${this.answers.length}个`);
+                    }
                     
+                    console.log('🔄 开始提交答案...');
+                    console.log('📊 答案数组:', this.answers);
+                    console.log('📊 答案长度:', this.answers.length);
+                    
+                    // 使用正确的API格式，包含用户信息
                     const response = await fetch(`${this.apiBaseUrl}/mbti/calculate`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({ 
-                            type: type,
-                            scores: scores
+                            answers: this.answers.map(answer => parseInt(answer)),
+                            userInfo: this.userInfo
                         })
                     });
                     
@@ -641,11 +1682,90 @@
                     if (data.success) {
                         const result = data.data;
                         
-                        document.getElementById('mbtiType').textContent = result.type;
-                        document.getElementById('personalityDescription').textContent = result.description;
-                        document.getElementById('careerSuggestions').textContent = '根据您的MBTI类型，建议选择适合您性格特点的职业';
-                        document.getElementById('strengths').textContent = '您的MBTI类型具有独特的人格特征';
-                        document.getElementById('weaknesses').textContent = '每个人都有不同的发展潜力';
+                        // 更新第一页：MBTI类型
+                        document.getElementById('mbti-type').textContent = result.mbtiType;
+                        document.getElementById('mbti-description').innerHTML = `
+                            <p><strong>🎯 你的MBTI类型：${result.mbtiType}</strong></p>
+                            <p>${result.description}</p>
+                            <p><em>💡 小贴士：这个类型的人往往有着独特的思维方式，他们可能看起来与常人不同，但正是这种"不同"让他们在某些领域能够脱颖而出。</em></p>
+                        `;
+                        
+                        // 更新第二页：职业建议
+                        let careerHtml = '';
+                        if (result.careerAdvice && result.careerAdvice.suitable) {
+                            careerHtml += '<h3>🎯 最适合的职业方向</h3>';
+                            result.careerAdvice.suitable.forEach(industry => {
+                                careerHtml += `
+                                    <div class="career-industry">
+                                        <h4>${industry.industry}</h4>
+                                        <p><strong>推荐岗位：</strong>${industry.positions.join('、')}</p>
+                                        <p><strong>匹配原因：</strong>${industry.reason}</p>
+                                        <p><em>💡 反直觉洞察：虽然你可能觉得自己不够"外向"或"专业"，但你的${result.mbtiType}特质恰恰是这些岗位最需要的核心竞争力。</em></p>
+                                    </div>
+                                `;
+                            });
+                        }
+                        
+                        if (result.careerAdvice && result.careerAdvice.unsuitable) {
+                            careerHtml += '<h3>⚠️ 需要谨慎考虑的方向</h3>';
+                            result.careerAdvice.unsuitable.forEach(industry => {
+                                careerHtml += `
+                                    <div class="career-industry" style="border-left-color: #ef4444;">
+                                        <h4 style="color: #ef4444;">${industry.industry}</h4>
+                                        <p><strong>避免岗位：</strong>${industry.positions.join('、')}</p>
+                                        <p><strong>原因：</strong>${industry.reason}</p>
+                                        <p><em>💡 反直觉洞察：这并不意味着你"不够好"，而是这些岗位的工作方式与你的天赋特质存在根本性冲突。选择适合自己的赛道，比盲目努力更重要。</em></p>
+                                    </div>
+                                `;
+                            });
+                        }
+                        document.getElementById('career-content').innerHTML = careerHtml;
+                        
+                        // 更新第三页：优势分析
+                        let strengthsHtml = '<h3>💪 你的核心优势</h3><ul>';
+                        if (result.strengths) {
+                            result.strengths.forEach(strength => {
+                                strengthsHtml += `<li>${strength}</li>`;
+                            });
+                        }
+                        strengthsHtml += '</ul>';
+                        strengthsHtml += `
+                            <div style="background: rgba(255, 215, 0, 0.1); padding: 20px; border-radius: 12px; margin-top: 20px; border-left: 4px solid #FFD700;">
+                                <h4>🎯 反直觉优势洞察</h4>
+                                <p>你可能没有意识到，你的${result.mbtiType}特质在某些情况下会被误认为是"缺点"，但实际上：</p>
+                                <ul>
+                                    <li>你的"内向"实际上是深度思考的能力</li>
+                                    <li>你的"敏感"实际上是超强的洞察力</li>
+                                    <li>你的"固执"实际上是坚定的执行力</li>
+                                    <li>你的"完美主义"实际上是卓越的品质追求</li>
+                                </ul>
+                                <p><em>记住：真正的优势往往隐藏在那些让你感到"不够好"的特质中。</em></p>
+                            </div>
+                        `;
+                        document.getElementById('strengths-content').innerHTML = strengthsHtml;
+                        
+                        // 更新第四页：改进建议
+                        let improvementsHtml = '<h3>📈 发展建议</h3><ul>';
+                        if (result.improvements) {
+                            result.improvements.forEach(improvement => {
+                                improvementsHtml += `<li>${improvement}</li>`;
+                            });
+                        }
+                        improvementsHtml += '</ul>';
+                        improvementsHtml += `
+                            <div style="background: rgba(139, 92, 246, 0.1); padding: 20px; border-radius: 12px; margin-top: 20px; border-left: 4px solid #8b5cf6;">
+                                <h4>🚀 成长突破策略</h4>
+                                <p>基于你的${result.mbtiType}特质，这里有一些"反直觉"的成长建议：</p>
+                                <ul>
+                                    <li><strong>不要试图改变你的核心特质</strong> - 相反，学会更好地利用它们</li>
+                                    <li><strong>拥抱你的"不完美"</strong> - 完美主义往往阻碍真正的成长</li>
+                                    <li><strong>学会"战略性妥协"</strong> - 在保持核心价值的同时，适应环境需求</li>
+                                    <li><strong>建立"互补性团队"</strong> - 找到能弥补你短板的合作伙伴</li>
+                                </ul>
+                                <p><em>💡 关键洞察：真正的成长不是变成别人，而是成为更好的自己。</em></p>
+                            </div>
+                        `;
+                        document.getElementById('improvements-content').innerHTML = improvementsHtml;
                         
                         this.hideLoading();
                         this.showResult();
@@ -656,6 +1776,8 @@
                     console.error('显示结果失败:', error);
                     this.hideLoading();
                     this.showError('生成结果失败，请稍后再试');
+                } finally {
+                    this.isProcessing = false;
                 }
             }
 
@@ -766,8 +1888,71 @@
 
         // 初始化应用
         document.addEventListener('DOMContentLoaded', () => {
-            new MbtiTestApp();
+            window.mbtiApp = new MbtiTestApp();
         });
+
+        // 分页导航函数
+        function showResultPage(pageNumber) {
+            // 隐藏所有页面
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`result-page-${i}`).style.display = 'none';
+            }
+            
+            // 显示指定页面
+            document.getElementById(`result-page-${pageNumber}`).style.display = 'block';
+            
+            // 更新页面指示器
+            document.querySelectorAll('.page-dot').forEach((dot, index) => {
+                dot.classList.toggle('active', index === pageNumber - 1);
+            });
+            
+            // 添加页面切换动画
+            const currentPage = document.getElementById(`result-page-${pageNumber}`);
+            currentPage.style.opacity = '0';
+            currentPage.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                currentPage.style.transition = 'all 0.5s ease-in-out';
+                currentPage.style.opacity = '1';
+                currentPage.style.transform = 'translateY(0)';
+            }, 50);
+        }
+
+        // 重新测试函数
+        function retakeTest() {
+            // 重置应用状态
+            const app = window.mbtiApp;
+            if (app) {
+                app.currentQuestionIndex = 0;
+                app.answers = [];
+                app.selectedOptionIndex = 0;
+                app.isProcessing = false;
+                
+                // 显示测试页面
+                document.getElementById('testProgress').style.display = 'block';
+                document.getElementById('questionContainer').style.display = 'block';
+                document.getElementById('resultContainer').style.display = 'none';
+                
+                // 重新开始测试
+                app.displayQuestion();
+            }
+        }
+
+        // 专业下拉框联动补充输入框
+        (function() {
+            const majorSelect = document.getElementById('userMajor');
+            const majorOther = document.getElementById('userMajorOther');
+            if (majorSelect && majorOther) {
+                majorSelect.addEventListener('change', function() {
+                    if (this.value === '其他') {
+                        majorOther.style.display = 'block';
+                    } else {
+                        majorOther.style.display = 'none';
+                        majorOther.value = '';
+                    }
+                });
+            }
+        })();
     </script>
 </body>
 </html> 

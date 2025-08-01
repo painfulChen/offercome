@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI 调试页面</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .debug { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <h1>MBTI 调试页面</h1>
+    
+    <div class="debug">
+        <h3>步骤 1: 获取问题</h3>
+        <button onclick="loadQuestions()">获取问题</button>
+        <div id="questions-result"></div>
+    </div>
+    
+    <div class="debug">
+        <h3>步骤 2: 模拟答案</h3>
+        <button onclick="simulateAnswers()">模拟32个答案</button>
+        <div id="answers-result"></div>
+    </div>
+    
+    <div class="debug">
+        <h3>步骤 3: 提交答案</h3>
+        <button onclick="submitAnswers()">提交答案</button>
+        <div id="submit-result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api16';
+        let questions = [];
+        let answers = [];
+        
+        async function loadQuestions() {
+            const resultDiv = document.getElementById('questions-result');
+            resultDiv.innerHTML = '正在获取问题...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/mbti/questions`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    questions = data.data;
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ 成功获取 ${questions.length} 个问题</div>
+                        <details>
+                            <summary>查看前3个问题</summary>
+                            <pre>${JSON.stringify(questions.slice(0, 3), null, 2)}</pre>
+                        </details>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ 获取问题失败: ${data.message}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ 网络错误: ${error.message}</div>`;
+            }
+        }
+        
+        function simulateAnswers() {
+            const resultDiv = document.getElementById('answers-result');
+            answers = [];
+            
+            // 模拟32个答案：0,1,0,1,...
+            for (let i = 0; i < 32; i++) {
+                answers.push(i % 2);
+            }
+            
+            resultDiv.innerHTML = `
+                <div class="success">✅ 模拟了 ${answers.length} 个答案</div>
+                <div>答案数组: [${answers.join(', ')}]</div>
+                <div>数据类型: ${typeof answers[0]}</div>
+                <div>数组类型: ${Array.isArray(answers) ? 'Array' : 'Not Array'}</div>
+            `;
+        }
+        
+        async function submitAnswers() {
+            const resultDiv = document.getElementById('submit-result');
+            resultDiv.innerHTML = '正在提交答案...';
+            
+            try {
+                console.log('准备发送的数据:', {
+                    answers: answers,
+                    answersType: typeof answers,
+                    answersLength: answers.length,
+                    answersIsArray: Array.isArray(answers)
+                });
+                
+                const requestBody = {
+                    answers: answers
+                };
+                
+                console.log('请求体:', JSON.stringify(requestBody, null, 2));
+                
+                const response = await fetch(`${API_BASE}/mbti/calculate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+                
+                console.log('响应状态:', response.status);
+                console.log('响应头:', Object.fromEntries(response.headers.entries()));
+                
+                const data = await response.json();
+                console.log('响应数据:', data);
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ 提交成功!</div>
+                        <div>MBTI类型: ${data.data.mbtiType}</div>
+                        <div>描述: ${data.data.description}</div>
+                        <details>
+                            <summary>完整响应</summary>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </details>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">❌ 提交失败: ${data.message}</div>
+                        <details>
+                            <summary>错误详情</summary>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </details>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('提交失败:', error);
+                resultDiv.innerHTML = `<div class="error">❌ 网络错误: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html> 

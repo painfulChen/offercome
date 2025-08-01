@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试答案提交</title>
+</head>
+<body>
+    <h1>测试答案提交</h1>
+    <button onclick="testSubmit()">测试提交答案</button>
+    <div id="result"></div>
+
+    <script>
+        const API_BASE = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api16';
+        
+        async function testSubmit() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '正在测试...';
+            
+            try {
+                // 创建32个测试答案
+                const testAnswers = [];
+                for (let i = 0; i < 32; i++) {
+                    testAnswers.push(i % 2); // 0,1,0,1,...
+                }
+                
+                console.log('发送的答案:', testAnswers);
+                
+                const response = await fetch(`${API_BASE}/mbti/calculate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        answers: testAnswers
+                    })
+                });
+                
+                console.log('响应状态:', response.status);
+                
+                const data = await response.json();
+                console.log('响应数据:', data);
+                
+                resultDiv.innerHTML = `
+                    <h3>测试结果:</h3>
+                    <p>状态码: ${response.status}</p>
+                    <p>成功: ${data.success}</p>
+                    <p>消息: ${data.message}</p>
+                    <p>MBTI类型: ${data.data?.mbtiType || 'N/A'}</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+                
+            } catch (error) {
+                console.error('测试失败:', error);
+                resultDiv.innerHTML = `<p style="color: red;">错误: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html> 

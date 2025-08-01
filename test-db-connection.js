@@ -1,51 +1,95 @@
-const axios = require('axios');
+const https = require('https');
 
-const API_BASE_URL = 'https://offercome2025-9g14jitp22f4ddfc.service.tcloudbase.com/api-v2';
-
-async function testDatabaseConnection() {
-  console.log('🧪 测试数据库连接...\n');
+// 测试数据库连接
+async function testDBConnection() {
+  const baseUrl = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api16';
   
+  console.log('🔍 测试数据库连接...\n');
+
   try {
-    // 测试1: 健康检查
-    console.log('📋 测试1: API健康检查');
-    const healthResponse = await axios.get(`${API_BASE_URL}/health`);
-    console.log('✅ API健康检查通过:', healthResponse.data.message);
-    console.log('');
-    
-    // 测试2: 获取MBTI问题（需要数据库查询）
-    console.log('📋 测试2: 获取MBTI问题（数据库查询）');
-    const questionsResponse = await axios.get(`${API_BASE_URL}/mbti/questions`);
-    if (questionsResponse.data.success) {
-      console.log('✅ MBTI问题获取成功');
-      console.log(`   问题数量: ${questionsResponse.data.data.length}`);
-      console.log(`   第一个问题: ${questionsResponse.data.data[0]?.text?.substring(0, 50)}...`);
+    // 测试健康检查
+    console.log('📡 1. 测试健康检查...');
+    const healthResponse = await makeRequest(`${baseUrl}/health`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (healthResponse.success) {
+      console.log('✅ 健康检查通过');
     } else {
-      console.log('❌ MBTI问题获取失败:', questionsResponse.data.message);
+      console.log('❌ 健康检查失败:', healthResponse.message);
     }
-    console.log('');
-    
-    // 测试3: 获取MBTI职业建议（需要数据库查询）
-    console.log('📋 测试3: 获取MBTI职业建议（数据库查询）');
-    const careerResponse = await axios.get(`${API_BASE_URL}/mbti/career-advice`);
-    if (careerResponse.data.success) {
-      console.log('✅ MBTI职业建议获取成功');
-      console.log(`   职业建议数量: ${careerResponse.data.data.length}`);
-      console.log(`   第一个类型: ${careerResponse.data.data[0]?.mbti_type}`);
+
+    // 测试MBTI计算（包含数据库保存）
+    console.log('\n💾 2. 测试MBTI计算和数据库保存...');
+    const testData = {
+      answers: [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+      userInfo: {
+        major: "计算机科学/软件工程",
+        school: "985",
+        email: "test@example.com"
+      }
+    };
+
+    const calculateResponse = await makeRequest(`${baseUrl}/mbti/calculate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(testData)
+    });
+
+    if (calculateResponse.success) {
+      console.log('✅ MBTI计算成功');
+      console.log(`   测试ID: ${calculateResponse.data.testId}`);
+      console.log(`   MBTI类型: ${calculateResponse.data.mbtiType}`);
+      
+      // 检查是否有数据库错误信息
+      if (calculateResponse.data.testId === undefined) {
+        console.log('⚠️  警告: 测试ID未生成，可能是数据库连接问题');
+      }
     } else {
-      console.log('❌ MBTI职业建议获取失败:', careerResponse.data.message);
+      console.log('❌ MBTI计算失败:', calculateResponse.message);
+      if (calculateResponse.error) {
+        console.log('   错误详情:', calculateResponse.error);
+      }
     }
-    console.log('');
-    
-    console.log('🎉 数据库连接测试完成！');
-    
+
   } catch (error) {
     console.error('❌ 测试失败:', error.message);
-    if (error.response) {
-      console.error('响应状态:', error.response.status);
-      console.error('响应数据:', error.response.data);
-    }
   }
 }
 
+// 发送HTTP请求的通用函数
+function makeRequest(url, options = {}) {
+  return new Promise((resolve, reject) => {
+    const req = https.request(url, options, (res) => {
+      let data = '';
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
+      res.on('end', () => {
+        try {
+          const result = JSON.parse(data);
+          resolve(result);
+        } catch (error) {
+          reject(new Error(`解析响应失败: ${error.message}`));
+        }
+      });
+    });
+
+    req.on('error', (error) => {
+      reject(error);
+    });
+
+    if (options.body) {
+      req.write(options.body);
+    }
+    req.end();
+  });
+}
+
 // 运行测试
-testDatabaseConnection(); 
+testDBConnection(); 

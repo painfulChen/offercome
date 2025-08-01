@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>MBTI 测试 - 简化版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+        
+        .progress {
+            width: 100%;
+            background: #e5e7eb;
+            border-radius: 10px;
+            height: 8px;
+            margin: 20px 0;
+            overflow: hidden;
+            padding: 0 20px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        
+        .question {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 30px 0;
+            line-height: 1.6;
+            padding: 0 20px;
+            text-align: left;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 30px 0;
+            padding: 0 20px;
+        }
+        
+        .option-btn {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            font-size: 16px;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 60px;
+        }
+        
+        .option-btn:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        
+        .option-btn.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .option-btn.processing {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        .answer-feedback {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(102, 126, 234, 0.9);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .result {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .result.show {
+            display: block;
+        }
+        
+        .mbti-type {
+            font-size: 32px;
+            font-weight: 700;
+            color: #667eea;
+            margin: 20px 0;
+        }
+        
+        .description {
+            font-size: 16px;
+            color: #6b7280;
+            line-height: 1.6;
+            margin: 20px 0;
+        }
+        
+        .result-description {
+            font-size: 18px;
+            color: #374151;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .career-section, .strengths-section, .improvements-section {
+            margin: 25px 0;
+            text-align: left;
+        }
+        
+        .career-section h3, .strengths-section h3, .improvements-section h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .career-item {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .career-item h4 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .career-item p {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+        
+        .career-item strong {
+            color: #374151;
+        }
+        
+        .strengths-section ul, .improvements-section ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .strengths-section li, .improvements-section li {
+            background: #f0f9ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #0ea5e9;
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.5;
+        }
+        
+        .improvements-section li {
+            background: #fef3c7;
+            border-left-color: #f59e0b;
+        }
+        
+        .error {
+            color: #dc2626;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .start-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .start-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+        
+        .illustration {
+            margin: 20px 0;
+            text-align: center;
+            display: block;
+        }
+        
+        .illustration svg {
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+            animation: float 3s ease-in-out infinite;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .career-icon {
+            font-size: 48px;
+            text-align: center;
+            margin: 20px 0;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        /* 结果页面样式 */
+        .result-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px 0;
+        }
+        
+        .result-header {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .mbti-type {
+            font-size: 36px;
+            font-weight: 800;
+            color: #667eea;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .mbti-description {
+            font-size: 16px;
+            color: #374151;
+            line-height: 1.6;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+            max-width: 100%;
+            text-align: left;
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            gap: 10px;
+        }
+        
+        .nav-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 15px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            max-width: 150px;
+        }
+        
+        .nav-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+        
+        .restart-btn {
+            background: #10b981;
+        }
+        
+        .restart-btn:hover {
+            background: #059669;
+        }
+        
+        .career-content, .strengths-content, .improvements-content {
+            width: 100%;
+            padding: 0 20px;
+            margin: 0 auto;
+        }
+        
+        .career-section {
+            margin: 20px 0;
+        }
+        
+        .career-section h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 15px;
+            text-align: center;
+            padding: 0 10px;
+        }
+        
+        .career-item {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .career-item h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .career-item h4::before {
+            content: "🏢";
+            font-size: 18px;
+        }
+        
+        .career-item p {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 10px 0;
+            line-height: 1.6;
+            text-align: left;
+        }
+        
+        .career-item strong {
+            color: #374151;
+            font-weight: 600;
+        }
+        
+        .strengths-content ul, .improvements-content ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .strengths-content li, .improvements-content li {
+            background: #f0f9ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 12px 0;
+            border-left: 4px solid #0ea5e9;
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.6;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            text-align: left;
+        }
+        
+        .strengths-content li::before {
+            content: "✅";
+            font-size: 16px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        
+        .improvements-content li {
+            background: #fef3c7;
+            border-left-color: #f59e0b;
+        }
+        
+        .improvements-content li::before {
+            content: "📈";
+            font-size: 16px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .page-illustration {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .page-illustration svg {
+            width: 100px;
+            height: 100px;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .page-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin: 20px 0;
+        }
+        
+        .page-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            transition: all 0.3s ease;
+        }
+        
+        .page-dot.active {
+            background: #667eea;
+            transform: scale(1.2);
+        }
+        
+        .page-title {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 开始页面 -->
+        <div id="start-page">
+            <!-- 小人插图 -->
+            <div class="illustration">
+                <svg width="120" height="120" viewBox="0 0 120 120">
+                    <!-- 头部 -->
+                    <circle cx="60" cy="30" r="15" fill="#667eea" stroke="#4c51bf" stroke-width="2"/>
+                    <!-- 身体 -->
+                    <rect x="50" y="45" width="20" height="40" fill="#667eea" stroke="#4c51bf" stroke-width="2" rx="5"/>
+                    <!-- 手臂 -->
+                    <line x1="45" y1="55" x2="35" y2="65" stroke="#667eea" stroke-width="3" stroke-linecap="round"/>
+                    <line x1="75" y1="55" x2="85" y2="65" stroke="#667eea" stroke-width="3" stroke-linecap="round"/>
+                    <!-- 腿部 -->
+                    <line x1="55" y1="85" x2="50" y2="95" stroke="#667eea" stroke-width="3" stroke-linecap="round"/>
+                    <line x1="65" y1="85" x2="70" y2="95" stroke="#667eea" stroke-width="3" stroke-linecap="round"/>
+                    <!-- 眼睛 -->
+                    <circle cx="55" cy="25" r="2" fill="#ffffff"/>
+                    <circle cx="65" cy="25" r="2" fill="#ffffff"/>
+                    <!-- 嘴巴 -->
+                    <path d="M 55 35 Q 60 38 65 35" stroke="#ffffff" stroke-width="2" fill="none"/>
+                </svg>
+            </div>
+            <h1 class="title">MBTI 人格测试</h1>
+            <p class="subtitle">了解你的性格类型，找到最适合的职业方向</p>
+            <button class="start-btn" onclick="startTest()">开始测试</button>
+        </div>
+        
+        <!-- 测试页面 -->
+        <div id="test-page" style="display: none;">
+            <div class="progress">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div style="text-align: center; margin: 10px 0; color: #6b7280; font-size: 14px;">
+                <span id="question-counter">问题 1 / 32</span>
+            </div>
+            <div class="question" id="question-text"></div>
+            <div class="options" id="options-container"></div>
+        </div>
+        
+        <!-- 加载页面 -->
+        <div id="loading-page" class="loading">
+            <div class="spinner"></div>
+            <p>正在计算你的MBTI类型...</p>
+        </div>
+        
+        <!-- 结果页面 -->
+        <div id="result-page" class="result">
+            <!-- 第一页：MBTI类型 -->
+            <div id="result-page-1" class="result-page">
+                <div class="result-header">
+                    <div class="page-illustration">
+                        <svg width="100" height="100" viewBox="0 0 100 100">
+                            <!-- 庆祝的小人 -->
+                            <circle cx="50" cy="25" r="12" fill="#667eea" stroke="#4c51bf" stroke-width="2"/>
+                            <rect x="42" y="37" width="16" height="30" fill="#667eea" stroke="#4c51bf" stroke-width="2" rx="3"/>
+                            <line x1="38" y1="45" x2="30" y2="55" stroke="#667eea" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="62" y1="45" x2="70" y2="55" stroke="#667eea" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="45" y1="67" x2="40" y2="75" stroke="#667eea" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="55" y1="67" x2="60" y2="75" stroke="#667eea" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="45" cy="20" r="2" fill="#ffffff"/>
+                            <circle cx="55" cy="20" r="2" fill="#ffffff"/>
+                            <path d="M 45 30 Q 50 33 55 30" stroke="#ffffff" stroke-width="2" fill="none"/>
+                            <!-- 庆祝的手势 -->
+                            <line x1="30" y1="40" x2="25" y2="35" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+                            <line x1="70" y1="40" x2="75" y2="35" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="page-title">第 1 页，共 4 页</div>
+                    <div class="page-indicator">
+                        <div class="page-dot active"></div>
+                        <div class="page-dot"></div>
+                        <div class="page-dot"></div>
+                        <div class="page-dot"></div>
+                    </div>
+                    <h2 class="title">🎉 测试完成！</h2>
+                    <div class="mbti-type" id="mbti-type"></div>
+                    <div class="mbti-description" id="mbti-description"></div>
+                </div>
+                <div class="navigation">
+                    <button class="nav-btn" onclick="showResultPage(2)">查看职业建议 →</button>
+                </div>
+            </div>
+            
+            <!-- 第二页：职业建议 -->
+            <div id="result-page-2" class="result-page" style="display: none;">
+                <div class="result-header">
+                    <div class="page-illustration">
+                        <svg width="100" height="100" viewBox="0 0 100 100">
+                            <!-- 工作的小人 -->
+                            <circle cx="50" cy="25" r="12" fill="#10b981" stroke="#059669" stroke-width="2"/>
+                            <rect x="42" y="37" width="16" height="30" fill="#10b981" stroke="#059669" stroke-width="2" rx="3"/>
+                            <line x1="38" y1="45" x2="30" y2="55" stroke="#10b981" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="62" y1="45" x2="70" y2="55" stroke="#10b981" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="45" y1="67" x2="40" y2="75" stroke="#10b981" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="55" y1="67" x2="60" y2="75" stroke="#10b981" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="45" cy="20" r="2" fill="#ffffff"/>
+                            <circle cx="55" cy="20" r="2" fill="#ffffff"/>
+                            <path d="M 45 30 Q 50 33 55 30" stroke="#ffffff" stroke-width="2" fill="none"/>
+                            <!-- 公文包 -->
+                            <rect x="35" y="50" width="30" height="20" fill="#f59e0b" stroke="#d97706" stroke-width="1" rx="2"/>
+                            <line x1="40" y1="50" x2="40" y2="45" stroke="#f59e0b" stroke-width="2"/>
+                            <line x1="60" y1="50" x2="60" y2="45" stroke="#f59e0b" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div class="page-title">第 2 页，共 4 页</div>
+                    <div class="page-indicator">
+                        <div class="page-dot"></div>
+                        <div class="page-dot active"></div>
+                        <div class="page-dot"></div>
+                        <div class="page-dot"></div>
+                    </div>
+                    <h2 class="title">💼 职业建议</h2>
+                    <div class="career-content" id="career-content"></div>
+                </div>
+                <div class="navigation">
+                    <button class="nav-btn" onclick="showResultPage(1)">← 返回</button>
+                    <button class="nav-btn" onclick="showResultPage(3)">查看优势分析 →</button>
+                </div>
+            </div>
+            
+            <!-- 第三页：优势分析 -->
+            <div id="result-page-3" class="result-page" style="display: none;">
+                <div class="result-header">
+                    <div class="page-illustration">
+                        <svg width="100" height="100" viewBox="0 0 100 100">
+                            <!-- 强壮的小人 -->
+                            <circle cx="50" cy="25" r="12" fill="#3b82f6" stroke="#1d4ed8" stroke-width="2"/>
+                            <rect x="42" y="37" width="16" height="30" fill="#3b82f6" stroke="#1d4ed8" stroke-width="2" rx="3"/>
+                            <line x1="38" y1="45" x2="30" y2="55" stroke="#3b82f6" stroke-width="3" stroke-linecap="round"/>
+                            <line x1="62" y1="45" x2="70" y2="55" stroke="#3b82f6" stroke-width="3" stroke-linecap="round"/>
+                            <line x1="45" y1="67" x2="40" y2="75" stroke="#3b82f6" stroke-width="3" stroke-linecap="round"/>
+                            <line x1="55" y1="67" x2="60" y2="75" stroke="#3b82f6" stroke-width="3" stroke-linecap="round"/>
+                            <circle cx="45" cy="20" r="2" fill="#ffffff"/>
+                            <circle cx="55" cy="20" r="2" fill="#ffffff"/>
+                            <path d="M 45 30 Q 50 33 55 30" stroke="#ffffff" stroke-width="2" fill="none"/>
+                            <!-- 肌肉效果 -->
+                            <circle cx="35" cy="45" r="3" fill="#1e40af"/>
+                            <circle cx="65" cy="45" r="3" fill="#1e40af"/>
+                        </svg>
+                    </div>
+                    <div class="page-title">第 3 页，共 4 页</div>
+                    <div class="page-indicator">
+                        <div class="page-dot"></div>
+                        <div class="page-dot"></div>
+                        <div class="page-dot active"></div>
+                        <div class="page-dot"></div>
+                    </div>
+                    <h2 class="title">💪 你的核心优势</h2>
+                    <div class="strengths-content" id="strengths-content"></div>
+                </div>
+                <div class="navigation">
+                    <button class="nav-btn" onclick="showResultPage(2)">← 返回</button>
+                    <button class="nav-btn" onclick="showResultPage(4)">查看发展建议 →</button>
+                </div>
+            </div>
+            
+            <!-- 第四页：发展建议 -->
+            <div id="result-page-4" class="result-page" style="display: none;">
+                <div class="result-header">
+                    <div class="page-illustration">
+                        <svg width="100" height="100" viewBox="0 0 100 100">
+                            <!-- 成长的小人 -->
+                            <circle cx="50" cy="25" r="12" fill="#8b5cf6" stroke="#7c3aed" stroke-width="2"/>
+                            <rect x="42" y="37" width="16" height="30" fill="#8b5cf6" stroke="#7c3aed" stroke-width="2" rx="3"/>
+                            <line x1="38" y1="45" x2="30" y2="55" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="62" y1="45" x2="70" y2="55" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="45" y1="67" x2="40" y2="75" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="55" y1="67" x2="60" y2="75" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="45" cy="20" r="2" fill="#ffffff"/>
+                            <circle cx="55" cy="20" r="2" fill="#ffffff"/>
+                            <path d="M 45 30 Q 50 33 55 30" stroke="#ffffff" stroke-width="2" fill="none"/>
+                            <!-- 成长箭头 -->
+                            <path d="M 50 60 L 50 80 M 45 75 L 50 80 L 55 75" stroke="#fbbf24" stroke-width="3" fill="none"/>
+                            <circle cx="50" cy="65" r="2" fill="#fbbf24"/>
+                        </svg>
+                    </div>
+                    <div class="page-title">第 4 页，共 4 页</div>
+                    <div class="page-indicator">
+                        <div class="page-dot"></div>
+                        <div class="page-dot"></div>
+                        <div class="page-dot"></div>
+                        <div class="page-dot active"></div>
+                    </div>
+                    <h2 class="title">📈 发展建议</h2>
+                    <div class="improvements-content" id="improvements-content"></div>
+                </div>
+                <div class="navigation">
+                    <button class="nav-btn" onclick="showResultPage(3)">← 返回</button>
+                    <button class="nav-btn restart-btn" onclick="restartTest()">重新测试</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 答案反馈 -->
+        <div id="answer-feedback" class="answer-feedback">
+            答案已记录 ✓
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api16';
+        
+        let questions = [];
+        let answers = [];
+        let currentQuestionIndex = 0;
+        let isProcessing = false; // 防止重复点击
+        
+        async function startTest() {
+            try {
+                // 显示加载状态
+                document.getElementById('start-page').style.display = 'none';
+                document.getElementById('test-page').style.display = 'block';
+                
+                // 获取问题
+                console.log('🔄 开始获取问题...');
+                const response = await fetch(`${API_BASE}/mbti/questions`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    questions = data.data;
+                    answers = [];
+                    currentQuestionIndex = 0;
+                    isProcessing = false;
+                    console.log('✅ 获取到', questions.length, '个问题');
+                    showQuestion();
+                } else {
+                    throw new Error('获取问题失败');
+                }
+            } catch (error) {
+                console.error('❌ 初始化失败:', error);
+                showError('加载失败，请检查网络连接');
+            }
+        }
+        
+        function showQuestion() {
+            if (currentQuestionIndex >= questions.length) {
+                // 检查是否完成了所有问题
+                if (answers.length === questions.length) {
+                    submitAnswers();
+                } else {
+                    // 如果答案数量不足，回到最后一个未完成的问题
+                    currentQuestionIndex = answers.length;
+                    showQuestion();
+                }
+                return;
+            }
+            
+            const question = questions[currentQuestionIndex];
+            document.getElementById('question-text').textContent = question.text;
+            
+            // 更新进度
+            const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+            document.getElementById('progress-fill').style.width = `${progress}%`;
+            
+            // 更新问题计数
+            document.getElementById('question-counter').textContent = `问题 ${currentQuestionIndex + 1} / ${questions.length}`;
+            
+            // 显示选项
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option.text;
+                btn.onclick = () => selectOption(index);
+                optionsContainer.appendChild(btn);
+            });
+        }
+        
+        function selectOption(optionIndex) {
+            // 防止重复点击
+            if (isProcessing) {
+                console.log('⚠️ 正在处理中，忽略重复点击');
+                return;
+            }
+            
+            isProcessing = true;
+            console.log('📝 选择答案:', optionIndex, '问题:', currentQuestionIndex + 1);
+            answers.push(optionIndex);
+            
+            // 添加选中效果
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach((btn, index) => {
+                if (index === optionIndex) {
+                    btn.classList.add('selected');
+                } else {
+                    btn.classList.remove('selected');
+                }
+                // 添加处理中状态
+                btn.classList.add('processing');
+            });
+            
+            // 显示答案反馈
+            const feedback = document.getElementById('answer-feedback');
+            feedback.style.display = 'block';
+            
+            // 延迟到下一题，给用户视觉反馈
+            setTimeout(() => {
+                // 隐藏反馈
+                feedback.style.display = 'none';
+                
+                // 移除处理中状态
+                buttons.forEach(btn => btn.classList.remove('processing'));
+                
+                currentQuestionIndex++;
+                isProcessing = false;
+                showQuestion();
+            }, 800); // 增加延迟时间，让用户看到选中效果
+        }
+        
+        async function submitAnswers() {
+            // 防止重复提交
+            if (isProcessing) {
+                console.log('⚠️ 正在提交中，忽略重复提交');
+                return;
+            }
+            
+            isProcessing = true;
+            console.log('🔄 开始提交答案...');
+            console.log('📊 答案数组:', answers);
+            console.log('📊 答案长度:', answers.length);
+            console.log('�� 问题总数:', questions.length);
+            
+            // 再次验证答案数量
+            if (answers.length !== questions.length) {
+                console.error('❌ 答案数量不匹配:', answers.length, '!=', questions.length);
+                showError(`答案数量错误，需要${questions.length}个答案，当前只有${answers.length}个`);
+                isProcessing = false;
+                return;
+            }
+            
+            // 显示加载状态
+            document.getElementById('test-page').style.display = 'none';
+            document.getElementById('loading-page').classList.add('show');
+            
+            try {
+                const requestBody = {
+                    answers: answers
+                };
+                
+                console.log('📤 发送请求体:', JSON.stringify(requestBody, null, 2));
+                
+                const response = await fetch(`${API_BASE}/mbti/calculate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+                
+                console.log('📡 响应状态:', response.status);
+                
+                const data = await response.json();
+                console.log('📊 响应数据:', data);
+                
+                if (data.success) {
+                    showResult(data.data);
+                } else {
+                    throw new Error(data.message || '计算结果失败');
+                }
+                
+            } catch (error) {
+                console.error('❌ 提交失败:', error);
+                showError('生成结果失败，请稍后再试');
+            } finally {
+                isProcessing = false;
+            }
+        }
+        
+        function showResult(result) {
+            document.getElementById('loading-page').classList.remove('show');
+            document.getElementById('result-page').classList.add('show');
+            
+            // 设置MBTI类型和描述
+            document.getElementById('mbti-type').textContent = result.mbtiType;
+            document.getElementById('mbti-description').textContent = result.description;
+            
+            // 构建职业建议内容
+            let careerHtml = '<div class="career-section">';
+            careerHtml += '<h3>🎯 适合的职业方向</h3>';
+            result.careerAdvice.suitable.forEach(industry => {
+                careerHtml += `<div class="career-item">`;
+                careerHtml += `<h4>${industry.industry}</h4>`;
+                careerHtml += `<p><strong>推荐岗位：</strong>${industry.positions.join('、')}</p>`;
+                careerHtml += `<p><strong>匹配原因：</strong>${industry.reason}</p>`;
+                careerHtml += `</div>`;
+            });
+            
+            careerHtml += '<h3>⚠️ 不适合的职业方向</h3>';
+            result.careerAdvice.unsuitable.forEach(industry => {
+                careerHtml += `<div class="career-item">`;
+                careerHtml += `<h4>${industry.industry}</h4>`;
+                careerHtml += `<p><strong>避免岗位：</strong>${industry.positions.join('、')}</p>`;
+                careerHtml += `<p><strong>原因：</strong>${industry.reason}</p>`;
+                careerHtml += `</div>`;
+            });
+            careerHtml += '</div>';
+            document.getElementById('career-content').innerHTML = careerHtml;
+            
+            // 构建优势分析内容
+            let strengthsHtml = '<ul>';
+            result.strengths.forEach(strength => {
+                strengthsHtml += `<li>${strength}</li>`;
+            });
+            strengthsHtml += '</ul>';
+            document.getElementById('strengths-content').innerHTML = strengthsHtml;
+            
+            // 构建发展建议内容
+            let improvementsHtml = '<ul>';
+            result.improvements.forEach(improvement => {
+                improvementsHtml += `<li>${improvement}</li>`;
+            });
+            improvementsHtml += '</ul>';
+            document.getElementById('improvements-content').innerHTML = improvementsHtml;
+            
+            // 显示第一页
+            showResultPage(1);
+            
+            console.log('✅ 显示结果:', result);
+        }
+        
+        function showResultPage(pageNumber) {
+            // 隐藏所有页面
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`result-page-${i}`).style.display = 'none';
+            }
+            
+            // 显示指定页面
+            document.getElementById(`result-page-${pageNumber}`).style.display = 'flex';
+            
+            // 更新页面指示器
+            updatePageIndicator(pageNumber);
+        }
+        
+        function updatePageIndicator(activePage) {
+            // 重置所有指示器
+            const allDots = document.querySelectorAll('.page-dot');
+            allDots.forEach(dot => dot.classList.remove('active'));
+            
+            // 激活当前页面的指示器
+            const activeDot = document.querySelector(`#result-page-${activePage} .page-dot:nth-child(${activePage})`);
+            if (activeDot) {
+                activeDot.classList.add('active');
+            }
+        }
+        
+        function showError(message) {
+            document.getElementById('loading-page').classList.remove('show');
+            document.getElementById('test-page').style.display = 'none';
+            
+            const container = document.querySelector('.container');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.textContent = message;
+            container.appendChild(errorDiv);
+        }
+        
+        function restartTest() {
+            document.getElementById('result-page').classList.remove('show');
+            document.getElementById('start-page').style.display = 'block';
+            
+            // 清除错误信息
+            const errorDiv = document.querySelector('.error');
+            if (errorDiv) {
+                errorDiv.remove();
+            }
+        }
+    </script>
+</body>
+</html> 

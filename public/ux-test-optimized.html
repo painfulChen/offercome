@@ -468,13 +468,13 @@
             try {
                 // 测试问题获取
                 const questionsStart = Date.now();
-                const questionsResponse = await fetch('https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api-v2/mbti/questions');
+                const questionsResponse = await fetch('https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api16/mbti/questions');
                 const questionsEnd = Date.now();
                 const questionsDuration = questionsEnd - questionsStart;
                 
                 // 测试计算接口
                 const calculateStart = Date.now();
-                const calculateResponse = await fetch('https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api-v2/mbti/calculate', {
+                const calculateResponse = await fetch('https://offercome2025-9g14jitp22f4ddfc-1256790827.ap-shanghai.app.tcloudbase.com/api16/mbti/calculate', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

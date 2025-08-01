@@ -1,0 +1,33 @@
+{
+    "envId": "offercome2025-9g14jitp22f4ddfc",
+    "version": "2.0",
+    "$schema": "https://framework-1258016615.tcloudbaseapp.com/schema/latest.json",
+    "functionRoot": "./server",
+    "functions": [
+        {
+            "name": "api16",
+            "runtime": "Nodejs16.13",
+            "memorySize": 256,
+            "timeout": 30,
+            "entry": "index.main",
+            "ignore": [
+                "cloudbase-function.js",
+                "tests/**",
+                "logs/**"
+            ],
+            "envVariables": {
+                "DB_HOST": "sh-cdb-l8rfujds.sql.tencentcdb.com",
+                "DB_PORT": "21736",
+                "DB_USER": "root",
+                "DB_PASSWORD": "Offercome2024!",
+                "DB_NAME": "offercome",
+                "NODE_ENV": "production"
+            }
+        }
+    ],
+    "service": {
+        "name": "offercome-api16",
+        "path": "api16",
+        "target": "api16"
+    }
+} 
