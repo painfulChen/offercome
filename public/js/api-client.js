@@ -180,15 +180,52 @@ class ApiClient {
     }
   }
   
-  async getProfile() {
-    return await this.request('/auth/me');
+    async getProfile() {
+    return await this.request('/auth/profile');
   }
-  
+
   async updateProfile(userData) {
-    return await this.request('/auth/me', {
+    return await this.request('/auth/profile', {
       method: 'PUT',
       body: JSON.stringify(userData)
     });
+  }
+
+  // 案例管理API
+  async getCases(page = 1, limit = 10, status = null, category = null) {
+    let query = `?page=${page}&limit=${limit}`;
+    if (status) query += `&status=${status}`;
+    if (category) query += `&category=${category}`;
+    
+    return await this.request(`/cases${query}`);
+  }
+
+  async getCase(id) {
+    return await this.request(`/cases/${id}`);
+  }
+
+  async createCase(caseData) {
+    return await this.request('/cases', {
+      method: 'POST',
+      body: JSON.stringify(caseData)
+    });
+  }
+
+  async updateCase(id, caseData) {
+    return await this.request(`/cases/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(caseData)
+    });
+  }
+
+  async deleteCase(id) {
+    return await this.request(`/cases/${id}`, {
+      method: 'DELETE'
+    });
+  }
+
+  async getUserCases(page = 1, limit = 10) {
+    return await this.request(`/user/cases?page=${page}&limit=${limit}`);
   }
   
   // AI相关API

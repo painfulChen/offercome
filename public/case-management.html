@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>案例管理 - OfferCome</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .user-info {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .toolbar {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e1e5e9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a646f;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .cases-grid {
+            padding: 24px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .case-card {
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .case-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .case-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .case-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .case-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .case-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .status-published {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-draft {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-archived {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .case-description {
+            color: #4b5563;
+            line-height: 1.5;
+            margin-bottom: 16px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .case-category {
+            display: inline-block;
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-bottom: 12px;
+        }
+
+        .case-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.875rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+
+        .empty-state img {
+            width: 120px;
+            height: 120px;
+            opacity: 0.5;
+            margin-bottom: 16px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+            padding: 4px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1100;
+            transform: translateX(100%);
+            transition: transform 0.3s;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: #10b981;
+        }
+
+        .notification.error {
+            background: #ef4444;
+        }
+
+        .notification.info {
+            background: #3b82f6;
+        }
+
+        .pagination {
+            padding: 20px 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            border-top: 1px solid #e1e5e9;
+        }
+
+        .page-btn {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .page-btn:hover {
+            background: #f3f4f6;
+        }
+
+        .page-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .cases-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filters {
+                justify-content: center;
+            }
+
+            .actions {
+                justify-content: center;
+            }
+
+            .user-info {
+                position: static;
+                justify-content: center;
+                margin-top: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="user-info" id="userInfo" style="display: none;">
+                <div class="user-avatar" id="userAvatar"></div>
+                <span id="userName"></span>
+                <button class="logout-btn" onclick="logout()">退出</button>
+            </div>
+            
+            <h1>案例管理</h1>
+            <p>管理您的职业规划案例</p>
+        </div>
+
+        <div class="toolbar">
+            <div class="filters">
+                <select class="filter-select" id="statusFilter" onchange="filterCases()">
+                    <option value="">所有状态</option>
+                    <option value="published">已发布</option>
+                    <option value="draft">草稿</option>
+                    <option value="archived">已归档</option>
+                </select>
+                
+                <select class="filter-select" id="categoryFilter" onchange="filterCases()">
+                    <option value="">所有分类</option>
+                    <option value="技术">技术</option>
+                    <option value="管理">管理</option>
+                    <option value="设计">设计</option>
+                    <option value="销售">销售</option>
+                    <option value="其他">其他</option>
+                </select>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-primary" onclick="openCreateModal()">
+                    ➕ 创建案例
+                </button>
+                <button class="btn btn-secondary" onclick="loadCases()">
+                    🔄 刷新
+                </button>
+            </div>
+        </div>
+
+        <div id="loadingState" class="loading">
+            <div style="font-size: 2rem; margin-bottom: 12px;">⏳</div>
+            <div>加载中...</div>
+        </div>
+
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <div style="font-size: 4rem; margin-bottom: 16px;">📝</div>
+            <h3 style="margin-bottom: 8px;">暂无案例</h3>
+            <p>点击"创建案例"开始添加您的第一个案例</p>
+        </div>
+
+        <div id="casesContainer" class="cases-grid" style="display: none;">
+            <!-- 案例卡片将在这里动态生成 -->
+        </div>
+
+        <div id="pagination" class="pagination" style="display: none;">
+            <!-- 分页将在这里动态生成 -->
+        </div>
+    </div>
+
+    <!-- 创建/编辑案例模态框 -->
+    <div id="caseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">创建案例</h2>
+                <button class="close-btn" onclick="closeCaseModal()">&times;</button>
+            </div>
+
+            <form id="caseForm" onsubmit="saveCaseForm(event)">
+                <div class="form-group">
+                    <label class="form-label" for="caseTitle">标题 *</label>
+                    <input type="text" id="caseTitle" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="caseDescription">描述 *</label>
+                    <textarea id="caseDescription" class="form-input form-textarea" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="caseCategory">分类</label>
+                    <select id="caseCategory" class="form-input">
+                        <option value="技术">技术</option>
+                        <option value="管理">管理</option>
+                        <option value="设计">设计</option>
+                        <option value="销售">销售</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="caseStatus">状态</label>
+                    <select id="caseStatus" class="form-input">
+                        <option value="draft">草稿</option>
+                        <option value="published">已发布</option>
+                        <option value="archived">已归档</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeCaseModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/api-client.js"></script>
+    <script>
+        let currentPage = 1;
+        let currentLimit = 10;
+        let editingCaseId = null;
+
+        // 页面初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadCases();
+        });
+
+        // 检查登录状态
+        function checkAuth() {
+            if (!apiClient.isLoggedIn()) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const user = apiClient.getCurrentUser();
+            if (user) {
+                document.getElementById('userInfo').style.display = 'flex';
+                document.getElementById('userName').textContent = user.username;
+                document.getElementById('userAvatar').textContent = user.username.charAt(0).toUpperCase();
+            }
+        }
+
+        // 加载案例列表
+        async function loadCases(page = 1, status = '', category = '') {
+            try {
+                showLoading(true);
+                
+                const response = await apiClient.getCases(page, currentLimit, status, category);
+                
+                if (response.success) {
+                    displayCases(response.data);
+                    displayPagination(response.pagination);
+                } else {
+                    showNotification('加载案例失败: ' + response.message, 'error');
+                }
+            } catch (error) {
+                console.error('加载案例失败:', error);
+                showNotification('加载案例失败', 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // 显示案例列表
+        function displayCases(cases) {
+            const container = document.getElementById('casesContainer');
+            const emptyState = document.getElementById('emptyState');
+
+            if (!cases || cases.length === 0) {
+                container.style.display = 'none';
+                emptyState.style.display = 'block';
+                document.getElementById('pagination').style.display = 'none';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            container.style.display = 'grid';
+
+            container.innerHTML = cases.map(caseItem => `
+                <div class="case-card">
+                    <div class="case-header">
+                        <div>
+                            <div class="case-title">${escapeHtml(caseItem.title)}</div>
+                            <div class="case-meta">
+                                <span>👤 ${escapeHtml(caseItem.author_name || '未知')}</span>
+                                <span>📅 ${formatDate(caseItem.created_at)}</span>
+                            </div>
+                        </div>
+                        <span class="case-status status-${caseItem.status}">${getStatusText(caseItem.status)}</span>
+                    </div>
+                    
+                    ${caseItem.category ? `<div class="case-category">${escapeHtml(caseItem.category)}</div>` : ''}
+                    
+                    <div class="case-description">
+                        ${escapeHtml(caseItem.description)}
+                    </div>
+                    
+                    <div class="case-actions">
+                        <button class="btn btn-secondary btn-sm" onclick="viewCase(${caseItem.id})">查看</button>
+                        ${caseItem.user_id === apiClient.getCurrentUser()?.id ? `
+                            <button class="btn btn-primary btn-sm" onclick="editCase(${caseItem.id})">编辑</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteCase(${caseItem.id})">删除</button>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 显示分页
+        function displayPagination(pagination) {
+            const container = document.getElementById('pagination');
+            
+            if (!pagination || pagination.total <= pagination.limit) {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.style.display = 'flex';
+            
+            const totalPages = Math.ceil(pagination.total / pagination.limit);
+            const currentPage = pagination.page;
+
+            let paginationHTML = '';
+
+            // 上一页
+            if (currentPage > 1) {
+                paginationHTML += `<button class="page-btn" onclick="loadCases(${currentPage - 1})">‹ 上一页</button>`;
+            }
+
+            // 页码
+            for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+                paginationHTML += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="loadCases(${i})">${i}</button>`;
+            }
+
+            // 下一页
+            if (currentPage < totalPages) {
+                paginationHTML += `<button class="page-btn" onclick="loadCases(${currentPage + 1})">下一页 ›</button>`;
+            }
+
+            container.innerHTML = paginationHTML;
+        }
+
+        // 筛选案例
+        function filterCases() {
+            const status = document.getElementById('statusFilter').value;
+            const category = document.getElementById('categoryFilter').value;
+            currentPage = 1;
+            loadCases(currentPage, status, category);
+        }
+
+        // 打开创建模态框
+        function openCreateModal() {
+            editingCaseId = null;
+            document.getElementById('modalTitle').textContent = '创建案例';
+            document.getElementById('caseForm').reset();
+            document.getElementById('caseModal').classList.add('active');
+        }
+
+        // 编辑案例
+        async function editCase(id) {
+            try {
+                const response = await apiClient.getCase(id);
+                
+                if (response.success) {
+                    editingCaseId = id;
+                    const caseData = response.data;
+                    
+                    document.getElementById('modalTitle').textContent = '编辑案例';
+                    document.getElementById('caseTitle').value = caseData.title;
+                    document.getElementById('caseDescription').value = caseData.description;
+                    document.getElementById('caseCategory').value = caseData.category || '其他';
+                    document.getElementById('caseStatus').value = caseData.status;
+                    
+                    document.getElementById('caseModal').classList.add('active');
+                } else {
+                    showNotification('获取案例详情失败: ' + response.message, 'error');
+                }
+            } catch (error) {
+                console.error('获取案例详情失败:', error);
+                showNotification('获取案例详情失败', 'error');
+            }
+        }
+
+        // 查看案例
+        async function viewCase(id) {
+            try {
+                const response = await apiClient.getCase(id);
+                
+                if (response.success) {
+                    const caseData = response.data;
+                    alert(`案例详情：\n\n标题：${caseData.title}\n分类：${caseData.category}\n状态：${getStatusText(caseData.status)}\n\n描述：\n${caseData.description}`);
+                } else {
+                    showNotification('获取案例详情失败: ' + response.message, 'error');
+                }
+            } catch (error) {
+                console.error('获取案例详情失败:', error);
+                showNotification('获取案例详情失败', 'error');
+            }
+        }
+
+        // 删除案例
+        async function deleteCase(id) {
+            if (!confirm('确定要删除这个案例吗？此操作不可恢复。')) {
+                return;
+            }
+
+            try {
+                const response = await apiClient.deleteCase(id);
+                
+                if (response.success) {
+                    showNotification('案例删除成功', 'success');
+                    loadCases(currentPage);
+                } else {
+                    showNotification('删除案例失败: ' + response.message, 'error');
+                }
+            } catch (error) {
+                console.error('删除案例失败:', error);
+                showNotification('删除案例失败', 'error');
+            }
+        }
+
+        // 保存案例表单
+        async function saveCaseForm(event) {
+            event.preventDefault();
+
+            const formData = {
+                title: document.getElementById('caseTitle').value.trim(),
+                description: document.getElementById('caseDescription').value.trim(),
+                category: document.getElementById('caseCategory').value,
+                status: document.getElementById('caseStatus').value
+            };
+
+            if (!formData.title || !formData.description) {
+                showNotification('请填写所有必填字段', 'error');
+                return;
+            }
+
+            try {
+                let response;
+                
+                if (editingCaseId) {
+                    response = await apiClient.updateCase(editingCaseId, formData);
+                } else {
+                    response = await apiClient.createCase(formData);
+                }
+
+                if (response.success) {
+                    showNotification(editingCaseId ? '案例更新成功' : '案例创建成功', 'success');
+                    closeCaseModal();
+                    loadCases(currentPage);
+                } else {
+                    showNotification((editingCaseId ? '更新' : '创建') + '案例失败: ' + response.message, 'error');
+                }
+            } catch (error) {
+                console.error('保存案例失败:', error);
+                showNotification('保存案例失败', 'error');
+            }
+        }
+
+        // 关闭模态框
+        function closeCaseModal() {
+            document.getElementById('caseModal').classList.remove('active');
+            editingCaseId = null;
+        }
+
+        // 退出登录
+        async function logout() {
+            if (confirm('确定要退出登录吗？')) {
+                await apiClient.logout();
+                window.location.href = 'login.html';
+            }
+        }
+
+        // 显示/隐藏加载状态
+        function showLoading(show) {
+            document.getElementById('loadingState').style.display = show ? 'block' : 'none';
+            document.getElementById('casesContainer').style.display = show ? 'none' : 'grid';
+            document.getElementById('emptyState').style.display = 'none';
+        }
+
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // 工具函数
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('zh-CN');
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'published': '已发布',
+                'draft': '草稿',
+                'archived': '已归档'
+            };
+            return statusMap[status] || status;
+        }
+
+        // 点击模态框外部关闭
+        document.getElementById('caseModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCaseModal();
+            }
+        });
+    </script>
+</body>
+</html>

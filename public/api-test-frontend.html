@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OfferCome 前端API测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+
+        .test-section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            background: #5a6fd8;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+        }
+
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 6px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .result.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .result.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .status-bar {
+            background: #f3f4f6;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .status-item {
+            display: inline-block;
+            margin-right: 20px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-connected {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-disconnected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-loading {
+            background: #fef3c7;
+            color: #92400e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 OfferCome 前端API测试</h1>
+
+        <div class="status-bar">
+            <div class="status-item" id="apiStatus">API状态: 检测中...</div>
+            <div class="status-item" id="authStatus">认证状态: 未登录</div>
+        </div>
+
+        <!-- 1. 健康检查 -->
+        <div class="test-section">
+            <h2>🏥 健康检查</h2>
+            <button class="btn" onclick="testHealth()">检查API健康状态</button>
+            <div id="healthResult" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- 2. 用户注册 -->
+        <div class="test-section">
+            <h2>👤 用户注册</h2>
+            <div class="form-group">
+                <label>用户名:</label>
+                <input type="text" id="regUsername" placeholder="输入用户名">
+            </div>
+            <div class="form-group">
+                <label>邮箱:</label>
+                <input type="email" id="regEmail" placeholder="输入邮箱">
+            </div>
+            <div class="form-group">
+                <label>密码:</label>
+                <input type="password" id="regPassword" placeholder="输入密码">
+            </div>
+            <button class="btn" onclick="testRegister()">注册用户</button>
+            <div id="registerResult" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- 3. 用户登录 -->
+        <div class="test-section">
+            <h2>🔐 用户登录</h2>
+            <div class="form-group">
+                <label>邮箱:</label>
+                <input type="email" id="loginEmail" value="new@example.com" placeholder="输入邮箱">
+            </div>
+            <div class="form-group">
+                <label>密码:</label>
+                <input type="password" id="loginPassword" value="123456" placeholder="输入密码">
+            </div>
+            <button class="btn" onclick="testLogin()">用户登录</button>
+            <button class="btn btn-secondary" onclick="testLogout()">退出登录</button>
+            <div id="loginResult" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- 4. 案例管理 -->
+        <div class="test-section">
+            <h2>📝 案例管理</h2>
+            <div class="form-group">
+                <label>案例标题:</label>
+                <input type="text" id="caseTitle" placeholder="输入案例标题">
+            </div>
+            <div class="form-group">
+                <label>案例描述:</label>
+                <input type="text" id="caseDescription" placeholder="输入案例描述">
+            </div>
+            <button class="btn" onclick="testCreateCase()">创建案例</button>
+            <button class="btn btn-secondary" onclick="testGetCases()">获取案例列表</button>
+            <button class="btn btn-secondary" onclick="testGetUserCases()">获取用户案例</button>
+            <div id="caseResult" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- 5. MBTI测试 -->
+        <div class="test-section">
+            <h2>🧠 MBTI测试</h2>
+            <button class="btn" onclick="testMbtiQuestions()">获取MBTI问题</button>
+            <div id="mbtiResult" class="result" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script src="js/api-client.js"></script>
+    <script>
+        let currentCaseId = null;
+
+        // 页面加载时检查状态
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStatus();
+            testHealth();
+        });
+
+        // 更新状态显示
+        function updateStatus() {
+            const apiStatus = document.getElementById('apiStatus');
+            const authStatus = document.getElementById('authStatus');
+
+            // API状态
+            apiStatus.textContent = 'API状态: 已连接';
+            apiStatus.className = 'status-item status-connected';
+
+            // 认证状态
+            if (apiClient.isLoggedIn()) {
+                const user = apiClient.getCurrentUser();
+                authStatus.textContent = `认证状态: 已登录 (${user?.username || '未知用户'})`;
+                authStatus.className = 'status-item status-connected';
+            } else {
+                authStatus.textContent = '认证状态: 未登录';
+                authStatus.className = 'status-item status-disconnected';
+            }
+        }
+
+        // 显示结果
+        function showResult(elementId, data, isError = false) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `result ${isError ? 'error' : 'success'}`;
+            element.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+        }
+
+        // 1. 健康检查
+        async function testHealth() {
+            try {
+                const response = await apiClient.checkHealth();
+                showResult('healthResult', response);
+            } catch (error) {
+                showResult('healthResult', `错误: ${error.message}`, true);
+            }
+        }
+
+        // 2. 用户注册
+        async function testRegister() {
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+
+            if (!username || !email || !password) {
+                showResult('registerResult', '请填写所有字段', true);
+                return;
+            }
+
+            try {
+                const response = await apiClient.register({
+                    username,
+                    email,
+                    password
+                });
+                showResult('registerResult', response);
+                updateStatus();
+            } catch (error) {
+                showResult('registerResult', `错误: ${error.message}`, true);
+            }
+        }
+
+        // 3. 用户登录
+        async function testLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showResult('loginResult', '请填写邮箱和密码', true);
+                return;
+            }
+
+            try {
+                const response = await apiClient.login({
+                    email,
+                    password
+                });
+                showResult('loginResult', response);
+                updateStatus();
+            } catch (error) {
+                showResult('loginResult', `错误: ${error.message}`, true);
+            }
+        }
+
+        // 退出登录
+        async function testLogout() {
+            try {
+                await apiClient.logout();
+                showResult('loginResult', '退出登录成功');
+                updateStatus();
+            } catch (error) {
+                showResult('loginResult', `错误: ${error.message}`, true);
+            }
+        }
+
+        // 4. 创建案例
+        async function testCreateCase() {
+            if (!apiClient.isLoggedIn()) {
+                showResult('caseResult', '请先登录', true);
+                return;
+            }
+
+            const title = document.getElementById('caseTitle').value;
+            const description = document.getElementById('caseDescription').value;
+
+            if (!title || !description) {
+                showResult('caseResult', '请填写案例标题和描述', true);
+                return;
+            }
+
+            try {
+                const response = await apiClient.createCase({
+                    title,
+                    description,
+                    category: '测试',
+                    status: 'draft'
+                });
+                showResult('caseResult', response);
+                if (response.success && response.data) {
+                    currentCaseId = response.data.id;
+                }
+            } catch (error) {
+                showResult('caseResult', `错误: ${error.message}`, true);
+            }
+        }
+
+        // 获取案例列表
+        async function testGetCases() {
+            try {
+                const response = await apiClient.getCases(1, 10);
+                showResult('caseResult', response);
+            } catch (error) {
+                showResult('caseResult', `错误: ${error.message}`, true);
+            }
+        }
+
+        // 获取用户案例
+        async function testGetUserCases() {
+            if (!apiClient.isLoggedIn()) {
+                showResult('caseResult', '请先登录', true);
+                return;
+            }
+
+            try {
+                const response = await apiClient.getUserCases(1, 10);
+                showResult('caseResult', response);
+            } catch (error) {
+                showResult('caseResult', `错误: ${error.message}`, true);
+            }
+        }
+
+        // 5. MBTI测试
+        async function testMbtiQuestions() {
+            try {
+                const response = await fetch(apiClient.baseURL + '/mbti/questions');
+                const data = await response.json();
+                showResult('mbtiResult', data);
+            } catch (error) {
+                showResult('mbtiResult', `错误: ${error.message}`, true);
+            }
+        }
+    </script>
+</body>
+</html>
