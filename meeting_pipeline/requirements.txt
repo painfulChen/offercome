@@ -1,0 +1,31 @@
+# 会议记录处理系统依赖包
+
+# HTTP请求
+requests>=2.31.0
+
+# 环境变量管理
+python-dotenv>=1.0.0
+
+# 数据库连接
+PyMySQL>=1.1.0
+
+# 音频处理
+ffmpeg-python>=0.2.0
+
+# 时间处理
+python-dateutil>=2.8.2
+
+# 日志处理
+loguru>=0.7.0
+
+# 数据处理
+pandas>=2.0.0
+numpy>=1.24.0
+
+# 系统工具
+psutil>=5.9.0
+
+# 开发工具
+pytest>=7.4.0
+black>=23.0.0
+flake8>=6.0.0 
